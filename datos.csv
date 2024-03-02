@@ -1,0 +1,880 @@
+id_paciente,evolucion,sexo,raza,edad,fecha_ingreso,fecha_egreso,mortalidad_oculta,sala_muerte,apache,limitacion,fecha_ing_uci,fecha_egr_uci,sala_egreso,causa_vam,tiempo_vam,tipo_via,clasificacion_via,diagnostico_preuci,causa_defuncion,tipo_causa_defuncion,causa_necropsia,tipo_causa_necropsia,diagnostico_postuci,tipo_causavam,estadia_uci
+1,vivo,f,blanco,35,2014-04-20,2014-04-24,30.88,,10,f,2014-04-20,2014-04-24,UCIM,Afecciones no traumáticas del SNC,48,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,,,,,Intoxicación Exógena,no respiratorias,4
+2,vivo,f,mestizo,87,2014-05-14,2014-06-07,23.04,,16,f,2014-05-14,2014-06-07,UCIM,Afecciones no traumáticas del SNC,48,TET-TQ,con traqueotomia,Coma,,,,,Coma,no respiratorias,24
+3,vivo,f,blanco,70,2014-05-27,2014-06-10,37.79,,11,f,2014-06-03,2014-06-06,Neurocirugía,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,3
+4,vivo,m,blanco,24,2014-06-03,2014-06-16,31.80,,11,f,2014-06-03,2014-06-16,UCIM,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,EPOC descompensada,no respiratorias,13
+4,vivo,m,blanco,24,2014-06-03,2014-06-16,31.80,,11,f,2014-06-03,2014-06-16,UCIM,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,SPO laparotomía,no respiratorias,13
+5,vivo,f,blanco,24,2014-05-14,2014-05-23,41.66,,17,f,2014-05-14,2014-05-19,Angiología,TCE,72,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,5
+6,vivo,m,mestizo,48,2014-08-01,2014-08-15,28.57,,17,f,2014-08-01,2014-08-05,Cardiología,Afecciones no traumáticas del SNC,96,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,,,,,Intoxicación Exógena,no respiratorias,4
+7,vivo,f,blanco,26,2014-06-18,2014-07-26,42.05,,13,f,2014-06-18,2014-07-15,UCIM,ARDS,336,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,Miocarditis,respiratorias,27
+7,vivo,f,blanco,26,2014-06-18,2014-07-26,42.05,,13,f,2014-06-18,2014-07-15,UCIM,ARDS,336,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,EPOC descompensada,respiratorias,27
+8,vivo,m,mestizo,59,2015-01-09,2015-02-06,37.33,,15,f,2015-01-22,2015-02-04,Medicina,EPOC,96,TET-TQ,con traqueotomia,ARDS,,,,,ARDS,respiratorias,13
+8,vivo,m,mestizo,59,2015-01-09,2015-02-06,37.33,,15,f,2015-01-22,2015-02-04,Medicina,EPOC,96,TET-TQ,con traqueotomia,ARDS,,,,,BNB-IH,respiratorias,13
+8,vivo,m,mestizo,59,2015-01-09,2015-02-06,37.33,,15,f,2015-01-22,2015-02-04,Medicina,EPOC,96,TET-TQ,con traqueotomia,BNB-IH,,,,,ARDS,respiratorias,13
+8,vivo,m,mestizo,59,2015-01-09,2015-02-06,37.33,,15,f,2015-01-22,2015-02-04,Medicina,EPOC,96,TET-TQ,con traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,13
+9,vivo,m,blanco,22,2014-02-14,2014-02-26,31.80,,10,f,2014-02-14,2014-02-22,Angiología,TCE,96,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,8
+9,vivo,m,blanco,22,2014-02-14,2014-02-26,31.80,,10,f,2014-02-14,2014-02-22,Angiología,TCE,96,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,Insuficiencia Renal Crónica,no respiratorias,8
+10,vivo,f,negro,24,2014-02-05,2014-02-28,26.11,,9,f,2014-02-19,2014-02-25,Neurocirugía,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,6
+11,vivo,m,blanco,88,2014-02-19,2014-03-13,45.62,,24,f,2014-02-26,2014-03-04,Medicina,EPOC,96,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,6
+11,vivo,m,blanco,88,2014-02-19,2014-03-13,45.62,,24,f,2014-02-26,2014-03-04,Medicina,EPOC,96,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,ARDS,respiratorias,6
+11,vivo,m,blanco,88,2014-02-19,2014-03-13,45.62,,24,f,2014-02-26,2014-03-04,Medicina,EPOC,96,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,6
+11,vivo,m,blanco,88,2014-02-19,2014-03-13,45.62,,24,f,2014-02-26,2014-03-04,Medicina,EPOC,96,tubo endotraqueal,sin traqueotomia,ARDS,,,,,BNB-IH,respiratorias,6
+12,vivo,f,blanco,23,2014-03-09,2014-04-14,30.41,,10,f,2014-03-09,2014-04-01,Angiología,TCE,312,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,,,,,BNV,no respiratorias,23
+12,vivo,f,blanco,23,2014-03-09,2014-04-14,30.41,,10,f,2014-03-09,2014-04-01,Angiología,TCE,312,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,,,,,TCE severo,no respiratorias,23
+12,vivo,f,blanco,23,2014-03-09,2014-04-14,30.41,,10,f,2014-03-09,2014-04-01,Angiología,TCE,312,TET-TQ,con traqueotomia,TCE severo,,,,,BNV,no respiratorias,23
+12,vivo,f,blanco,23,2014-03-09,2014-04-14,30.41,,10,f,2014-03-09,2014-04-01,Angiología,TCE,312,TET-TQ,con traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,23
+13,fallecido,m,blanco,86,2014-04-16,2014-04-24,55.76,Cardiología,21,f,2014-04-16,2014-04-23,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,Miocarditis,EPOC,basica,,,BNB-IH,respiratorias,7
+13,fallecido,m,blanco,86,2014-04-16,2014-04-24,55.76,Cardiología,21,f,2014-04-16,2014-04-23,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,EPOC,basica,,,BNB-IH,respiratorias,7
+13,fallecido,m,blanco,86,2014-04-16,2014-04-24,55.76,Cardiología,21,f,2014-04-16,2014-04-23,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,EPOC,basica,,,ARDS,respiratorias,7
+13,fallecido,m,blanco,86,2014-04-16,2014-04-24,55.76,Cardiología,21,f,2014-04-16,2014-04-23,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,Insuficiencia respiratoria,directa,,,ARDS,respiratorias,7
+13,fallecido,m,blanco,86,2014-04-16,2014-04-24,55.76,Cardiología,21,f,2014-04-16,2014-04-23,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,BNB-EH,intermedia,,,ARDS,respiratorias,7
+13,fallecido,m,blanco,86,2014-04-16,2014-04-24,55.76,Cardiología,21,f,2014-04-16,2014-04-23,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,BNB-EH,intermedia,,,BNB-IH,respiratorias,7
+13,fallecido,m,blanco,86,2014-04-16,2014-04-24,55.76,Cardiología,21,f,2014-04-16,2014-04-23,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,Miocarditis,BNB-EH,intermedia,,,BNB-IH,respiratorias,7
+13,fallecido,m,blanco,86,2014-04-16,2014-04-24,55.76,Cardiología,21,f,2014-04-16,2014-04-23,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,Insuficiencia respiratoria,directa,,,BNB-IH,respiratorias,7
+13,fallecido,m,blanco,86,2014-04-16,2014-04-24,55.76,Cardiología,21,f,2014-04-16,2014-04-23,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,Miocarditis,BNB-EH,intermedia,,,ARDS,respiratorias,7
+13,fallecido,m,blanco,86,2014-04-16,2014-04-24,55.76,Cardiología,21,f,2014-04-16,2014-04-23,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,Miocarditis,Insuficiencia respiratoria,directa,,,ARDS,respiratorias,7
+13,fallecido,m,blanco,86,2014-04-16,2014-04-24,55.76,Cardiología,21,f,2014-04-16,2014-04-23,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,Miocarditis,Insuficiencia respiratoria,directa,,,BNB-IH,respiratorias,7
+13,fallecido,m,blanco,86,2014-04-16,2014-04-24,55.76,Cardiología,21,f,2014-04-16,2014-04-23,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,Miocarditis,EPOC,basica,,,ARDS,respiratorias,7
+14,fallecido,m,blanco,50,2014-03-30,2014-06-14,52.53,Cardiología,24,f,2014-03-30,2014-04-08,Medicina,Afecciones no traumáticas del SNC,216,TET-TQ,con traqueotomia,Coma,PCR,directa,,,BNB-IH,no respiratorias,9
+14,fallecido,m,blanco,50,2014-03-30,2014-06-14,52.53,Cardiología,24,f,2014-03-30,2014-04-08,Medicina,Afecciones no traumáticas del SNC,216,TET-TQ,con traqueotomia,Coma,BNB-IH,intermedia,,,BNB-IH,no respiratorias,9
+14,fallecido,m,blanco,50,2014-03-30,2014-06-14,52.53,Cardiología,24,f,2014-03-30,2014-04-08,Medicina,Afecciones no traumáticas del SNC,216,TET-TQ,con traqueotomia,Coma,PCR,directa,,,Ahorcamiento Incompleto,no respiratorias,9
+14,fallecido,m,blanco,50,2014-03-30,2014-06-14,52.53,Cardiología,24,f,2014-03-30,2014-04-08,Medicina,Afecciones no traumáticas del SNC,216,TET-TQ,con traqueotomia,Coma,BNB-IH,intermedia,,,Ahorcamiento Incompleto,no respiratorias,9
+15,fallecido,m,blanco,42,2014-01-13,2014-01-31,51.61,Medicina,16,f,2014-01-15,2014-01-22,Medicina,TCE,120,TET-TQ,con traqueotomia,TCE severo,TCE,basica,,,BNV,no respiratorias,7
+15,fallecido,m,blanco,42,2014-01-13,2014-01-31,51.61,Medicina,16,f,2014-01-15,2014-01-22,Medicina,TCE,120,TET-TQ,con traqueotomia,TCE severo,BNB-IH,intermedia,,,BNV,no respiratorias,7
+15,fallecido,m,blanco,42,2014-01-13,2014-01-31,51.61,Medicina,16,f,2014-01-15,2014-01-22,Medicina,TCE,120,TET-TQ,con traqueotomia,TCE severo,TCE,basica,,,TCE severo,no respiratorias,7
+15,fallecido,m,blanco,42,2014-01-13,2014-01-31,51.61,Medicina,16,f,2014-01-15,2014-01-22,Medicina,TCE,120,TET-TQ,con traqueotomia,TCE severo,Insuficiencia respiratoria,directa,,,BNV,no respiratorias,7
+15,fallecido,m,blanco,42,2014-01-13,2014-01-31,51.61,Medicina,16,f,2014-01-15,2014-01-22,Medicina,TCE,120,TET-TQ,con traqueotomia,TCE severo,Insuficiencia respiratoria,directa,,,TCE severo,no respiratorias,7
+15,fallecido,m,blanco,42,2014-01-13,2014-01-31,51.61,Medicina,16,f,2014-01-15,2014-01-22,Medicina,TCE,120,TET-TQ,con traqueotomia,TCE severo,BNB-IH,intermedia,,,TCE severo,no respiratorias,7
+16,vivo,m,mestizo,44,2014-08-21,2014-10-07,23.96,,15,f,2014-08-24,2014-09-19,UCIM,ARDS,336,tubo endotraqueal,sin traqueotomia,SPO amputación,,,,,SPO amputación,respiratorias,26
+16,vivo,m,mestizo,44,2014-08-21,2014-10-07,23.96,,15,f,2014-08-24,2014-09-19,UCIM,ARDS,336,tubo endotraqueal,sin traqueotomia,SPO amputación,,,,,BNB-EH,respiratorias,26
+17,vivo,m,blanco,81,2014-08-26,2014-09-27,40.55,,14,f,2014-08-27,2014-09-15,Cardiología,EPOC,336,TET-TQ,con traqueotomia,ARDS,,,,,ARDS,respiratorias,19
+17,vivo,m,blanco,81,2014-08-26,2014-09-27,40.55,,14,f,2014-08-27,2014-09-15,Cardiología,EPOC,336,TET-TQ,con traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,19
+17,vivo,m,blanco,81,2014-08-26,2014-09-27,40.55,,14,f,2014-08-27,2014-09-15,Cardiología,EPOC,336,TET-TQ,con traqueotomia,BNB-IH,,,,,ARDS,respiratorias,19
+17,vivo,m,blanco,81,2014-08-26,2014-09-27,40.55,,14,f,2014-08-27,2014-09-15,Cardiología,EPOC,336,TET-TQ,con traqueotomia,ARDS,,,,,BNB-IH,respiratorias,19
+18,vivo,m,mestizo,73,2014-09-04,2014-10-04,31.80,,17,f,2014-09-04,2014-09-19,Cardiología,EPOC,144,TET-TQ,con traqueotomia,Materna Crítica,,,,,Materna Crítica,respiratorias,15
+18,vivo,m,mestizo,73,2014-09-04,2014-10-04,31.80,,17,f,2014-09-04,2014-09-19,Cardiología,EPOC,144,TET-TQ,con traqueotomia,ARDS,,,,,ARDS,respiratorias,15
+18,vivo,m,mestizo,73,2014-09-04,2014-10-04,31.80,,17,f,2014-09-04,2014-09-19,Cardiología,EPOC,144,TET-TQ,con traqueotomia,ARDS,,,,,Materna Crítica,respiratorias,15
+18,vivo,m,mestizo,73,2014-09-04,2014-10-04,31.80,,17,f,2014-09-04,2014-09-19,Cardiología,EPOC,144,TET-TQ,con traqueotomia,Materna Crítica,,,,,ARDS,respiratorias,15
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,BNB-EH,intermedia,Insuficiencia respiratoria,directa,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,BNB-EH,intermedia,Insuficiencia respiratoria,directa,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,EPOC,basica,BNB-EH,intermedia,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,BNB-EH,intermedia,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,BNB-EH,intermedia,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,Insuficiencia respiratoria,directa,BNB-EH,intermedia,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,Insuficiencia respiratoria,directa,BNB-EH,intermedia,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,BNB-EH,intermedia,EPOC,basica,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,BNB-EH,intermedia,EPOC,basica,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,BNB-EH,intermedia,EPOC,basica,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,BNB-EH,intermedia,EPOC,basica,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,EPOC,basica,EPOC,basica,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,EPOC,basica,EPOC,basica,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,EPOC,basica,EPOC,basica,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,EPOC,basica,BNB-EH,intermedia,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,EPOC,basica,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,EPOC,basica,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,Insuficiencia respiratoria,directa,EPOC,basica,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,Insuficiencia respiratoria,directa,EPOC,basica,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,BNB-EH,intermedia,Insuficiencia respiratoria,directa,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,EPOC,basica,EPOC,basica,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,EPOC,basica,BNB-EH,intermedia,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,EPOC,basica,BNB-EH,intermedia,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,BNB-EH,intermedia,BNB-EH,intermedia,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,BNB-EH,intermedia,BNB-EH,intermedia,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,BNB-EH,intermedia,BNB-EH,intermedia,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,BNB-EH,intermedia,BNB-EH,intermedia,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,Insuficiencia respiratoria,directa,Insuficiencia respiratoria,directa,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,Insuficiencia respiratoria,directa,Insuficiencia respiratoria,directa,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,Insuficiencia respiratoria,directa,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,Insuficiencia respiratoria,directa,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,EPOC,basica,Insuficiencia respiratoria,directa,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,EPOC,basica,Insuficiencia respiratoria,directa,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,EPOC,basica,Insuficiencia respiratoria,directa,BNV,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,ARDS,EPOC,basica,Insuficiencia respiratoria,directa,ARDS,respiratorias,9
+19,fallecido,m,negro,74,2014-08-04,2014-09-23,41.01,Cardiología,22,f,2014-09-03,2014-09-12,Cardiología,EPOC,120,traqueotomia TQ,con traqueotomia,BNV,BNB-EH,intermedia,Insuficiencia respiratoria,directa,BNV,respiratorias,9
+20,fallecido,m,blanco,61,2014-08-18,2014-10-07,56.22,Cardiología,27,f,2014-08-18,2014-09-01,Medicina,EPOC,240,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,,,BNB-IH,respiratorias,14
+20,fallecido,m,blanco,61,2014-08-18,2014-10-07,56.22,Cardiología,27,f,2014-08-18,2014-09-01,Medicina,EPOC,240,TET-TQ,con traqueotomia,ARDS,EPOC,basica,,,BNB-IH,respiratorias,14
+20,fallecido,m,blanco,61,2014-08-18,2014-10-07,56.22,Cardiología,27,f,2014-08-18,2014-09-01,Medicina,EPOC,240,TET-TQ,con traqueotomia,ARDS,EPOC,basica,,,ARDS,respiratorias,14
+20,fallecido,m,blanco,61,2014-08-18,2014-10-07,56.22,Cardiología,27,f,2014-08-18,2014-09-01,Medicina,EPOC,240,TET-TQ,con traqueotomia,BNB-IH,EPOC,basica,,,BNB-IH,respiratorias,14
+20,fallecido,m,blanco,61,2014-08-18,2014-10-07,56.22,Cardiología,27,f,2014-08-18,2014-09-01,Medicina,EPOC,240,TET-TQ,con traqueotomia,BNB-IH,Insuficiencia respiratoria,directa,,,ARDS,respiratorias,14
+20,fallecido,m,blanco,61,2014-08-18,2014-10-07,56.22,Cardiología,27,f,2014-08-18,2014-09-01,Medicina,EPOC,240,TET-TQ,con traqueotomia,BNB-IH,Insuficiencia respiratoria,directa,,,BNB-IH,respiratorias,14
+20,fallecido,m,blanco,61,2014-08-18,2014-10-07,56.22,Cardiología,27,f,2014-08-18,2014-09-01,Medicina,EPOC,240,TET-TQ,con traqueotomia,BNB-IH,EPOC,basica,,,ARDS,respiratorias,14
+20,fallecido,m,blanco,61,2014-08-18,2014-10-07,56.22,Cardiología,27,f,2014-08-18,2014-09-01,Medicina,EPOC,240,TET-TQ,con traqueotomia,ARDS,BNB-IH,intermedia,,,ARDS,respiratorias,14
+20,fallecido,m,blanco,61,2014-08-18,2014-10-07,56.22,Cardiología,27,f,2014-08-18,2014-09-01,Medicina,EPOC,240,TET-TQ,con traqueotomia,BNB-IH,BNB-IH,intermedia,,,BNB-IH,respiratorias,14
+20,fallecido,m,blanco,61,2014-08-18,2014-10-07,56.22,Cardiología,27,f,2014-08-18,2014-09-01,Medicina,EPOC,240,TET-TQ,con traqueotomia,ARDS,BNB-IH,intermedia,,,BNB-IH,respiratorias,14
+20,fallecido,m,blanco,61,2014-08-18,2014-10-07,56.22,Cardiología,27,f,2014-08-18,2014-09-01,Medicina,EPOC,240,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,,,ARDS,respiratorias,14
+20,fallecido,m,blanco,61,2014-08-18,2014-10-07,56.22,Cardiología,27,f,2014-08-18,2014-09-01,Medicina,EPOC,240,TET-TQ,con traqueotomia,BNB-IH,BNB-IH,intermedia,,,ARDS,respiratorias,14
+21,fallecido,f,blanco,74,2014-10-19,2014-11-01,51.15,Cardiología,15,f,2014-10-19,2014-10-31,Cardiología,Neumonías,48,tubo endotraqueal,sin traqueotomia,Sepsis grave,Insuficiencia respiratoria,directa,,,PCR recuperado,respiratorias,12
+21,fallecido,f,blanco,74,2014-10-19,2014-11-01,51.15,Cardiología,15,f,2014-10-19,2014-10-31,Cardiología,Neumonías,48,tubo endotraqueal,sin traqueotomia,Sepsis grave,Insuficiencia respiratoria,directa,,,BNV,respiratorias,12
+21,fallecido,f,blanco,74,2014-10-19,2014-11-01,51.15,Cardiología,15,f,2014-10-19,2014-10-31,Cardiología,Neumonías,48,tubo endotraqueal,sin traqueotomia,Sepsis grave,TEP,intermedia,,,BNV,respiratorias,12
+21,fallecido,f,blanco,74,2014-10-19,2014-11-01,51.15,Cardiología,15,f,2014-10-19,2014-10-31,Cardiología,Neumonías,48,tubo endotraqueal,sin traqueotomia,Sepsis grave,TEP,intermedia,,,PCR recuperado,respiratorias,12
+22,vivo,f,blanco,65,2014-09-16,2014-09-24,52.07,,17,f,2014-09-16,2014-09-23,Medicina,Neumonías,48,tubo endotraqueal,sin traqueotomia,Miocarditis,,,,,Miocarditis,respiratorias,7
+23,vivo,m,blanco,26,2014-11-04,2014-11-24,23.96,,3,f,2014-11-04,2014-11-20,UCIM,Neumonías,96,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,EPOC descompensada,respiratorias,16
+23,vivo,m,blanco,26,2014-11-04,2014-11-24,23.96,,3,f,2014-11-04,2014-11-20,UCIM,Neumonías,96,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,EPOC descompensada,respiratorias,16
+23,vivo,m,blanco,26,2014-11-04,2014-11-24,23.96,,3,f,2014-11-04,2014-11-20,UCIM,Neumonías,96,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,SPO toracotomía,respiratorias,16
+23,vivo,m,blanco,26,2014-11-04,2014-11-24,23.96,,3,f,2014-11-04,2014-11-20,UCIM,Neumonías,96,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,SPO toracotomía,respiratorias,16
+24,vivo,f,blanco,31,2014-11-10,2015-01-02,24.42,,2,f,2014-11-18,2014-12-01,Angiología,Estatus posoperatorio,168,TET-TQ,con traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,13
+25,vivo,f,blanco,35,2014-11-13,2014-11-21,36.87,,14,f,2014-11-13,2014-11-20,Cardiología,ARDS,96,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,Shock séptico,respiratorias,7
+25,vivo,f,blanco,35,2014-11-13,2014-11-21,36.87,,14,f,2014-11-13,2014-11-20,Cardiología,ARDS,96,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,EPOC descompensada,respiratorias,7
+25,vivo,f,blanco,35,2014-11-13,2014-11-21,36.87,,14,f,2014-11-13,2014-11-20,Cardiología,ARDS,96,tubo endotraqueal,sin traqueotomia,Shock séptico,,,,,EPOC descompensada,respiratorias,7
+25,vivo,f,blanco,35,2014-11-13,2014-11-21,36.87,,14,f,2014-11-13,2014-11-20,Cardiología,ARDS,96,tubo endotraqueal,sin traqueotomia,Shock séptico,,,,,Shock séptico,respiratorias,7
+26,vivo,m,blanco,60,2014-11-12,2014-11-24,42.40,,16,f,2014-11-12,2014-11-17,Cardiología,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,,,,,Intoxicación Exógena,no respiratorias,5
+26,vivo,m,blanco,60,2014-11-12,2014-11-24,42.40,,16,f,2014-11-12,2014-11-17,Cardiología,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,Intoxicación Exógena,no respiratorias,5
+27,vivo,f,blanco,24,2014-11-06,2015-04-06,35.48,,16,f,2014-11-06,2014-11-14,Cardiología,TCE,96,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,8
+27,vivo,f,blanco,24,2014-11-06,2015-04-06,35.48,,16,f,2014-11-06,2014-11-14,Cardiología,TCE,96,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,Insuficiencia Renal Crónica,no respiratorias,8
+27,vivo,f,blanco,24,2014-11-06,2015-04-06,35.48,,16,f,2014-11-06,2014-11-14,Cardiología,TCE,96,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,TCE severo,no respiratorias,8
+27,vivo,f,blanco,24,2014-11-06,2015-04-06,35.48,,16,f,2014-11-06,2014-11-14,Cardiología,TCE,96,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,8
+28,vivo,m,blanco,66,2014-11-07,2014-11-22,45.16,,22,f,2014-11-07,2014-11-15,Cardiología,Otras,72,tubo endotraqueal,sin traqueotomia,Sepsis grave,,,,,Sepsis grave,respiratorias,8
+28,vivo,m,blanco,66,2014-11-07,2014-11-22,45.16,,22,f,2014-11-07,2014-11-15,Cardiología,Otras,72,tubo endotraqueal,sin traqueotomia,Shock hipovolémico,,,,,Sepsis grave,respiratorias,8
+28,vivo,m,blanco,66,2014-11-07,2014-11-22,45.16,,22,f,2014-11-07,2014-11-15,Cardiología,Otras,72,tubo endotraqueal,sin traqueotomia,Shock hipovolémico,,,,,Shock hipovolémico,respiratorias,8
+28,vivo,m,blanco,66,2014-11-07,2014-11-22,45.16,,22,f,2014-11-07,2014-11-15,Cardiología,Otras,72,tubo endotraqueal,sin traqueotomia,Sepsis grave,,,,,Shock hipovolémico,respiratorias,8
+29,vivo,m,blanco,26,2014-11-14,2014-11-27,31.80,,8,f,2014-11-14,2014-11-22,Cardiología,Afecciones no traumáticas del SNC,48,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Aguda,,,,,Insuficiencia Renal Aguda,no respiratorias,8
+29,vivo,m,blanco,26,2014-11-14,2014-11-27,31.80,,8,f,2014-11-14,2014-11-22,Cardiología,Afecciones no traumáticas del SNC,48,tubo endotraqueal,sin traqueotomia,Leptospirosis complicada,,,,,Leptospirosis complicada,no respiratorias,8
+29,vivo,m,blanco,26,2014-11-14,2014-11-27,31.80,,8,f,2014-11-14,2014-11-22,Cardiología,Afecciones no traumáticas del SNC,48,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Aguda,,,,,Leptospirosis complicada,no respiratorias,8
+29,vivo,m,blanco,26,2014-11-14,2014-11-27,31.80,,8,f,2014-11-14,2014-11-22,Cardiología,Afecciones no traumáticas del SNC,48,tubo endotraqueal,sin traqueotomia,Leptospirosis complicada,,,,,Insuficiencia Renal Aguda,no respiratorias,8
+30,vivo,m,blanco,65,2014-12-09,2015-02-06,31.80,,6,f,2014-12-11,2014-12-23,Otros,Causas extrapulmonares,120,tubo endotraqueal,sin traqueotomia,Politraumatizado,,,,,BNV,no respiratorias,12
+30,vivo,m,blanco,65,2014-12-09,2015-02-06,31.80,,6,f,2014-12-11,2014-12-23,Otros,Causas extrapulmonares,120,tubo endotraqueal,sin traqueotomia,Politraumatizado,,,,,Politraumatizado,no respiratorias,12
+31,vivo,f,blanco,65,2014-11-18,2014-12-09,42.86,,20,f,2014-11-18,2014-12-05,Cardiología,EPOC,144,tubo endotraqueal,sin traqueotomia,ARDS,,,,,BNV,respiratorias,17
+31,vivo,f,blanco,65,2014-11-18,2014-12-09,42.86,,20,f,2014-11-18,2014-12-05,Cardiología,EPOC,144,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNV,respiratorias,17
+31,vivo,f,blanco,65,2014-11-18,2014-12-09,42.86,,20,f,2014-11-18,2014-12-05,Cardiología,EPOC,144,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,ARDS,respiratorias,17
+31,vivo,f,blanco,65,2014-11-18,2014-12-09,42.86,,20,f,2014-11-18,2014-12-05,Cardiología,EPOC,144,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,17
+32,vivo,m,blanco,57,2014-12-29,2015-01-14,35.02,,12,f,2014-12-29,2015-01-09,Neurocirugía,Estatus posoperatorio,120,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,11
+33,vivo,m,blanco,74,2014-12-29,2015-01-12,51.61,,16,f,2014-12-29,2015-01-07,Medicina,Neumonías,48,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,9
+33,vivo,m,blanco,74,2014-12-29,2015-01-12,51.61,,16,f,2014-12-29,2015-01-07,Medicina,Neumonías,48,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,SPO laparotomía,respiratorias,9
+33,vivo,m,blanco,74,2014-12-29,2015-01-12,51.61,,16,f,2014-12-29,2015-01-07,Medicina,Neumonías,48,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,SPO laparotomía,respiratorias,9
+33,vivo,m,blanco,74,2014-12-29,2015-01-12,51.61,,16,f,2014-12-29,2015-01-07,Medicina,Neumonías,48,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,BNB-IH,respiratorias,9
+34,vivo,f,blanco,56,2014-12-15,2015-01-02,42.40,,11,f,2014-12-15,2014-12-23,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,PCR recuperado,,,,,PCR recuperado,no respiratorias,8
+34,vivo,f,blanco,56,2014-12-15,2015-01-02,42.40,,11,f,2014-12-15,2014-12-23,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Crisis miasténica,,,,,Crisis miasténica,no respiratorias,8
+34,vivo,f,blanco,56,2014-12-15,2015-01-02,42.40,,11,f,2014-12-15,2014-12-23,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Crisis miasténica,,,,,PCR recuperado,no respiratorias,8
+34,vivo,f,blanco,56,2014-12-15,2015-01-02,42.40,,11,f,2014-12-15,2014-12-23,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,PCR recuperado,,,,,Crisis miasténica,no respiratorias,8
+35,vivo,f,blanco,57,2014-12-15,2015-01-08,33.64,,12,f,2014-12-23,2015-01-04,Neurocirugía,Estatus posoperatorio,120,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,Shock séptico,no respiratorias,12
+35,vivo,f,blanco,57,2014-12-15,2015-01-08,33.64,,12,f,2014-12-23,2015-01-04,Neurocirugía,Estatus posoperatorio,120,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,12
+36,vivo,f,blanco,52,2014-10-18,2014-10-29,31.80,,8,f,2014-10-18,2014-10-27,Cardiología,Otras,120,tubo endotraqueal,sin traqueotomia,Sepsis grave,,,,,Sepsis grave,respiratorias,9
+37,fallecido,f,blanco,82,2014-12-27,2015-01-06,57.60,Medicina,23,f,2014-12-28,2014-12-31,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,BNB-IH,TEP,directa,,,ARDS,respiratorias,3
+37,fallecido,f,blanco,82,2014-12-27,2015-01-06,57.60,Medicina,23,f,2014-12-28,2014-12-31,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,BNB-IH,EPOC,basica,,,BNB-IH,respiratorias,3
+37,fallecido,f,blanco,82,2014-12-27,2015-01-06,57.60,Medicina,23,f,2014-12-28,2014-12-31,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,BNB-IH,EPOC,basica,,,ARDS,respiratorias,3
+37,fallecido,f,blanco,82,2014-12-27,2015-01-06,57.60,Medicina,23,f,2014-12-28,2014-12-31,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,EPOC,basica,,,BNB-IH,respiratorias,3
+37,fallecido,f,blanco,82,2014-12-27,2015-01-06,57.60,Medicina,23,f,2014-12-28,2014-12-31,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,EPOC,basica,,,ARDS,respiratorias,3
+37,fallecido,f,blanco,82,2014-12-27,2015-01-06,57.60,Medicina,23,f,2014-12-28,2014-12-31,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,BNB-IH,BNB-EH,intermedia,,,ARDS,respiratorias,3
+37,fallecido,f,blanco,82,2014-12-27,2015-01-06,57.60,Medicina,23,f,2014-12-28,2014-12-31,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,BNB-EH,intermedia,,,BNB-IH,respiratorias,3
+37,fallecido,f,blanco,82,2014-12-27,2015-01-06,57.60,Medicina,23,f,2014-12-28,2014-12-31,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,BNB-EH,intermedia,,,ARDS,respiratorias,3
+37,fallecido,f,blanco,82,2014-12-27,2015-01-06,57.60,Medicina,23,f,2014-12-28,2014-12-31,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,TEP,directa,,,BNB-IH,respiratorias,3
+37,fallecido,f,blanco,82,2014-12-27,2015-01-06,57.60,Medicina,23,f,2014-12-28,2014-12-31,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,TEP,directa,,,ARDS,respiratorias,3
+37,fallecido,f,blanco,82,2014-12-27,2015-01-06,57.60,Medicina,23,f,2014-12-28,2014-12-31,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,BNB-IH,BNB-EH,intermedia,,,BNB-IH,respiratorias,3
+37,fallecido,f,blanco,82,2014-12-27,2015-01-06,57.60,Medicina,23,f,2014-12-28,2014-12-31,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,BNB-IH,TEP,directa,,,BNB-IH,respiratorias,3
+38,vivo,f,blanco,24,2014-10-22,2014-11-19,33.18,,13,f,2014-10-22,2014-11-03,Angiología,TCE,168,TET-TQ,con traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,12
+38,vivo,f,blanco,24,2014-10-22,2014-11-19,33.18,,13,f,2014-10-22,2014-11-03,Angiología,TCE,168,TET-TQ,con traqueotomia,TCE severo,,,,,BNV,no respiratorias,12
+39,vivo,m,blanco,65,2014-09-20,2014-10-13,50.23,,15,f,2014-09-20,2014-10-08,Medicina,Afecciones no traumáticas del SNC,192,TET-TQ,con traqueotomia,PCR recuperado,,,,,PCR recuperado,no respiratorias,18
+39,vivo,m,blanco,65,2014-09-20,2014-10-13,50.23,,15,f,2014-09-20,2014-10-08,Medicina,Afecciones no traumáticas del SNC,192,TET-TQ,con traqueotomia,Politraumatizado,,,,,PCR recuperado,no respiratorias,18
+39,vivo,m,blanco,65,2014-09-20,2014-10-13,50.23,,15,f,2014-09-20,2014-10-08,Medicina,Afecciones no traumáticas del SNC,192,TET-TQ,con traqueotomia,PCR recuperado,,,,,Insuficiencia Renal Aguda,no respiratorias,18
+39,vivo,m,blanco,65,2014-09-20,2014-10-13,50.23,,15,f,2014-09-20,2014-10-08,Medicina,Afecciones no traumáticas del SNC,192,TET-TQ,con traqueotomia,Politraumatizado,,,,,Insuficiencia Renal Aguda,no respiratorias,18
+40,vivo,m,blanco,24,2014-08-24,2014-09-29,41.47,,11,f,2014-08-24,2014-09-02,Medicina,Otras,48,tubo endotraqueal,sin traqueotomia,Sepsis grave,,,,,Sepsis grave,respiratorias,9
+40,vivo,m,blanco,24,2014-08-24,2014-09-29,41.47,,11,f,2014-08-24,2014-09-02,Medicina,Otras,48,tubo endotraqueal,sin traqueotomia,Sepsis grave,,,,,BNB-EH,respiratorias,9
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,Trauma espinal,basica,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,TEP,intermedia,Insuficiencia respiratoria,directa,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,TEP,intermedia,Insuficiencia respiratoria,directa,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,EPOC,basica,BNB-EH,intermedia,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,TEP,intermedia,Insuficiencia respiratoria,directa,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,EPOC,basica,BNB-EH,intermedia,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,EPOC,basica,BNB-EH,intermedia,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,EPOC,basica,BNB-EH,intermedia,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,TEP,intermedia,Insuficiencia respiratoria,directa,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,Insuficiencia respiratoria,directa,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,Insuficiencia respiratoria,directa,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,Insuficiencia respiratoria,directa,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,BNB-EH,intermedia,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,Insuficiencia respiratoria,directa,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,EPOC,basica,Insuficiencia respiratoria,directa,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,EPOC,basica,Insuficiencia respiratoria,directa,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,EPOC,basica,Insuficiencia respiratoria,directa,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,EPOC,basica,Insuficiencia respiratoria,directa,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,TEP,intermedia,Trauma espinal,basica,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,TEP,intermedia,Trauma espinal,basica,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,TEP,intermedia,Trauma espinal,basica,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,TEP,intermedia,Trauma espinal,basica,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,Trauma espinal,basica,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,Trauma espinal,basica,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,Trauma espinal,basica,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,EPOC,basica,Trauma espinal,basica,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,EPOC,basica,Trauma espinal,basica,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,EPOC,basica,Trauma espinal,basica,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,EPOC,basica,Trauma espinal,basica,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,TEP,intermedia,BNB-EH,intermedia,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,TEP,intermedia,BNB-EH,intermedia,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,TEP,intermedia,BNB-EH,intermedia,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,TEP,intermedia,BNB-EH,intermedia,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,BNB-EH,intermedia,Materna Crítica,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,BNB-EH,intermedia,ARDS,respiratorias,23
+41,fallecido,m,blanco,41,2014-11-01,2014-12-01,54.84,Medicina,17,f,2014-11-02,2014-11-25,Medicina,EPOC,264,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,BNB-EH,intermedia,Materna Crítica,respiratorias,23
+42,fallecido,f,blanco,65,2014-09-03,2014-10-09,57.60,Medicina,27,f,2014-09-03,2014-09-08,Medicina,EPOC,96,tubo endotraqueal,sin traqueotomia,ARDS,TEP,directa,,,ARDS,respiratorias,5
+42,fallecido,f,blanco,65,2014-09-03,2014-10-09,57.60,Medicina,27,f,2014-09-03,2014-09-08,Medicina,EPOC,96,tubo endotraqueal,sin traqueotomia,Materna Crítica,BNB-IH,intermedia,,,Materna Crítica,respiratorias,5
+42,fallecido,f,blanco,65,2014-09-03,2014-10-09,57.60,Medicina,27,f,2014-09-03,2014-09-08,Medicina,EPOC,96,tubo endotraqueal,sin traqueotomia,Materna Crítica,BNB-IH,intermedia,,,ARDS,respiratorias,5
+42,fallecido,f,blanco,65,2014-09-03,2014-10-09,57.60,Medicina,27,f,2014-09-03,2014-09-08,Medicina,EPOC,96,tubo endotraqueal,sin traqueotomia,Materna Crítica,TEP,directa,,,ARDS,respiratorias,5
+42,fallecido,f,blanco,65,2014-09-03,2014-10-09,57.60,Medicina,27,f,2014-09-03,2014-09-08,Medicina,EPOC,96,tubo endotraqueal,sin traqueotomia,ARDS,BNB-IH,intermedia,,,Materna Crítica,respiratorias,5
+42,fallecido,f,blanco,65,2014-09-03,2014-10-09,57.60,Medicina,27,f,2014-09-03,2014-09-08,Medicina,EPOC,96,tubo endotraqueal,sin traqueotomia,ARDS,BNB-IH,intermedia,,,ARDS,respiratorias,5
+42,fallecido,f,blanco,65,2014-09-03,2014-10-09,57.60,Medicina,27,f,2014-09-03,2014-09-08,Medicina,EPOC,96,tubo endotraqueal,sin traqueotomia,Materna Crítica,TEP,directa,,,Materna Crítica,respiratorias,5
+42,fallecido,f,blanco,65,2014-09-03,2014-10-09,57.60,Medicina,27,f,2014-09-03,2014-09-08,Medicina,EPOC,96,tubo endotraqueal,sin traqueotomia,ARDS,TEP,directa,,,Materna Crítica,respiratorias,5
+43,vivo,f,mestizo,18,2015-04-16,2015-05-21,17.97,,11,f,2015-04-16,2015-04-30,Angiología,TCE,264,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,14
+43,vivo,f,mestizo,18,2015-04-16,2015-05-21,17.97,,11,f,2015-04-16,2015-04-30,Angiología,TCE,264,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,,,,,TCE severo,no respiratorias,14
+43,vivo,f,mestizo,18,2015-04-16,2015-05-21,17.97,,11,f,2015-04-16,2015-04-30,Angiología,TCE,264,TET-TQ,con traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,14
+43,vivo,f,mestizo,18,2015-04-16,2015-05-21,17.97,,11,f,2015-04-16,2015-04-30,Angiología,TCE,264,TET-TQ,con traqueotomia,TCE severo,,,,,Insuficiencia Renal Crónica,no respiratorias,14
+44,vivo,m,blanco,80,2015-03-31,2015-04-24,51.15,,18,f,2015-03-31,2015-04-15,Medicina,TCE,48,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,15
+44,vivo,m,blanco,80,2015-03-31,2015-04-24,51.15,,18,f,2015-03-31,2015-04-15,Medicina,TCE,48,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,15
+44,vivo,m,blanco,80,2015-03-31,2015-04-24,51.15,,18,f,2015-03-31,2015-04-15,Medicina,TCE,48,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,Insuficiencia Renal Crónica,no respiratorias,15
+44,vivo,m,blanco,80,2015-03-31,2015-04-24,51.15,,18,f,2015-03-31,2015-04-15,Medicina,TCE,48,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,TCE severo,no respiratorias,15
+45,vivo,f,blanco,86,2015-04-02,2015-04-28,43.32,,26,f,2015-04-02,2015-04-22,Medicina,EPOC,192,TET-TQ,con traqueotomia,ARDS,,,,,BNB-IH,respiratorias,20
+45,vivo,f,blanco,86,2015-04-02,2015-04-28,43.32,,26,f,2015-04-02,2015-04-22,Medicina,EPOC,192,TET-TQ,con traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,20
+45,vivo,f,blanco,86,2015-04-02,2015-04-28,43.32,,26,f,2015-04-02,2015-04-22,Medicina,EPOC,192,TET-TQ,con traqueotomia,ARDS,,,,,ARDS,respiratorias,20
+45,vivo,f,blanco,86,2015-04-02,2015-04-28,43.32,,26,f,2015-04-02,2015-04-22,Medicina,EPOC,192,TET-TQ,con traqueotomia,BNB-IH,,,,,ARDS,respiratorias,20
+46,vivo,m,blanco,56,2015-04-15,2015-05-09,37.79,,15,f,2015-04-18,2015-05-06,Angiología,Afecciones no traumáticas del SNC,288,TET-TQ,con traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,18
+46,vivo,m,blanco,56,2015-04-15,2015-05-09,37.79,,15,f,2015-04-18,2015-05-06,Angiología,Afecciones no traumáticas del SNC,288,TET-TQ,con traqueotomia,SPO neurología,,,,,BNV,no respiratorias,18
+47,vivo,m,blanco,91,2015-03-11,2015-04-23,40.09,,11,f,2015-03-11,2015-03-31,Medicina,Afecciones no traumáticas del SNC,432,TET-TQ,con traqueotomia,Ahorcamiento Incompleto,,,,,ICC descompensada,no respiratorias,20
+47,vivo,m,blanco,91,2015-03-11,2015-04-23,40.09,,11,f,2015-03-11,2015-03-31,Medicina,Afecciones no traumáticas del SNC,432,TET-TQ,con traqueotomia,ICC descompensada,,,,,Ahorcamiento Incompleto,no respiratorias,20
+47,vivo,m,blanco,91,2015-03-11,2015-04-23,40.09,,11,f,2015-03-11,2015-03-31,Medicina,Afecciones no traumáticas del SNC,432,TET-TQ,con traqueotomia,Ahorcamiento Incompleto,,,,,Ahorcamiento Incompleto,no respiratorias,20
+47,vivo,m,blanco,91,2015-03-11,2015-04-23,40.09,,11,f,2015-03-11,2015-03-31,Medicina,Afecciones no traumáticas del SNC,432,TET-TQ,con traqueotomia,ICC descompensada,,,,,ICC descompensada,no respiratorias,20
+48,vivo,m,blanco,23,2015-02-16,2015-03-09,38.71,,19,f,2015-02-17,2015-02-23,Angiología,TCE,48,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,6
+48,vivo,m,blanco,23,2015-02-16,2015-03-09,38.71,,19,f,2015-02-17,2015-02-23,Angiología,TCE,48,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,6
+48,vivo,m,blanco,23,2015-02-16,2015-03-09,38.71,,19,f,2015-02-17,2015-02-23,Angiología,TCE,48,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,TCE severo,no respiratorias,6
+48,vivo,m,blanco,23,2015-02-16,2015-03-09,38.71,,19,f,2015-02-17,2015-02-23,Angiología,TCE,48,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,SPO neurología,no respiratorias,6
+49,vivo,f,blanco,52,2015-03-09,2015-03-25,39.17,,19,f,2015-03-10,2015-03-18,Cardiología,Neumonías,120,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,8
+49,vivo,f,blanco,52,2015-03-09,2015-03-25,39.17,,19,f,2015-03-10,2015-03-18,Cardiología,Neumonías,120,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,SPO toracotomía,respiratorias,8
+50,vivo,m,blanco,33,2015-02-09,2015-03-06,37.79,,17,f,2015-02-09,2015-02-20,Neurocirugía,Causas extrapulmonares,96,tubo endotraqueal,sin traqueotomia,DMO,,,,,DMO,no respiratorias,11
+50,vivo,m,blanco,33,2015-02-09,2015-03-06,37.79,,17,f,2015-02-09,2015-02-20,Neurocirugía,Causas extrapulmonares,96,tubo endotraqueal,sin traqueotomia,DMO,,,,,SPO laparotomía,no respiratorias,11
+50,vivo,m,blanco,33,2015-02-09,2015-03-06,37.79,,17,f,2015-02-09,2015-02-20,Neurocirugía,Causas extrapulmonares,96,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,SPO laparotomía,no respiratorias,11
+50,vivo,m,blanco,33,2015-02-09,2015-03-06,37.79,,17,f,2015-02-09,2015-02-20,Neurocirugía,Causas extrapulmonares,96,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,DMO,no respiratorias,11
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,EPOC,basica,TEP,intermedia,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,TEP,intermedia,Insuficiencia respiratoria,directa,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,EPOC,basica,Insuficiencia respiratoria,directa,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,EPOC,basica,Insuficiencia respiratoria,directa,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,EPOC,basica,Insuficiencia respiratoria,directa,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,EPOC,basica,Insuficiencia respiratoria,directa,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,Insuficiencia respiratoria,directa,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,Insuficiencia respiratoria,directa,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,Insuficiencia respiratoria,directa,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,Insuficiencia respiratoria,directa,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,TEP,intermedia,Insuficiencia respiratoria,directa,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,TEP,intermedia,Insuficiencia respiratoria,directa,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,TEP,intermedia,Insuficiencia respiratoria,directa,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,EPOC,basica,TEP,intermedia,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,EPOC,basica,TEP,intermedia,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,EPOC,basica,TEP,intermedia,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,TEP,intermedia,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,TEP,intermedia,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,TEP,intermedia,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,TEP,intermedia,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,TEP,intermedia,TEP,intermedia,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,TEP,intermedia,TEP,intermedia,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,TEP,intermedia,TEP,intermedia,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,TEP,intermedia,TEP,intermedia,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,EPOC,basica,EPOC,basica,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,EPOC,basica,EPOC,basica,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,EPOC,basica,EPOC,basica,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,EPOC,basica,EPOC,basica,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,EPOC,basica,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,EPOC,basica,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,EPOC,basica,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,EPOC,basica,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,TEP,intermedia,EPOC,basica,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,TEP,intermedia,EPOC,basica,BNV,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,TEP,intermedia,EPOC,basica,ARDS,respiratorias,18
+51,fallecido,f,blanco,68,2015-03-08,2015-04-07,58.53,Medicina,24,f,2015-03-08,2015-03-26,Medicina,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,TEP,intermedia,EPOC,basica,BNV,respiratorias,18
+52,vivo,m,blanco,26,2015-01-06,2015-01-29,32.26,,12,f,2015-01-22,2015-01-27,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,5
+52,vivo,m,blanco,26,2015-01-06,2015-01-29,32.26,,12,f,2015-01-22,2015-01-27,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,SPO toracotomía,no respiratorias,5
+52,vivo,m,blanco,26,2015-01-06,2015-01-29,32.26,,12,f,2015-01-22,2015-01-27,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,Shock séptico,no respiratorias,5
+52,vivo,m,blanco,26,2015-01-06,2015-01-29,32.26,,12,f,2015-01-22,2015-01-27,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,Shock séptico,no respiratorias,5
+53,vivo,f,blanco,31,2015-02-05,2015-03-13,28.57,,10,f,2015-02-05,2015-02-27,UCIM,ARDS,360,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,22
+53,vivo,f,blanco,31,2015-02-05,2015-03-13,28.57,,10,f,2015-02-05,2015-02-27,UCIM,ARDS,360,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,EPOC descompensada,respiratorias,22
+53,vivo,f,blanco,31,2015-02-05,2015-03-13,28.57,,10,f,2015-02-05,2015-02-27,UCIM,ARDS,360,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,EPOC descompensada,respiratorias,22
+53,vivo,f,blanco,31,2015-02-05,2015-03-13,28.57,,10,f,2015-02-05,2015-02-27,UCIM,ARDS,360,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,BNB-IH,respiratorias,22
+54,fallecido,f,negro,73,2015-01-30,2015-04-27,47.47,Medicina,19,f,2015-02-02,2015-02-28,Medicina,EPOC,480,TET-TQ,con traqueotomia,ARDS,EPOC,basica,,,Materna Crítica,respiratorias,26
+54,fallecido,f,negro,73,2015-01-30,2015-04-27,47.47,Medicina,19,f,2015-02-02,2015-02-28,Medicina,EPOC,480,TET-TQ,con traqueotomia,Materna Crítica,EPOC,basica,,,ARDS,respiratorias,26
+54,fallecido,f,negro,73,2015-01-30,2015-04-27,47.47,Medicina,19,f,2015-02-02,2015-02-28,Medicina,EPOC,480,TET-TQ,con traqueotomia,Materna Crítica,EPOC,basica,,,Materna Crítica,respiratorias,26
+54,fallecido,f,negro,73,2015-01-30,2015-04-27,47.47,Medicina,19,f,2015-02-02,2015-02-28,Medicina,EPOC,480,TET-TQ,con traqueotomia,ARDS,PCR,intermedia,,,ARDS,respiratorias,26
+54,fallecido,f,negro,73,2015-01-30,2015-04-27,47.47,Medicina,19,f,2015-02-02,2015-02-28,Medicina,EPOC,480,TET-TQ,con traqueotomia,ARDS,PCR,intermedia,,,Materna Crítica,respiratorias,26
+54,fallecido,f,negro,73,2015-01-30,2015-04-27,47.47,Medicina,19,f,2015-02-02,2015-02-28,Medicina,EPOC,480,TET-TQ,con traqueotomia,Materna Crítica,PCR,intermedia,,,ARDS,respiratorias,26
+54,fallecido,f,negro,73,2015-01-30,2015-04-27,47.47,Medicina,19,f,2015-02-02,2015-02-28,Medicina,EPOC,480,TET-TQ,con traqueotomia,Materna Crítica,PCR,intermedia,,,Materna Crítica,respiratorias,26
+54,fallecido,f,negro,73,2015-01-30,2015-04-27,47.47,Medicina,19,f,2015-02-02,2015-02-28,Medicina,EPOC,480,TET-TQ,con traqueotomia,Materna Crítica,Disfunción múltiple de órganos,directa,,,Materna Crítica,respiratorias,26
+54,fallecido,f,negro,73,2015-01-30,2015-04-27,47.47,Medicina,19,f,2015-02-02,2015-02-28,Medicina,EPOC,480,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,intermedia,,,ARDS,respiratorias,26
+54,fallecido,f,negro,73,2015-01-30,2015-04-27,47.47,Medicina,19,f,2015-02-02,2015-02-28,Medicina,EPOC,480,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,intermedia,,,Materna Crítica,respiratorias,26
+54,fallecido,f,negro,73,2015-01-30,2015-04-27,47.47,Medicina,19,f,2015-02-02,2015-02-28,Medicina,EPOC,480,TET-TQ,con traqueotomia,Materna Crítica,Insuficiencia respiratoria,intermedia,,,ARDS,respiratorias,26
+54,fallecido,f,negro,73,2015-01-30,2015-04-27,47.47,Medicina,19,f,2015-02-02,2015-02-28,Medicina,EPOC,480,TET-TQ,con traqueotomia,Materna Crítica,Insuficiencia respiratoria,intermedia,,,Materna Crítica,respiratorias,26
+54,fallecido,f,negro,73,2015-01-30,2015-04-27,47.47,Medicina,19,f,2015-02-02,2015-02-28,Medicina,EPOC,480,TET-TQ,con traqueotomia,ARDS,Disfunción múltiple de órganos,directa,,,ARDS,respiratorias,26
+54,fallecido,f,negro,73,2015-01-30,2015-04-27,47.47,Medicina,19,f,2015-02-02,2015-02-28,Medicina,EPOC,480,TET-TQ,con traqueotomia,ARDS,Disfunción múltiple de órganos,directa,,,Materna Crítica,respiratorias,26
+54,fallecido,f,negro,73,2015-01-30,2015-04-27,47.47,Medicina,19,f,2015-02-02,2015-02-28,Medicina,EPOC,480,TET-TQ,con traqueotomia,ARDS,EPOC,basica,,,ARDS,respiratorias,26
+54,fallecido,f,negro,73,2015-01-30,2015-04-27,47.47,Medicina,19,f,2015-02-02,2015-02-28,Medicina,EPOC,480,TET-TQ,con traqueotomia,Materna Crítica,Disfunción múltiple de órganos,directa,,,ARDS,respiratorias,26
+55,vivo,f,blanco,69,2015-01-09,2015-02-04,49.77,,25,f,2015-01-10,2015-01-20,Medicina,EPOC,120,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,10
+55,vivo,f,blanco,69,2015-01-09,2015-02-04,49.77,,25,f,2015-01-10,2015-01-20,Medicina,EPOC,120,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,ARDS,respiratorias,10
+55,vivo,f,blanco,69,2015-01-09,2015-02-04,49.77,,25,f,2015-01-10,2015-01-20,Medicina,EPOC,120,tubo endotraqueal,sin traqueotomia,ARDS,,,,,BNB-IH,respiratorias,10
+55,vivo,f,blanco,69,2015-01-09,2015-02-04,49.77,,25,f,2015-01-10,2015-01-20,Medicina,EPOC,120,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,10
+56,vivo,f,blanco,60,2015-01-09,2015-02-06,35.94,,11,f,2015-01-22,2015-02-04,Cardiología,EPOC,264,traqueotomia TQ,con traqueotomia,ARDS,,,,,ARDS,respiratorias,13
+56,vivo,f,blanco,60,2015-01-09,2015-02-06,35.94,,11,f,2015-01-22,2015-02-04,Cardiología,EPOC,264,traqueotomia TQ,con traqueotomia,BNV,,,,,BNV,respiratorias,13
+56,vivo,f,blanco,60,2015-01-09,2015-02-06,35.94,,11,f,2015-01-22,2015-02-04,Cardiología,EPOC,264,traqueotomia TQ,con traqueotomia,ARDS,,,,,BNV,respiratorias,13
+56,vivo,f,blanco,60,2015-01-09,2015-02-06,35.94,,11,f,2015-01-22,2015-02-04,Cardiología,EPOC,264,traqueotomia TQ,con traqueotomia,BNV,,,,,ARDS,respiratorias,13
+57,vivo,m,blanco,60,2014-08-16,2014-08-25,50.23,,19,f,2014-08-16,2014-08-23,Medicina,EPOC,120,tubo endotraqueal,sin traqueotomia,Miocarditis,,,,,Miocarditis,respiratorias,7
+57,vivo,m,blanco,60,2014-08-16,2014-08-25,50.23,,19,f,2014-08-16,2014-08-23,Medicina,EPOC,120,tubo endotraqueal,sin traqueotomia,ARDS,,,,,Miocarditis,respiratorias,7
+57,vivo,m,blanco,60,2014-08-16,2014-08-25,50.23,,19,f,2014-08-16,2014-08-23,Medicina,EPOC,120,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,7
+57,vivo,m,blanco,60,2014-08-16,2014-08-25,50.23,,19,f,2014-08-16,2014-08-23,Medicina,EPOC,120,tubo endotraqueal,sin traqueotomia,Miocarditis,,,,,ARDS,respiratorias,7
+58,vivo,f,blanco,87,2014-04-24,2014-05-22,44.70,,17,f,2014-04-29,2014-05-10,Medicina,EPOC,168,TET-TQ,con traqueotomia,ARDS,,,,,ARDS,respiratorias,11
+58,vivo,f,blanco,87,2014-04-24,2014-05-22,44.70,,17,f,2014-04-29,2014-05-10,Medicina,EPOC,168,TET-TQ,con traqueotomia,Materna Crítica,,,,,Miocarditis,respiratorias,11
+58,vivo,f,blanco,87,2014-04-24,2014-05-22,44.70,,17,f,2014-04-29,2014-05-10,Medicina,EPOC,168,TET-TQ,con traqueotomia,ARDS,,,,,Miocarditis,respiratorias,11
+58,vivo,f,blanco,87,2014-04-24,2014-05-22,44.70,,17,f,2014-04-29,2014-05-10,Medicina,EPOC,168,TET-TQ,con traqueotomia,Materna Crítica,,,,,ARDS,respiratorias,11
+59,vivo,m,blanco,50,2014-01-25,2014-05-03,37.79,,14,f,2014-01-25,2014-02-24,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,Miocarditis,,,,,BNV,no respiratorias,30
+59,vivo,m,blanco,50,2014-01-25,2014-05-03,37.79,,14,f,2014-01-25,2014-02-24,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,Sepsis grave,,,,,SPO toracotomía,no respiratorias,30
+59,vivo,m,blanco,50,2014-01-25,2014-05-03,37.79,,14,f,2014-01-25,2014-02-24,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,Miocarditis,,,,,SPO toracotomía,no respiratorias,30
+59,vivo,m,blanco,50,2014-01-25,2014-05-03,37.79,,14,f,2014-01-25,2014-02-24,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,Sepsis grave,,,,,BNV,no respiratorias,30
+60,vivo,m,blanco,60,2014-08-16,2014-08-26,50.23,,19,f,2014-08-16,2014-08-23,Medicina,EPOC,120,tubo endotraqueal,sin traqueotomia,Miocarditis,,,,,Miocarditis,respiratorias,7
+60,vivo,m,blanco,60,2014-08-16,2014-08-26,50.23,,19,f,2014-08-16,2014-08-23,Medicina,EPOC,120,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,7
+60,vivo,m,blanco,60,2014-08-16,2014-08-26,50.23,,19,f,2014-08-16,2014-08-23,Medicina,EPOC,120,tubo endotraqueal,sin traqueotomia,ARDS,,,,,Miocarditis,respiratorias,7
+60,vivo,m,blanco,60,2014-08-16,2014-08-26,50.23,,19,f,2014-08-16,2014-08-23,Medicina,EPOC,120,tubo endotraqueal,sin traqueotomia,Miocarditis,,,,,ARDS,respiratorias,7
+61,vivo,f,negro,54,2014-01-06,2014-01-23,31.80,,28,f,2014-01-06,2014-01-19,Medicina,Afecciones no traumáticas del SNC,168,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,,,,,Encefalopatía metabólica,no respiratorias,13
+61,vivo,f,negro,54,2014-01-06,2014-01-23,31.80,,28,f,2014-01-06,2014-01-19,Medicina,Afecciones no traumáticas del SNC,168,tubo endotraqueal,sin traqueotomia,PCR recuperado,,,,,Encefalopatía metabólica,no respiratorias,13
+61,vivo,f,negro,54,2014-01-06,2014-01-23,31.80,,28,f,2014-01-06,2014-01-19,Medicina,Afecciones no traumáticas del SNC,168,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,,,,,PCR recuperado,no respiratorias,13
+61,vivo,f,negro,54,2014-01-06,2014-01-23,31.80,,28,f,2014-01-06,2014-01-19,Medicina,Afecciones no traumáticas del SNC,168,tubo endotraqueal,sin traqueotomia,PCR recuperado,,,,,PCR recuperado,no respiratorias,13
+62,vivo,m,blanco,47,2014-03-08,2014-04-03,47.93,,23,f,2014-03-09,2014-03-18,Medicina,TCE,96,TET-TQ,con traqueotomia,SPO neurología,,,,,TCE severo,no respiratorias,9
+62,vivo,m,blanco,47,2014-03-08,2014-04-03,47.93,,23,f,2014-03-09,2014-03-18,Medicina,TCE,96,TET-TQ,con traqueotomia,TCE severo,,,,,SPO neurología,no respiratorias,9
+62,vivo,m,blanco,47,2014-03-08,2014-04-03,47.93,,23,f,2014-03-09,2014-03-18,Medicina,TCE,96,TET-TQ,con traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,9
+62,vivo,m,blanco,47,2014-03-08,2014-04-03,47.93,,23,f,2014-03-09,2014-03-18,Medicina,TCE,96,TET-TQ,con traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,9
+63,vivo,f,blanco,59,2014-03-14,2014-04-24,33.18,,8,f,2014-03-14,2014-04-07,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,24
+63,vivo,f,blanco,59,2014-03-14,2014-04-24,33.18,,8,f,2014-03-14,2014-04-07,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,SPO laparotomía,no respiratorias,24
+63,vivo,f,blanco,59,2014-03-14,2014-04-24,33.18,,8,f,2014-03-14,2014-04-07,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,Insuficiencia Renal Crónica,no respiratorias,24
+63,vivo,f,blanco,59,2014-03-14,2014-04-24,33.18,,8,f,2014-03-14,2014-04-07,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,SPO laparotomía,no respiratorias,24
+64,vivo,f,blanco,82,2014-01-24,2014-02-25,48.39,,18,f,2014-01-25,2014-02-18,Medicina,EPOC,480,TET-TQ,con traqueotomia,ARDS,,,,,BNV,respiratorias,24
+64,vivo,f,blanco,82,2014-01-24,2014-02-25,48.39,,18,f,2014-01-25,2014-02-18,Medicina,EPOC,480,TET-TQ,con traqueotomia,ARDS,,,,,ARDS,respiratorias,24
+65,vivo,f,blanco,50,2014-03-20,2014-04-04,37.79,,16,f,2014-03-20,2014-03-28,Angiología,TCE,72,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,8
+66,vivo,m,blanco,51,2014-11-18,2014-12-19,33.18,,11,f,2014-11-25,2014-12-14,Neurocirugía,Estatus posoperatorio,408,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,SPO laparotomía,no respiratorias,19
+66,vivo,m,blanco,51,2014-11-18,2014-12-19,33.18,,11,f,2014-11-25,2014-12-14,Neurocirugía,Estatus posoperatorio,408,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO laparotomía,no respiratorias,19
+66,vivo,m,blanco,51,2014-11-18,2014-12-19,33.18,,11,f,2014-11-25,2014-12-14,Neurocirugía,Estatus posoperatorio,408,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,19
+66,vivo,m,blanco,51,2014-11-18,2014-12-19,33.18,,11,f,2014-11-25,2014-12-14,Neurocirugía,Estatus posoperatorio,408,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,SPO toracotomía,no respiratorias,19
+67,vivo,m,blanco,61,2014-12-23,2015-01-21,35.94,,10,f,2014-12-23,2015-01-11,Angiología,TCE,168,TET-TQ,con traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,19
+68,vivo,f,blanco,67,2014-02-27,2014-03-27,49.77,,17,f,2014-02-27,2014-03-21,Medicina,EPOC,288,TET-TQ,con traqueotomia,Materna Crítica,,,,,Materna Crítica,respiratorias,22
+68,vivo,f,blanco,67,2014-02-27,2014-03-27,49.77,,17,f,2014-02-27,2014-03-21,Medicina,EPOC,288,TET-TQ,con traqueotomia,ARDS,,,,,ARDS,respiratorias,22
+68,vivo,f,blanco,67,2014-02-27,2014-03-27,49.77,,17,f,2014-02-27,2014-03-21,Medicina,EPOC,288,TET-TQ,con traqueotomia,Materna Crítica,,,,,ARDS,respiratorias,22
+68,vivo,f,blanco,67,2014-02-27,2014-03-27,49.77,,17,f,2014-02-27,2014-03-21,Medicina,EPOC,288,TET-TQ,con traqueotomia,ARDS,,,,,Materna Crítica,respiratorias,22
+69,vivo,m,blanco,68,2014-04-07,2014-05-26,51.61,,19,f,2014-04-07,2014-04-21,Medicina,TCE,264,TET-TQ,con traqueotomia,TCE severo,,,,,BNV,no respiratorias,14
+69,vivo,m,blanco,68,2014-04-07,2014-05-26,51.61,,19,f,2014-04-07,2014-04-21,Medicina,TCE,264,TET-TQ,con traqueotomia,SPO neurología,,,,,BNV,no respiratorias,14
+69,vivo,m,blanco,68,2014-04-07,2014-05-26,51.61,,19,f,2014-04-07,2014-04-21,Medicina,TCE,264,TET-TQ,con traqueotomia,SPO neurología,,,,,TCE severo,no respiratorias,14
+69,vivo,m,blanco,68,2014-04-07,2014-05-26,51.61,,19,f,2014-04-07,2014-04-21,Medicina,TCE,264,TET-TQ,con traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,14
+70,vivo,m,blanco,65,2014-09-21,2014-10-13,40.55,,15,f,2014-09-21,2014-10-08,Otros,Afecciones no traumáticas del SNC,192,TET-TQ,con traqueotomia,PCR recuperado,,,,,Ahorcamiento Incompleto,no respiratorias,17
+70,vivo,m,blanco,65,2014-09-21,2014-10-13,40.55,,15,f,2014-09-21,2014-10-08,Otros,Afecciones no traumáticas del SNC,192,TET-TQ,con traqueotomia,Ahorcamiento Incompleto,,,,,PCR recuperado,no respiratorias,17
+70,vivo,m,blanco,65,2014-09-21,2014-10-13,40.55,,15,f,2014-09-21,2014-10-08,Otros,Afecciones no traumáticas del SNC,192,TET-TQ,con traqueotomia,PCR recuperado,,,,,PCR recuperado,no respiratorias,17
+70,vivo,m,blanco,65,2014-09-21,2014-10-13,40.55,,15,f,2014-09-21,2014-10-08,Otros,Afecciones no traumáticas del SNC,192,TET-TQ,con traqueotomia,Ahorcamiento Incompleto,,,,,Ahorcamiento Incompleto,no respiratorias,17
+71,vivo,m,blanco,23,2014-10-17,2014-12-09,34.10,,13,f,2014-10-17,2014-11-05,Angiología,TCE,192,TET-TQ,con traqueotomia,TCE severo,,,,,BNV,no respiratorias,19
+71,vivo,m,blanco,23,2014-10-17,2014-12-09,34.10,,13,f,2014-10-17,2014-11-05,Angiología,TCE,192,TET-TQ,con traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,19
+72,vivo,f,blanco,58,2014-04-06,2014-04-24,42.40,,17,f,2014-04-06,2014-04-16,Cardiología,EPOC,72,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,10
+72,vivo,f,blanco,58,2014-04-06,2014-04-24,42.40,,17,f,2014-04-06,2014-04-16,Cardiología,EPOC,72,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,ARDS,respiratorias,10
+72,vivo,f,blanco,58,2014-04-06,2014-04-24,42.40,,17,f,2014-04-06,2014-04-16,Cardiología,EPOC,72,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,BNV,respiratorias,10
+72,vivo,f,blanco,58,2014-04-06,2014-04-24,42.40,,17,f,2014-04-06,2014-04-16,Cardiología,EPOC,72,tubo endotraqueal,sin traqueotomia,ARDS,,,,,BNV,respiratorias,10
+73,vivo,f,blanco,78,2014-08-01,2014-08-18,47.93,,24,f,2014-08-01,2014-08-11,Medicina,EPOC,192,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,10
+73,vivo,f,blanco,78,2014-08-01,2014-08-18,47.93,,24,f,2014-08-01,2014-08-11,Medicina,EPOC,192,tubo endotraqueal,sin traqueotomia,Miocarditis,,,,,ARDS,respiratorias,10
+74,vivo,m,blanco,19,2015-03-27,2015-04-10,29.49,,10,f,2015-03-27,2015-04-02,Otros,Afecciones no traumáticas del SNC,96,tubo endotraqueal,sin traqueotomia,Estatus Asmático,,,,,BNV,no respiratorias,6
+74,vivo,m,blanco,19,2015-03-27,2015-04-10,29.49,,10,f,2015-03-27,2015-04-02,Otros,Afecciones no traumáticas del SNC,96,tubo endotraqueal,sin traqueotomia,Estatus Asmático,,,,,Estatus Asmático,no respiratorias,6
+75,vivo,m,blanco,80,2015-03-31,2015-04-24,49.77,,18,f,2015-03-31,2015-04-15,Medicina,TCE,168,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,SPO laparotomía,no respiratorias,15
+75,vivo,m,blanco,80,2015-03-31,2015-04-24,49.77,,18,f,2015-03-31,2015-04-15,Medicina,TCE,168,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,Insuficiencia Renal Crónica,no respiratorias,15
+75,vivo,m,blanco,80,2015-03-31,2015-04-24,49.77,,18,f,2015-03-31,2015-04-15,Medicina,TCE,168,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,15
+75,vivo,m,blanco,80,2015-03-31,2015-04-24,49.77,,18,f,2015-03-31,2015-04-15,Medicina,TCE,168,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,SPO laparotomía,no respiratorias,15
+76,vivo,m,blanco,49,2015-04-12,2015-07-06,38.25,,26,f,2015-04-12,2015-04-24,Angiología,TCE,120,TET-TQ,con traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,12
+76,vivo,m,blanco,49,2015-04-12,2015-07-06,38.25,,26,f,2015-04-12,2015-04-24,Angiología,TCE,120,TET-TQ,con traqueotomia,SPO neurología,,,,,Insuficiencia Renal Crónica,no respiratorias,12
+76,vivo,m,blanco,49,2015-04-12,2015-07-06,38.25,,26,f,2015-04-12,2015-04-24,Angiología,TCE,120,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,12
+76,vivo,m,blanco,49,2015-04-12,2015-07-06,38.25,,26,f,2015-04-12,2015-04-24,Angiología,TCE,120,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,,,,,SPO neurología,no respiratorias,12
+77,vivo,f,mestizo,18,2015-04-16,2015-05-21,17.51,,11,f,2015-04-16,2015-04-30,Angiología,TCE,288,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,14
+77,vivo,f,mestizo,18,2015-04-16,2015-05-21,17.51,,11,f,2015-04-16,2015-04-30,Angiología,TCE,288,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,,,,,TCE severo,no respiratorias,14
+77,vivo,f,mestizo,18,2015-04-16,2015-05-21,17.51,,11,f,2015-04-16,2015-04-30,Angiología,TCE,288,TET-TQ,con traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,14
+77,vivo,f,mestizo,18,2015-04-16,2015-05-21,17.51,,11,f,2015-04-16,2015-04-30,Angiología,TCE,288,TET-TQ,con traqueotomia,TCE severo,,,,,Insuficiencia Renal Crónica,no respiratorias,14
+78,vivo,f,blanco,26,2015-03-09,2015-03-27,30.41,,12,f,2015-03-09,2015-03-20,Neurología,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,EPOC descompensada,no respiratorias,11
+78,vivo,f,blanco,26,2015-03-09,2015-03-27,30.41,,12,f,2015-03-09,2015-03-20,Neurología,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,Leptospirosis complicada,no respiratorias,11
+79,vivo,f,blanco,56,2015-03-20,2015-03-30,39.17,,14,f,2015-03-20,2015-03-27,Cardiología,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,7
+80,fallecido,m,blanco,72,2015-04-15,2015-06-05,57.60,Medicina,19,f,2015-04-15,2015-05-07,Medicina,Causas extrapulmonares,480,TET-TQ,con traqueotomia,DMO,Trauma espinal,basica,,,Insuficiencia Renal Crónica,no respiratorias,22
+80,fallecido,m,blanco,72,2015-04-15,2015-06-05,57.60,Medicina,19,f,2015-04-15,2015-05-07,Medicina,Causas extrapulmonares,480,TET-TQ,con traqueotomia,DMO,Trauma espinal,basica,,,DMO,no respiratorias,22
+80,fallecido,m,blanco,72,2015-04-15,2015-06-05,57.60,Medicina,19,f,2015-04-15,2015-05-07,Medicina,Causas extrapulmonares,480,TET-TQ,con traqueotomia,DMO,Disfunción múltiple de órganos,directa,,,Insuficiencia Renal Crónica,no respiratorias,22
+80,fallecido,m,blanco,72,2015-04-15,2015-06-05,57.60,Medicina,19,f,2015-04-15,2015-05-07,Medicina,Causas extrapulmonares,480,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,Disfunción múltiple de órganos,directa,,,Insuficiencia Renal Crónica,no respiratorias,22
+80,fallecido,m,blanco,72,2015-04-15,2015-06-05,57.60,Medicina,19,f,2015-04-15,2015-05-07,Medicina,Causas extrapulmonares,480,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,Disfunción múltiple de órganos,directa,,,DMO,no respiratorias,22
+80,fallecido,m,blanco,72,2015-04-15,2015-06-05,57.60,Medicina,19,f,2015-04-15,2015-05-07,Medicina,Causas extrapulmonares,480,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,Trauma espinal,basica,,,Insuficiencia Renal Crónica,no respiratorias,22
+80,fallecido,m,blanco,72,2015-04-15,2015-06-05,57.60,Medicina,19,f,2015-04-15,2015-05-07,Medicina,Causas extrapulmonares,480,TET-TQ,con traqueotomia,DMO,Disfunción múltiple de órganos,directa,,,DMO,no respiratorias,22
+80,fallecido,m,blanco,72,2015-04-15,2015-06-05,57.60,Medicina,19,f,2015-04-15,2015-05-07,Medicina,Causas extrapulmonares,480,TET-TQ,con traqueotomia,DMO,BNB-IH,intermedia,,,DMO,no respiratorias,22
+80,fallecido,m,blanco,72,2015-04-15,2015-06-05,57.60,Medicina,19,f,2015-04-15,2015-05-07,Medicina,Causas extrapulmonares,480,TET-TQ,con traqueotomia,DMO,BNB-IH,intermedia,,,Insuficiencia Renal Crónica,no respiratorias,22
+80,fallecido,m,blanco,72,2015-04-15,2015-06-05,57.60,Medicina,19,f,2015-04-15,2015-05-07,Medicina,Causas extrapulmonares,480,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,BNB-IH,intermedia,,,DMO,no respiratorias,22
+80,fallecido,m,blanco,72,2015-04-15,2015-06-05,57.60,Medicina,19,f,2015-04-15,2015-05-07,Medicina,Causas extrapulmonares,480,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,BNB-IH,intermedia,,,Insuficiencia Renal Crónica,no respiratorias,22
+80,fallecido,m,blanco,72,2015-04-15,2015-06-05,57.60,Medicina,19,f,2015-04-15,2015-05-07,Medicina,Causas extrapulmonares,480,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,Trauma espinal,basica,,,DMO,no respiratorias,22
+81,fallecido,m,blanco,67,2015-04-08,2015-07-16,58.99,Medicina,15,f,2015-04-08,2015-04-22,Medicina,EPOC,216,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,,,ARDS,respiratorias,14
+81,fallecido,m,blanco,67,2015-04-08,2015-07-16,58.99,Medicina,15,f,2015-04-08,2015-04-22,Medicina,EPOC,216,TET-TQ,con traqueotomia,ARDS,BNB-IH,intermedia,,,ARDS,respiratorias,14
+81,fallecido,m,blanco,67,2015-04-08,2015-07-16,58.99,Medicina,15,f,2015-04-08,2015-04-22,Medicina,EPOC,216,TET-TQ,con traqueotomia,ARDS,EPOC,basica,,,ARDS,respiratorias,14
+82,vivo,f,blanco,47,2015-04-28,2015-05-09,29.95,,7,f,2015-05-02,2015-05-08,Cardiología,EPOC,96,tubo endotraqueal,sin traqueotomia,ARDS,,,,,Materna Crítica,respiratorias,6
+82,vivo,f,blanco,47,2015-04-28,2015-05-09,29.95,,7,f,2015-05-02,2015-05-08,Cardiología,EPOC,96,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,6
+82,vivo,f,blanco,47,2015-04-28,2015-05-09,29.95,,7,f,2015-05-02,2015-05-08,Cardiología,EPOC,96,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,ARDS,respiratorias,6
+82,vivo,f,blanco,47,2015-04-28,2015-05-09,29.95,,7,f,2015-05-02,2015-05-08,Cardiología,EPOC,96,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,Materna Crítica,respiratorias,6
+83,vivo,m,blanco,65,2015-05-04,2015-05-19,41.01,,5,f,2015-05-06,2015-05-13,Medicina,EPOC,120,tubo endotraqueal,sin traqueotomia,ARDS,,,,,BNB-IH,respiratorias,7
+83,vivo,m,blanco,65,2015-05-04,2015-05-19,41.01,,5,f,2015-05-06,2015-05-13,Medicina,EPOC,120,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,7
+83,vivo,m,blanco,65,2015-05-04,2015-05-19,41.01,,5,f,2015-05-06,2015-05-13,Medicina,EPOC,120,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,ARDS,respiratorias,7
+83,vivo,m,blanco,65,2015-05-04,2015-05-19,41.01,,5,f,2015-05-06,2015-05-13,Medicina,EPOC,120,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,7
+84,vivo,m,blanco,48,2015-05-14,2015-08-07,27.19,,4,f,2015-05-14,2015-06-15,Cardiología,ARDS,408,TET-TQ,con traqueotomia,BNB-IH,,,,,BNB-EH,respiratorias,32
+84,vivo,m,blanco,48,2015-05-14,2015-08-07,27.19,,4,f,2015-05-14,2015-06-15,Cardiología,ARDS,408,TET-TQ,con traqueotomia,BNB-EH,,,,,BNB-EH,respiratorias,32
+84,vivo,m,blanco,48,2015-05-14,2015-08-07,27.19,,4,f,2015-05-14,2015-06-15,Cardiología,ARDS,408,TET-TQ,con traqueotomia,BNB-EH,,,,,BNB-IH,respiratorias,32
+84,vivo,m,blanco,48,2015-05-14,2015-08-07,27.19,,4,f,2015-05-14,2015-06-15,Cardiología,ARDS,408,TET-TQ,con traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,32
+85,vivo,m,blanco,48,2015-05-12,2015-05-23,32.26,,8,f,2015-05-14,2015-05-20,Neurocirugía,ARDS,48,tubo endotraqueal,sin traqueotomia,BNB-EH,,,,,Estatus Epiléptico,respiratorias,6
+85,vivo,m,blanco,48,2015-05-12,2015-05-23,32.26,,8,f,2015-05-14,2015-05-20,Neurocirugía,ARDS,48,tubo endotraqueal,sin traqueotomia,Estatus Epiléptico,,,,,Estatus Epiléptico,respiratorias,6
+85,vivo,m,blanco,48,2015-05-12,2015-05-23,32.26,,8,f,2015-05-14,2015-05-20,Neurocirugía,ARDS,48,tubo endotraqueal,sin traqueotomia,BNB-EH,,,,,BNB-EH,respiratorias,6
+85,vivo,m,blanco,48,2015-05-12,2015-05-23,32.26,,8,f,2015-05-14,2015-05-20,Neurocirugía,ARDS,48,tubo endotraqueal,sin traqueotomia,Estatus Epiléptico,,,,,BNB-EH,respiratorias,6
+86,vivo,f,negro,53,2015-05-30,2015-06-22,26.27,,18,f,2015-05-31,2015-06-11,UCIM,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,Pancreatitis,no respiratorias,11
+86,vivo,f,negro,53,2015-05-30,2015-06-22,26.27,,18,f,2015-05-31,2015-06-11,UCIM,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,11
+86,vivo,f,negro,53,2015-05-30,2015-06-22,26.27,,18,f,2015-05-31,2015-06-11,UCIM,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Pancreatitis,,,,,Insuficiencia Renal Crónica,no respiratorias,11
+86,vivo,f,negro,53,2015-05-30,2015-06-22,26.27,,18,f,2015-05-31,2015-06-11,UCIM,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Pancreatitis,,,,,Pancreatitis,no respiratorias,11
+87,vivo,m,blanco,49,2015-06-03,2015-09-09,45.16,,26,f,2015-06-03,2015-07-28,Medicina,TCE,384,TET-TQ,con traqueotomia,TCE severo,,,,,SPO neurología,no respiratorias,55
+87,vivo,m,blanco,49,2015-06-03,2015-09-09,45.16,,26,f,2015-06-03,2015-07-28,Medicina,TCE,384,TET-TQ,con traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,55
+87,vivo,m,blanco,49,2015-06-03,2015-09-09,45.16,,26,f,2015-06-03,2015-07-28,Medicina,TCE,384,TET-TQ,con traqueotomia,SPO neurología,,,,,TCE severo,no respiratorias,55
+87,vivo,m,blanco,49,2015-06-03,2015-09-09,45.16,,26,f,2015-06-03,2015-07-28,Medicina,TCE,384,TET-TQ,con traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,55
+88,vivo,m,blanco,25,2015-06-09,2015-06-21,30.88,,9,f,2015-06-16,2015-06-20,Neurocirugía,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,4
+89,vivo,f,blanco,65,2015-06-01,2015-06-24,41.47,,15,f,2015-06-16,2015-06-23,Neurocirugía,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,7
+90,vivo,m,blanco,65,2015-06-15,2015-08-14,51.61,,18,f,2015-06-15,2015-06-29,Medicina,TCE,192,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,Insuficiencia Renal Crónica,no respiratorias,14
+90,vivo,m,blanco,65,2015-06-15,2015-08-14,51.61,,18,f,2015-06-15,2015-06-29,Medicina,TCE,192,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,TCE severo,no respiratorias,14
+90,vivo,m,blanco,65,2015-06-15,2015-08-14,51.61,,18,f,2015-06-15,2015-06-29,Medicina,TCE,192,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,14
+90,vivo,m,blanco,65,2015-06-15,2015-08-14,51.61,,18,f,2015-06-15,2015-06-29,Medicina,TCE,192,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,14
+91,vivo,m,blanco,57,2015-06-18,2015-07-22,37.79,,21,f,2015-06-18,2015-07-22,UCIM,EPOC,696,TET-TQ,con traqueotomia,ARDS,,,,,Miocarditis,respiratorias,34
+91,vivo,m,blanco,57,2015-06-18,2015-07-22,37.79,,21,f,2015-06-18,2015-07-22,UCIM,EPOC,696,TET-TQ,con traqueotomia,Miocarditis,,,,,ARDS,respiratorias,34
+91,vivo,m,blanco,57,2015-06-18,2015-07-22,37.79,,21,f,2015-06-18,2015-07-22,UCIM,EPOC,696,TET-TQ,con traqueotomia,ARDS,,,,,ARDS,respiratorias,34
+91,vivo,m,blanco,57,2015-06-18,2015-07-22,37.79,,21,f,2015-06-18,2015-07-22,UCIM,EPOC,696,TET-TQ,con traqueotomia,Miocarditis,,,,,Miocarditis,respiratorias,34
+92,vivo,m,blanco,42,2015-06-20,2015-07-20,47.00,,19,f,2015-06-21,2015-07-04,Medicina,TCE,120,TET-TQ,sin traqueotomia,SPO neurología,,,,,TCE severo,no respiratorias,13
+92,vivo,m,blanco,42,2015-06-20,2015-07-20,47.00,,19,f,2015-06-21,2015-07-04,Medicina,TCE,120,TET-TQ,sin traqueotomia,TCE severo,,,,,SPO neurología,no respiratorias,13
+92,vivo,m,blanco,42,2015-06-20,2015-07-20,47.00,,19,f,2015-06-21,2015-07-04,Medicina,TCE,120,TET-TQ,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,13
+92,vivo,m,blanco,42,2015-06-20,2015-07-20,47.00,,19,f,2015-06-21,2015-07-04,Medicina,TCE,120,TET-TQ,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,13
+93,vivo,m,blanco,55,2015-07-14,2015-08-05,32.26,,8,f,2015-07-28,2015-07-31,Neurocirugía,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,3
+94,fallecido,m,blanco,30,2015-07-24,2015-09-17,41.47,Medicina,13,f,2015-07-24,2015-07-30,Angiología,TCE,96,tubo endotraqueal,sin traqueotomia,TCE severo,Insuficiencia respiratoria,directa,,,TCE severo,no respiratorias,6
+94,fallecido,m,blanco,30,2015-07-24,2015-09-17,41.47,Medicina,13,f,2015-07-24,2015-07-30,Angiología,TCE,96,tubo endotraqueal,sin traqueotomia,TCE severo,BNB-IH,intermedia,,,TCE severo,no respiratorias,6
+94,fallecido,m,blanco,30,2015-07-24,2015-09-17,41.47,Medicina,13,f,2015-07-24,2015-07-30,Angiología,TCE,96,tubo endotraqueal,sin traqueotomia,TCE severo,Insuficiencia cardiaca,basica,,,TCE severo,no respiratorias,6
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,Estatus Epiléptico,Absceso pancreático,intermedia,Pancreatitis aguda,basica,BNB-EH,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,BNB-EH,Diabetes Mellitus,basica,Pancreatitis aguda,basica,Estatus Epiléptico,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,BNB-EH,Absceso pancreático,intermedia,Pancreatitis aguda,basica,BNB-EH,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,Estatus Epiléptico,Disfunción múltiple de órganos,directa,Disfunción múltiple de órganos,directa,Estatus Epiléptico,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,Estatus Epiléptico,Disfunción múltiple de órganos,directa,Disfunción múltiple de órganos,directa,BNB-EH,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,BNB-EH,Disfunción múltiple de órganos,directa,Disfunción múltiple de órganos,directa,Estatus Epiléptico,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,BNB-EH,Disfunción múltiple de órganos,directa,Disfunción múltiple de órganos,directa,BNB-EH,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,Estatus Epiléptico,Diabetes Mellitus,basica,Disfunción múltiple de órganos,directa,Estatus Epiléptico,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,Estatus Epiléptico,Diabetes Mellitus,basica,Disfunción múltiple de órganos,directa,BNB-EH,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,BNB-EH,Diabetes Mellitus,basica,Disfunción múltiple de órganos,directa,Estatus Epiléptico,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,BNB-EH,Diabetes Mellitus,basica,Disfunción múltiple de órganos,directa,BNB-EH,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,Estatus Epiléptico,Absceso pancreático,intermedia,Disfunción múltiple de órganos,directa,Estatus Epiléptico,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,Estatus Epiléptico,Absceso pancreático,intermedia,Disfunción múltiple de órganos,directa,BNB-EH,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,BNB-EH,Absceso pancreático,intermedia,Disfunción múltiple de órganos,directa,Estatus Epiléptico,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,BNB-EH,Absceso pancreático,intermedia,Disfunción múltiple de órganos,directa,BNB-EH,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,Estatus Epiléptico,Disfunción múltiple de órganos,directa,Pancreatitis aguda,basica,Estatus Epiléptico,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,Estatus Epiléptico,Disfunción múltiple de órganos,directa,Pancreatitis aguda,basica,BNB-EH,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,BNB-EH,Disfunción múltiple de órganos,directa,Pancreatitis aguda,basica,Estatus Epiléptico,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,BNB-EH,Disfunción múltiple de órganos,directa,Pancreatitis aguda,basica,BNB-EH,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,Estatus Epiléptico,Diabetes Mellitus,basica,Pancreatitis aguda,basica,Estatus Epiléptico,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,Estatus Epiléptico,Diabetes Mellitus,basica,Pancreatitis aguda,basica,BNB-EH,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,BNB-EH,Diabetes Mellitus,basica,Pancreatitis aguda,basica,BNB-EH,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,Estatus Epiléptico,Absceso pancreático,intermedia,Pancreatitis aguda,basica,Estatus Epiléptico,respiratorias,27
+95,fallecido,m,blanco,61,2015-07-28,2015-09-09,41.01,Medicina,8,f,2015-07-28,2015-08-24,Neurocirugía,ARDS,360,tubo endotraqueal,sin traqueotomia,BNB-EH,Absceso pancreático,intermedia,Pancreatitis aguda,basica,Estatus Epiléptico,respiratorias,27
+96,vivo,m,negro,22,2015-08-29,2015-10-24,31.80,,15,f,2015-08-30,2015-09-13,Medicina,TCE,288,TET-TQ,con traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,14
+96,vivo,m,negro,22,2015-08-29,2015-10-24,31.80,,15,f,2015-08-30,2015-09-13,Medicina,TCE,288,TET-TQ,con traqueotomia,SPO neurología,,,,,TCE severo,no respiratorias,14
+96,vivo,m,negro,22,2015-08-29,2015-10-24,31.80,,15,f,2015-08-30,2015-09-13,Medicina,TCE,288,TET-TQ,con traqueotomia,TCE severo,,,,,SPO neurología,no respiratorias,14
+96,vivo,m,negro,22,2015-08-29,2015-10-24,31.80,,15,f,2015-08-30,2015-09-13,Medicina,TCE,288,TET-TQ,con traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,14
+97,vivo,f,blanco,36,2015-08-23,2015-09-11,32.26,,11,f,2015-08-23,2015-09-07,Cardiología,ARDS,192,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,15
+97,vivo,f,blanco,36,2015-08-23,2015-09-11,32.26,,11,f,2015-08-23,2015-09-07,Cardiología,ARDS,192,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-EH,respiratorias,15
+97,vivo,f,blanco,36,2015-08-23,2015-09-11,32.26,,11,f,2015-08-23,2015-09-07,Cardiología,ARDS,192,tubo endotraqueal,sin traqueotomia,BNB-EH,,,,,BNB-EH,respiratorias,15
+97,vivo,f,blanco,36,2015-08-23,2015-09-11,32.26,,11,f,2015-08-23,2015-09-07,Cardiología,ARDS,192,tubo endotraqueal,sin traqueotomia,BNB-EH,,,,,BNB-IH,respiratorias,15
+98,vivo,m,blanco,47,2015-08-27,2015-09-02,39.17,,21,f,2015-08-27,2015-08-31,Neurología,Afecciones no traumáticas del SNC,48,tubo endotraqueal,sin traqueotomia,Ahorcamiento Incompleto,,,,,PCR recuperado,no respiratorias,4
+98,vivo,m,blanco,47,2015-08-27,2015-09-02,39.17,,21,f,2015-08-27,2015-08-31,Neurología,Afecciones no traumáticas del SNC,48,tubo endotraqueal,sin traqueotomia,PCR recuperado,,,,,Ahorcamiento Incompleto,no respiratorias,4
+98,vivo,m,blanco,47,2015-08-27,2015-09-02,39.17,,21,f,2015-08-27,2015-08-31,Neurología,Afecciones no traumáticas del SNC,48,tubo endotraqueal,sin traqueotomia,PCR recuperado,,,,,PCR recuperado,no respiratorias,4
+98,vivo,m,blanco,47,2015-08-27,2015-09-02,39.17,,21,f,2015-08-27,2015-08-31,Neurología,Afecciones no traumáticas del SNC,48,tubo endotraqueal,sin traqueotomia,Ahorcamiento Incompleto,,,,,Ahorcamiento Incompleto,no respiratorias,4
+99,vivo,f,blanco,67,2015-08-18,2015-09-14,51.15,,18,f,2015-08-18,2015-09-03,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,,,,,ARDS,respiratorias,16
+99,vivo,f,blanco,67,2015-08-18,2015-09-14,51.15,,18,f,2015-08-18,2015-09-03,Medicina,EPOC,312,TET-TQ,con traqueotomia,ARDS,,,,,BNB-IH,respiratorias,16
+99,vivo,f,blanco,67,2015-08-18,2015-09-14,51.15,,18,f,2015-08-18,2015-09-03,Medicina,EPOC,312,TET-TQ,con traqueotomia,BNB-IH,,,,,ARDS,respiratorias,16
+99,vivo,f,blanco,67,2015-08-18,2015-09-14,51.15,,18,f,2015-08-18,2015-09-03,Medicina,EPOC,312,TET-TQ,con traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,16
+100,vivo,f,blanco,18,2014-04-02,2014-04-28,23.04,,5,f,2014-04-08,2014-04-21,Neurocirugía,Estatus posoperatorio,120,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,13
+101,vivo,m,blanco,66,2014-01-01,2014-01-08,36.41,,7,f,2014-01-02,2014-01-06,Cardiología,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,4
+102,vivo,f,blanco,55,2014-07-10,2014-08-04,33.18,,11,f,2014-07-29,2014-08-02,Neurocirugía,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,4
+102,vivo,f,blanco,55,2014-07-10,2014-08-04,33.18,,11,f,2014-07-29,2014-08-02,Neurocirugía,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,SPO toracotomía,no respiratorias,4
+102,vivo,f,blanco,55,2014-07-10,2014-08-04,33.18,,11,f,2014-07-29,2014-08-02,Neurocirugía,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,4
+102,vivo,f,blanco,55,2014-07-10,2014-08-04,33.18,,11,f,2014-07-29,2014-08-02,Neurocirugía,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,Insuficiencia Renal Crónica,no respiratorias,4
+103,vivo,f,blanco,65,2014-02-01,2014-02-10,40.09,,12,f,2014-02-01,2014-02-06,Cardiología,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,,,,,BNB-IH,respiratorias,5
+103,vivo,f,blanco,65,2014-02-01,2014-02-10,40.09,,12,f,2014-02-01,2014-02-06,Cardiología,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,5
+103,vivo,f,blanco,65,2014-02-01,2014-02-10,40.09,,12,f,2014-02-01,2014-02-06,Cardiología,EPOC,48,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,ARDS,respiratorias,5
+103,vivo,f,blanco,65,2014-02-01,2014-02-10,40.09,,12,f,2014-02-01,2014-02-06,Cardiología,EPOC,48,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,5
+104,vivo,f,blanco,42,2014-07-31,2014-08-22,40.55,,10,f,2014-07-31,2014-08-09,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,SPO laparotomía,no respiratorias,9
+104,vivo,f,blanco,42,2014-07-31,2014-08-22,40.55,,10,f,2014-07-31,2014-08-09,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,Embolismo graso,no respiratorias,9
+105,vivo,m,blanco,85,2014-08-05,2014-08-25,29.03,,7,f,2014-08-05,2014-08-17,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,Embolismo graso,no respiratorias,12
+105,vivo,m,blanco,85,2014-08-05,2014-08-25,29.03,,7,f,2014-08-05,2014-08-17,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,SPO laparotomía,no respiratorias,12
+105,vivo,m,blanco,85,2014-08-05,2014-08-25,29.03,,7,f,2014-08-05,2014-08-17,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,Embolismo graso,,,,,SPO laparotomía,no respiratorias,12
+105,vivo,m,blanco,85,2014-08-05,2014-08-25,29.03,,7,f,2014-08-05,2014-08-17,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,Embolismo graso,,,,,Embolismo graso,no respiratorias,12
+106,vivo,m,blanco,36,2014-10-26,2014-11-01,28.11,,6,f,2014-10-27,2014-10-30,Neurocirugía,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,SPO toracotomía,no respiratorias,3
+106,vivo,m,blanco,36,2014-10-26,2014-11-01,28.11,,6,f,2014-10-27,2014-10-30,Neurocirugía,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,Insuficiencia Renal Crónica,no respiratorias,3
+106,vivo,m,blanco,36,2014-10-26,2014-11-01,28.11,,6,f,2014-10-27,2014-10-30,Neurocirugía,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,3
+106,vivo,m,blanco,36,2014-10-26,2014-11-01,28.11,,6,f,2014-10-27,2014-10-30,Neurocirugía,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,3
+107,vivo,m,blanco,56,2015-11-24,2015-12-31,35.48,,11,f,2015-11-25,2015-12-09,Cardiología,Neumonías,120,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,14
+108,vivo,m,blanco,73,2015-11-30,2015-12-15,31.34,,6,f,2015-11-30,2015-12-10,Neurocirugía,Estatus posoperatorio,144,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,10
+108,vivo,m,blanco,73,2015-11-30,2015-12-15,31.34,,6,f,2015-11-30,2015-12-10,Neurocirugía,Estatus posoperatorio,144,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,Insuficiencia Renal Crónica,no respiratorias,10
+108,vivo,m,blanco,73,2015-11-30,2015-12-15,31.34,,6,f,2015-11-30,2015-12-10,Neurocirugía,Estatus posoperatorio,144,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,10
+108,vivo,m,blanco,73,2015-11-30,2015-12-15,31.34,,6,f,2015-11-30,2015-12-10,Neurocirugía,Estatus posoperatorio,144,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,SPO toracotomía,no respiratorias,10
+109,vivo,m,blanco,50,2015-12-10,2015-12-23,40.09,,19,f,2015-12-11,2015-12-17,Angiología,TCE,96,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,6
+109,vivo,m,blanco,50,2015-12-10,2015-12-23,40.09,,19,f,2015-12-11,2015-12-17,Angiología,TCE,96,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,6
+109,vivo,m,blanco,50,2015-12-10,2015-12-23,40.09,,19,f,2015-12-11,2015-12-17,Angiología,TCE,96,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,TCE severo,no respiratorias,6
+109,vivo,m,blanco,50,2015-12-10,2015-12-23,40.09,,19,f,2015-12-11,2015-12-17,Angiología,TCE,96,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,SPO neurología,no respiratorias,6
+110,vivo,f,negro,24,2015-12-18,2015-12-29,12.44,,3,f,2015-12-18,2015-12-29,UCIM,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,EPOC descompensada,no respiratorias,11
+110,vivo,f,negro,24,2015-12-18,2015-12-29,12.44,,3,f,2015-12-18,2015-12-29,UCIM,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,Leptospirosis complicada,no respiratorias,11
+110,vivo,f,negro,24,2015-12-18,2015-12-29,12.44,,3,f,2015-12-18,2015-12-29,UCIM,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,Leptospirosis complicada,,,,,Leptospirosis complicada,no respiratorias,11
+110,vivo,f,negro,24,2015-12-18,2015-12-29,12.44,,3,f,2015-12-18,2015-12-29,UCIM,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,Leptospirosis complicada,,,,,EPOC descompensada,no respiratorias,11
+111,vivo,m,mestizo,66,2015-12-21,2016-01-20,25.81,,10,f,2015-12-30,2016-01-05,Neurología,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,Shock cardiogénico,,,,,Insuficiencia Renal Aguda,no respiratorias,6
+111,vivo,m,mestizo,66,2015-12-21,2016-01-20,25.81,,10,f,2015-12-30,2016-01-05,Neurología,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Aguda,,,,,Insuficiencia Renal Aguda,no respiratorias,6
+111,vivo,m,mestizo,66,2015-12-21,2016-01-20,25.81,,10,f,2015-12-30,2016-01-05,Neurología,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Aguda,,,,,Shock cardiogénico,no respiratorias,6
+111,vivo,m,mestizo,66,2015-12-21,2016-01-20,25.81,,10,f,2015-12-30,2016-01-05,Neurología,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,Shock cardiogénico,,,,,Shock cardiogénico,no respiratorias,6
+112,vivo,m,blanco,29,2015-09-07,2015-10-22,39.17,,9,f,2015-09-07,2015-09-18,Medicina,TCE,168,TET-TQ,con traqueotomia,TCE severo,,,,,BNV,no respiratorias,11
+112,vivo,m,blanco,29,2015-09-07,2015-10-22,39.17,,9,f,2015-09-07,2015-09-18,Medicina,TCE,168,TET-TQ,con traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,11
+113,vivo,f,blanco,71,2015-09-09,2015-09-23,35.94,,12,f,2015-09-09,2015-09-17,Neurología,Neumonías,144,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,BNB-IH,respiratorias,8
+113,vivo,f,blanco,71,2015-09-09,2015-09-23,35.94,,12,f,2015-09-09,2015-09-17,Neurología,Neumonías,144,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,Materna Crítica,respiratorias,8
+113,vivo,f,blanco,71,2015-09-09,2015-09-23,35.94,,12,f,2015-09-09,2015-09-17,Neurología,Neumonías,144,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,8
+113,vivo,f,blanco,71,2015-09-09,2015-09-23,35.94,,12,f,2015-09-09,2015-09-17,Neurología,Neumonías,144,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,Materna Crítica,respiratorias,8
+114,vivo,m,blanco,48,2015-09-17,2015-10-07,32.26,,11,f,2015-09-17,2015-10-07,UCIM,Afecciones no traumáticas del SNC,192,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,Síndrome Apn-Hipo del sueño,no respiratorias,20
+114,vivo,m,blanco,48,2015-09-17,2015-10-07,32.26,,11,f,2015-09-17,2015-10-07,UCIM,Afecciones no traumáticas del SNC,192,tubo endotraqueal,sin traqueotomia,Síndrome Apn-Hipo del sueño,,,,,Materna Crítica,no respiratorias,20
+114,vivo,m,blanco,48,2015-09-17,2015-10-07,32.26,,11,f,2015-09-17,2015-10-07,UCIM,Afecciones no traumáticas del SNC,192,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,Materna Crítica,no respiratorias,20
+114,vivo,m,blanco,48,2015-09-17,2015-10-07,32.26,,11,f,2015-09-17,2015-10-07,UCIM,Afecciones no traumáticas del SNC,192,tubo endotraqueal,sin traqueotomia,Síndrome Apn-Hipo del sueño,,,,,Síndrome Apn-Hipo del sueño,no respiratorias,20
+115,vivo,f,blanco,39,2015-09-28,2015-10-16,33.64,,13,f,2015-09-28,2015-10-13,UCIM,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,SPO toracotomía,no respiratorias,15
+115,vivo,f,blanco,39,2015-09-28,2015-10-16,33.64,,13,f,2015-09-28,2015-10-13,UCIM,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,15
+115,vivo,f,blanco,39,2015-09-28,2015-10-16,33.64,,13,f,2015-09-28,2015-10-13,UCIM,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,Insuficiencia Renal Crónica,no respiratorias,15
+115,vivo,f,blanco,39,2015-09-28,2015-10-16,33.64,,13,f,2015-09-28,2015-10-13,UCIM,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,15
+116,vivo,m,blanco,22,2015-11-07,2015-11-23,31.80,,9,f,2015-11-07,2015-11-12,Angiología,TCE,72,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,SPO neurología,no respiratorias,5
+116,vivo,m,blanco,22,2015-11-07,2015-11-23,31.80,,9,f,2015-11-07,2015-11-12,Angiología,TCE,72,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,5
+116,vivo,m,blanco,22,2015-11-07,2015-11-23,31.80,,9,f,2015-11-07,2015-11-12,Angiología,TCE,72,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,5
+116,vivo,m,blanco,22,2015-11-07,2015-11-23,31.80,,9,f,2015-11-07,2015-11-12,Angiología,TCE,72,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,TCE severo,no respiratorias,5
+117,vivo,m,blanco,89,2016-01-09,2016-01-16,39.63,,17,f,2016-01-09,2016-01-14,Cardiología,EPOC,72,tubo endotraqueal,sin traqueotomia,ARDS,,,,,BNB-IH,respiratorias,5
+117,vivo,m,blanco,89,2016-01-09,2016-01-16,39.63,,17,f,2016-01-09,2016-01-14,Cardiología,EPOC,72,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,5
+117,vivo,m,blanco,89,2016-01-09,2016-01-16,39.63,,17,f,2016-01-09,2016-01-14,Cardiología,EPOC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,ARDS,respiratorias,5
+117,vivo,m,blanco,89,2016-01-09,2016-01-16,39.63,,17,f,2016-01-09,2016-01-14,Cardiología,EPOC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,5
+118,vivo,m,blanco,72,2015-10-07,2015-10-16,45.16,,17,f,2015-10-07,2015-10-12,Cardiología,Neumonías,72,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,5
+119,vivo,m,blanco,29,2015-05-23,2015-05-27,29.49,,33,f,2015-05-23,2015-05-26,Nefrología,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,ACV,,,,,ACV,no respiratorias,3
+119,vivo,m,blanco,29,2015-05-23,2015-05-27,29.49,,33,f,2015-05-23,2015-05-26,Nefrología,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,ACV,,,,,DMO,no respiratorias,3
+119,vivo,m,blanco,29,2015-05-23,2015-05-27,29.49,,33,f,2015-05-23,2015-05-26,Nefrología,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,DMO,,,,,DMO,no respiratorias,3
+119,vivo,m,blanco,29,2015-05-23,2015-05-27,29.49,,33,f,2015-05-23,2015-05-26,Nefrología,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,DMO,,,,,ACV,no respiratorias,3
+120,vivo,f,blanco,55,2015-10-07,2015-10-14,38.25,,14,f,2015-10-07,2015-10-12,Cardiología,EPOC,72,tubo endotraqueal,sin traqueotomia,ARDS,,,,,Materna Crítica,respiratorias,5
+120,vivo,f,blanco,55,2015-10-07,2015-10-14,38.25,,14,f,2015-10-07,2015-10-12,Cardiología,EPOC,72,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,ARDS,respiratorias,5
+120,vivo,f,blanco,55,2015-10-07,2015-10-14,38.25,,14,f,2015-10-07,2015-10-12,Cardiología,EPOC,72,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,Materna Crítica,respiratorias,5
+120,vivo,f,blanco,55,2015-10-07,2015-10-14,38.25,,14,f,2015-10-07,2015-10-12,Cardiología,EPOC,72,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,5
+121,vivo,m,blanco,46,2015-12-29,2016-02-26,47.93,,18,f,2015-12-29,2016-01-05,Medicina,TCE,168,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,7
+121,vivo,m,blanco,46,2015-12-29,2016-02-26,47.93,,18,f,2015-12-29,2016-01-05,Medicina,TCE,168,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,7
+121,vivo,m,blanco,46,2015-12-29,2016-02-26,47.93,,18,f,2015-12-29,2016-01-05,Medicina,TCE,168,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,TCE severo,no respiratorias,7
+121,vivo,m,blanco,46,2015-12-29,2016-02-26,47.93,,18,f,2015-12-29,2016-01-05,Medicina,TCE,168,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,Insuficiencia Renal Crónica,no respiratorias,7
+122,vivo,m,blanco,48,2015-12-15,2015-12-28,33.18,,9,f,2015-12-21,2015-12-24,Neurocirugía,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,3
+123,vivo,m,mestizo,42,2015-11-22,2016-01-23,22.12,,12,f,2015-11-22,2015-12-28,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO laparotomía,no respiratorias,36
+123,vivo,m,mestizo,42,2015-11-22,2016-01-23,22.12,,12,f,2015-11-22,2015-12-28,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,SPO laparotomía,no respiratorias,36
+123,vivo,m,mestizo,42,2015-11-22,2016-01-23,22.12,,12,f,2015-11-22,2015-12-28,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,36
+123,vivo,m,mestizo,42,2015-11-22,2016-01-23,22.12,,12,f,2015-11-22,2015-12-28,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,SPO toracotomía,no respiratorias,36
+124,vivo,m,blanco,68,2015-07-14,2015-07-31,52.07,,15,f,2015-07-15,2015-07-20,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,,,,,BNB-IH,respiratorias,5
+124,vivo,m,blanco,68,2015-07-14,2015-07-31,52.07,,15,f,2015-07-15,2015-07-20,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,5
+124,vivo,m,blanco,68,2015-07-14,2015-07-31,52.07,,15,f,2015-07-15,2015-07-20,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,ARDS,respiratorias,5
+124,vivo,m,blanco,68,2015-07-14,2015-07-31,52.07,,15,f,2015-07-15,2015-07-20,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,5
+125,vivo,m,blanco,77,2015-03-12,2015-03-24,40.55,,12,f,2015-03-12,2015-03-18,Cardiología,Neumonías,72,tubo endotraqueal,sin traqueotomia,BNV,,,,,BNV,respiratorias,6
+126,vivo,m,blanco,49,2015-11-20,2015-12-22,39.63,,17,f,2015-11-20,2015-11-27,Angiología,TCE,120,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,7
+127,vivo,f,blanco,48,2015-11-19,2016-01-13,32.26,,10,f,2015-11-20,2015-11-24,Neurocirugía,Afecciones no traumáticas del SNC,48,TET-TQ,con traqueotomia,SPO laparotomía,,,,,SPO laparotomía,no respiratorias,4
+127,vivo,f,blanco,48,2015-11-19,2016-01-13,32.26,,10,f,2015-11-20,2015-11-24,Neurocirugía,Afecciones no traumáticas del SNC,48,TET-TQ,con traqueotomia,PCR recuperado,,,,,SPO laparotomía,no respiratorias,4
+127,vivo,f,blanco,48,2015-11-19,2016-01-13,32.26,,10,f,2015-11-20,2015-11-24,Neurocirugía,Afecciones no traumáticas del SNC,48,TET-TQ,con traqueotomia,SPO laparotomía,,,,,PCR recuperado,no respiratorias,4
+127,vivo,f,blanco,48,2015-11-19,2016-01-13,32.26,,10,f,2015-11-20,2015-11-24,Neurocirugía,Afecciones no traumáticas del SNC,48,TET-TQ,con traqueotomia,PCR recuperado,,,,,PCR recuperado,no respiratorias,4
+128,vivo,f,blanco,43,2015-12-03,2015-12-15,32.72,,11,f,2015-12-03,2015-12-12,Neurocirugía,TCE,48,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,SPO laparotomía,no respiratorias,9
+128,vivo,f,blanco,43,2015-12-03,2015-12-15,32.72,,11,f,2015-12-03,2015-12-12,Neurocirugía,TCE,48,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,9
+128,vivo,f,blanco,43,2015-12-03,2015-12-15,32.72,,11,f,2015-12-03,2015-12-12,Neurocirugía,TCE,48,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,Insuficiencia Renal Crónica,no respiratorias,9
+128,vivo,f,blanco,43,2015-12-03,2015-12-15,32.72,,11,f,2015-12-03,2015-12-12,Neurocirugía,TCE,48,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,SPO laparotomía,no respiratorias,9
+129,vivo,f,blanco,85,2015-09-04,2015-09-10,36.87,,22,f,2015-09-04,2015-09-07,Otros,Afecciones no traumáticas del SNC,48,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,,,,,Embolismo graso,no respiratorias,3
+129,vivo,f,blanco,85,2015-09-04,2015-09-10,36.87,,22,f,2015-09-04,2015-09-07,Otros,Afecciones no traumáticas del SNC,48,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,,,,,Intoxicación Exógena,no respiratorias,3
+130,vivo,m,blanco,44,2015-07-29,2015-09-04,32.26,,11,f,2015-07-29,2015-08-31,Neurocirugía,Estatus posoperatorio,288,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,33
+130,vivo,m,blanco,44,2015-07-29,2015-09-04,32.26,,11,f,2015-07-29,2015-08-31,Neurocirugía,Estatus posoperatorio,288,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,BNV,no respiratorias,33
+131,vivo,f,blanco,44,2015-10-26,2015-11-16,36.41,,19,f,2015-10-26,2015-11-02,UCIM,Afecciones no traumáticas del SNC,120,tubo endotraqueal,sin traqueotomia,PCR recuperado,,,,,PCR recuperado,no respiratorias,7
+132,vivo,f,blanco,79,2015-11-09,2016-01-15,39.63,,21,f,2015-12-02,2015-12-14,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,12
+132,vivo,f,blanco,79,2015-11-09,2016-01-15,39.63,,21,f,2015-12-02,2015-12-14,Neurocirugía,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO laparotomía,no respiratorias,12
+133,vivo,m,blanco,65,2015-09-03,2015-09-17,35.94,,7,f,2015-09-04,2015-09-10,Cardiología,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-IH,no respiratorias,6
+133,vivo,m,blanco,65,2015-09-03,2015-09-17,35.94,,7,f,2015-09-04,2015-09-10,Cardiología,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Coma,,,,,Coma,no respiratorias,6
+133,vivo,m,blanco,65,2015-09-03,2015-09-17,35.94,,7,f,2015-09-04,2015-09-10,Cardiología,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Coma,,,,,BNB-IH,no respiratorias,6
+133,vivo,m,blanco,65,2015-09-03,2015-09-17,35.94,,7,f,2015-09-04,2015-09-10,Cardiología,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,Coma,no respiratorias,6
+134,vivo,f,blanco,35,2015-07-31,2015-10-10,24.88,,5,f,2015-07-31,2015-10-05,Neurocirugía,Estatus posoperatorio,216,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,SPO laparotomía,no respiratorias,66
+134,vivo,f,blanco,35,2015-07-31,2015-10-10,24.88,,5,f,2015-07-31,2015-10-05,Neurocirugía,Estatus posoperatorio,216,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,EPOC descompensada,no respiratorias,66
+135,fallecido,m,blanco,74,2015-07-26,2015-08-03,52.53,Cardiología,10,f,2015-07-26,2015-07-30,Medicina,Afecciones no traumáticas del SNC,72,TET-TQ,con traqueotomia,Coma,BNB-IH,intermedia,,,Coma,no respiratorias,4
+135,fallecido,m,blanco,74,2015-07-26,2015-08-03,52.53,Cardiología,10,f,2015-07-26,2015-07-30,Medicina,Afecciones no traumáticas del SNC,72,TET-TQ,con traqueotomia,Coma,Insuficiencia respiratoria,directa,,,PCR recuperado,no respiratorias,4
+135,fallecido,m,blanco,74,2015-07-26,2015-08-03,52.53,Cardiología,10,f,2015-07-26,2015-07-30,Medicina,Afecciones no traumáticas del SNC,72,TET-TQ,con traqueotomia,Coma,Insuficiencia respiratoria,directa,,,Coma,no respiratorias,4
+135,fallecido,m,blanco,74,2015-07-26,2015-08-03,52.53,Cardiología,10,f,2015-07-26,2015-07-30,Medicina,Afecciones no traumáticas del SNC,72,TET-TQ,con traqueotomia,Coma,Diabetes Mellitus,basica,,,PCR recuperado,no respiratorias,4
+135,fallecido,m,blanco,74,2015-07-26,2015-08-03,52.53,Cardiología,10,f,2015-07-26,2015-07-30,Medicina,Afecciones no traumáticas del SNC,72,TET-TQ,con traqueotomia,Coma,Diabetes Mellitus,basica,,,Coma,no respiratorias,4
+135,fallecido,m,blanco,74,2015-07-26,2015-08-03,52.53,Cardiología,10,f,2015-07-26,2015-07-30,Medicina,Afecciones no traumáticas del SNC,72,TET-TQ,con traqueotomia,Coma,BNB-IH,intermedia,,,PCR recuperado,no respiratorias,4
+136,fallecido,m,blanco,86,2015-11-10,2015-11-27,55.76,Medicina,20,f,2015-11-10,2015-11-18,Medicina,EPOC,72,tubo endotraqueal,sin traqueotomia,ARDS,EPOC,basica,,,BNB-IH,respiratorias,8
+136,fallecido,m,blanco,86,2015-11-10,2015-11-27,55.76,Medicina,20,f,2015-11-10,2015-11-18,Medicina,EPOC,72,tubo endotraqueal,sin traqueotomia,ARDS,Insuficiencia respiratoria,directa,,,BNB-IH,respiratorias,8
+136,fallecido,m,blanco,86,2015-11-10,2015-11-27,55.76,Medicina,20,f,2015-11-10,2015-11-18,Medicina,EPOC,72,tubo endotraqueal,sin traqueotomia,ARDS,Insuficiencia respiratoria,directa,,,ARDS,respiratorias,8
+136,fallecido,m,blanco,86,2015-11-10,2015-11-27,55.76,Medicina,20,f,2015-11-10,2015-11-18,Medicina,EPOC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,BNB-IH,intermedia,,,BNB-IH,respiratorias,8
+136,fallecido,m,blanco,86,2015-11-10,2015-11-27,55.76,Medicina,20,f,2015-11-10,2015-11-18,Medicina,EPOC,72,tubo endotraqueal,sin traqueotomia,ARDS,EPOC,basica,,,ARDS,respiratorias,8
+136,fallecido,m,blanco,86,2015-11-10,2015-11-27,55.76,Medicina,20,f,2015-11-10,2015-11-18,Medicina,EPOC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,BNB-IH,intermedia,,,ARDS,respiratorias,8
+136,fallecido,m,blanco,86,2015-11-10,2015-11-27,55.76,Medicina,20,f,2015-11-10,2015-11-18,Medicina,EPOC,72,tubo endotraqueal,sin traqueotomia,ARDS,BNB-IH,intermedia,,,BNB-IH,respiratorias,8
+136,fallecido,m,blanco,86,2015-11-10,2015-11-27,55.76,Medicina,20,f,2015-11-10,2015-11-18,Medicina,EPOC,72,tubo endotraqueal,sin traqueotomia,ARDS,BNB-IH,intermedia,,,ARDS,respiratorias,8
+136,fallecido,m,blanco,86,2015-11-10,2015-11-27,55.76,Medicina,20,f,2015-11-10,2015-11-18,Medicina,EPOC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,Insuficiencia respiratoria,directa,,,BNB-IH,respiratorias,8
+136,fallecido,m,blanco,86,2015-11-10,2015-11-27,55.76,Medicina,20,f,2015-11-10,2015-11-18,Medicina,EPOC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,EPOC,basica,,,BNB-IH,respiratorias,8
+136,fallecido,m,blanco,86,2015-11-10,2015-11-27,55.76,Medicina,20,f,2015-11-10,2015-11-18,Medicina,EPOC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,EPOC,basica,,,ARDS,respiratorias,8
+136,fallecido,m,blanco,86,2015-11-10,2015-11-27,55.76,Medicina,20,f,2015-11-10,2015-11-18,Medicina,EPOC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,Insuficiencia respiratoria,directa,,,ARDS,respiratorias,8
+137,fallecido,m,mestizo,21,2015-06-14,2015-07-11,38.71,Medicina,18,f,2015-06-14,2015-07-04,Medicina,TCE,336,TET-TQ,con traqueotomia,SPO neurología,Insuficiencia respiratoria,directa,,,TCE severo,no respiratorias,20
+137,fallecido,m,mestizo,21,2015-06-14,2015-07-11,38.71,Medicina,18,f,2015-06-14,2015-07-04,Medicina,TCE,336,TET-TQ,con traqueotomia,TCE severo,Insuficiencia respiratoria,directa,,,SPO neurología,no respiratorias,20
+137,fallecido,m,mestizo,21,2015-06-14,2015-07-11,38.71,Medicina,18,f,2015-06-14,2015-07-04,Medicina,TCE,336,TET-TQ,con traqueotomia,SPO neurología,Contusión cerebral + laceración cerebral,intermedia,,,SPO neurología,no respiratorias,20
+137,fallecido,m,mestizo,21,2015-06-14,2015-07-11,38.71,Medicina,18,f,2015-06-14,2015-07-04,Medicina,TCE,336,TET-TQ,con traqueotomia,TCE severo,Insuficiencia respiratoria,directa,,,TCE severo,no respiratorias,20
+137,fallecido,m,mestizo,21,2015-06-14,2015-07-11,38.71,Medicina,18,f,2015-06-14,2015-07-04,Medicina,TCE,336,TET-TQ,con traqueotomia,TCE severo,Colisión con automóvil,basica,,,TCE severo,no respiratorias,20
+137,fallecido,m,mestizo,21,2015-06-14,2015-07-11,38.71,Medicina,18,f,2015-06-14,2015-07-04,Medicina,TCE,336,TET-TQ,con traqueotomia,SPO neurología,Contusión cerebral + laceración cerebral,intermedia,,,TCE severo,no respiratorias,20
+137,fallecido,m,mestizo,21,2015-06-14,2015-07-11,38.71,Medicina,18,f,2015-06-14,2015-07-04,Medicina,TCE,336,TET-TQ,con traqueotomia,TCE severo,Contusión cerebral + laceración cerebral,intermedia,,,TCE severo,no respiratorias,20
+137,fallecido,m,mestizo,21,2015-06-14,2015-07-11,38.71,Medicina,18,f,2015-06-14,2015-07-04,Medicina,TCE,336,TET-TQ,con traqueotomia,TCE severo,Contusión cerebral + laceración cerebral,intermedia,,,SPO neurología,no respiratorias,20
+137,fallecido,m,mestizo,21,2015-06-14,2015-07-11,38.71,Medicina,18,f,2015-06-14,2015-07-04,Medicina,TCE,336,TET-TQ,con traqueotomia,TCE severo,Colisión con automóvil,basica,,,SPO neurología,no respiratorias,20
+137,fallecido,m,mestizo,21,2015-06-14,2015-07-11,38.71,Medicina,18,f,2015-06-14,2015-07-04,Medicina,TCE,336,TET-TQ,con traqueotomia,SPO neurología,Colisión con automóvil,basica,,,TCE severo,no respiratorias,20
+137,fallecido,m,mestizo,21,2015-06-14,2015-07-11,38.71,Medicina,18,f,2015-06-14,2015-07-04,Medicina,TCE,336,TET-TQ,con traqueotomia,SPO neurología,Colisión con automóvil,basica,,,SPO neurología,no respiratorias,20
+137,fallecido,m,mestizo,21,2015-06-14,2015-07-11,38.71,Medicina,18,f,2015-06-14,2015-07-04,Medicina,TCE,336,TET-TQ,con traqueotomia,SPO neurología,Insuficiencia respiratoria,directa,,,SPO neurología,no respiratorias,20
+138,fallecido,m,blanco,66,2015-08-07,2015-10-19,60.83,Cardiología,17,f,2015-08-07,2015-08-14,Medicina,EPOC,96,TET-TQ,con traqueotomia,ARDS,EPOC,basica,,,BNB-IH,respiratorias,7
+138,fallecido,m,blanco,66,2015-08-07,2015-10-19,60.83,Cardiología,17,f,2015-08-07,2015-08-14,Medicina,EPOC,96,TET-TQ,con traqueotomia,ARDS,BNB-EH,intermedia,,,ARDS,respiratorias,7
+138,fallecido,m,blanco,66,2015-08-07,2015-10-19,60.83,Cardiología,17,f,2015-08-07,2015-08-14,Medicina,EPOC,96,TET-TQ,con traqueotomia,BNB-IH,EPOC,basica,,,BNB-IH,respiratorias,7
+138,fallecido,m,blanco,66,2015-08-07,2015-10-19,60.83,Cardiología,17,f,2015-08-07,2015-08-14,Medicina,EPOC,96,TET-TQ,con traqueotomia,ARDS,EPOC,basica,,,ARDS,respiratorias,7
+138,fallecido,m,blanco,66,2015-08-07,2015-10-19,60.83,Cardiología,17,f,2015-08-07,2015-08-14,Medicina,EPOC,96,TET-TQ,con traqueotomia,BNB-IH,EPOC,basica,,,ARDS,respiratorias,7
+138,fallecido,m,blanco,66,2015-08-07,2015-10-19,60.83,Cardiología,17,f,2015-08-07,2015-08-14,Medicina,EPOC,96,TET-TQ,con traqueotomia,ARDS,TEP,directa,,,ARDS,respiratorias,7
+138,fallecido,m,blanco,66,2015-08-07,2015-10-19,60.83,Cardiología,17,f,2015-08-07,2015-08-14,Medicina,EPOC,96,TET-TQ,con traqueotomia,ARDS,TEP,directa,,,BNB-IH,respiratorias,7
+138,fallecido,m,blanco,66,2015-08-07,2015-10-19,60.83,Cardiología,17,f,2015-08-07,2015-08-14,Medicina,EPOC,96,TET-TQ,con traqueotomia,BNB-IH,TEP,directa,,,ARDS,respiratorias,7
+138,fallecido,m,blanco,66,2015-08-07,2015-10-19,60.83,Cardiología,17,f,2015-08-07,2015-08-14,Medicina,EPOC,96,TET-TQ,con traqueotomia,BNB-IH,TEP,directa,,,BNB-IH,respiratorias,7
+138,fallecido,m,blanco,66,2015-08-07,2015-10-19,60.83,Cardiología,17,f,2015-08-07,2015-08-14,Medicina,EPOC,96,TET-TQ,con traqueotomia,BNB-IH,BNB-EH,intermedia,,,BNB-IH,respiratorias,7
+138,fallecido,m,blanco,66,2015-08-07,2015-10-19,60.83,Cardiología,17,f,2015-08-07,2015-08-14,Medicina,EPOC,96,TET-TQ,con traqueotomia,BNB-IH,BNB-EH,intermedia,,,ARDS,respiratorias,7
+138,fallecido,m,blanco,66,2015-08-07,2015-10-19,60.83,Cardiología,17,f,2015-08-07,2015-08-14,Medicina,EPOC,96,TET-TQ,con traqueotomia,ARDS,BNB-EH,intermedia,,,BNB-IH,respiratorias,7
+139,vivo,f,blanco,59,2015-11-21,2015-12-01,37.33,,11,f,2015-11-21,2015-11-27,Cardiología,EPOC,73,tubo endotraqueal,sin traqueotomia,ARDS,,,,,Miocarditis,respiratorias,6
+139,vivo,f,blanco,59,2015-11-21,2015-12-01,37.33,,11,f,2015-11-21,2015-11-27,Cardiología,EPOC,73,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,6
+140,vivo,m,blanco,67,2014-12-01,2014-12-28,46.54,,9,f,2014-12-01,2014-12-20,Medicina,EPOC,72,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,19
+140,vivo,m,blanco,67,2014-12-01,2014-12-28,46.54,,9,f,2014-12-01,2014-12-20,Medicina,EPOC,72,tubo endotraqueal,sin traqueotomia,ARDS,,,,,BNB-IH,respiratorias,19
+140,vivo,m,blanco,67,2014-12-01,2014-12-28,46.54,,9,f,2014-12-01,2014-12-20,Medicina,EPOC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,19
+140,vivo,m,blanco,67,2014-12-01,2014-12-28,46.54,,9,f,2014-12-01,2014-12-20,Medicina,EPOC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,ARDS,respiratorias,19
+141,vivo,m,blanco,72,2014-10-15,2014-11-25,35.02,,9,f,2014-11-18,2014-11-22,Neurocirugía,Estatus posoperatorio,36,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,Shock cardiogénico,no respiratorias,4
+141,vivo,m,blanco,72,2014-10-15,2014-11-25,35.02,,9,f,2014-11-18,2014-11-22,Neurocirugía,Estatus posoperatorio,36,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,4
+142,vivo,f,negro,65,2015-01-28,2015-02-17,29.49,,15,f,2015-02-07,2015-02-10,Angiología,TCE,24,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,3
+142,vivo,f,negro,65,2015-01-28,2015-02-17,29.49,,15,f,2015-02-07,2015-02-10,Angiología,TCE,24,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,TCE severo,no respiratorias,3
+142,vivo,f,negro,65,2015-01-28,2015-02-17,29.49,,15,f,2015-02-07,2015-02-10,Angiología,TCE,24,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,SPO neurología,no respiratorias,3
+142,vivo,f,negro,65,2015-01-28,2015-02-17,29.49,,15,f,2015-02-07,2015-02-10,Angiología,TCE,24,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,3
+143,vivo,f,negro,39,2015-08-17,2015-08-22,23.04,,13,f,2015-08-17,2015-08-22,UCIM,Otras,38,tubo endotraqueal,sin traqueotomia,Encefalopatía metabólica,,,,,PCR recuperado,respiratorias,5
+143,vivo,f,negro,39,2015-08-17,2015-08-22,23.04,,13,f,2015-08-17,2015-08-22,UCIM,Otras,38,tubo endotraqueal,sin traqueotomia,Encefalopatía metabólica,,,,,Ahorcamiento Incompleto,respiratorias,5
+144,vivo,m,blanco,51,2015-08-10,2015-08-25,26.27,,4,f,2015-08-20,2015-08-23,Neurocirugía,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,3
+145,vivo,m,blanco,59,2015-02-17,2015-03-06,34.10,,8,f,2015-02-23,2015-02-25,Angiología,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,2
+146,vivo,m,negro,44,2015-03-02,2015-03-17,15.21,,2,f,2015-03-12,2015-03-16,Angiología,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,4
+147,vivo,f,blanco,62,2015-04-15,2015-05-14,38.25,,15,f,2015-04-28,2015-04-30,Angiología,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,2
+148,vivo,f,blanco,50,2015-04-14,2015-04-25,24.88,,2,f,2015-04-21,2015-04-24,Angiología,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,3
+149,vivo,m,blanco,42,2015-12-15,2016-01-11,33.18,,11,f,2015-12-24,2015-12-28,Angiología,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,4
+150,vivo,m,blanco,28,2015-05-07,2015-05-20,35.48,,15,f,2015-05-12,2015-05-18,Angiología,Estatus posoperatorio,36,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,6
+151,vivo,f,blanco,85,2014-02-01,2014-02-06,37.33,,8,f,2014-02-01,2014-02-04,Medicina,EPOC,24,tubo endotraqueal,sin traqueotomia,ARDS,,,,,Materna Crítica,respiratorias,3
+151,vivo,f,blanco,85,2014-02-01,2014-02-06,37.33,,8,f,2014-02-01,2014-02-04,Medicina,EPOC,24,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,3
+151,vivo,f,blanco,85,2014-02-01,2014-02-06,37.33,,8,f,2014-02-01,2014-02-04,Medicina,EPOC,24,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,ARDS,respiratorias,3
+151,vivo,f,blanco,85,2014-02-01,2014-02-06,37.33,,8,f,2014-02-01,2014-02-04,Medicina,EPOC,24,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,Materna Crítica,respiratorias,3
+152,vivo,f,blanco,65,2014-02-20,2014-02-27,31.80,,6,f,2014-02-22,2014-02-25,Cardiología,EPOC,24,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,Materna Crítica,respiratorias,3
+152,vivo,f,blanco,65,2014-02-20,2014-02-27,31.80,,6,f,2014-02-22,2014-02-25,Cardiología,EPOC,24,tubo endotraqueal,sin traqueotomia,ARDS,,,,,Materna Crítica,respiratorias,3
+152,vivo,f,blanco,65,2014-02-20,2014-02-27,31.80,,6,f,2014-02-22,2014-02-25,Cardiología,EPOC,24,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,3
+152,vivo,f,blanco,65,2014-02-20,2014-02-27,31.80,,6,f,2014-02-22,2014-02-25,Cardiología,EPOC,24,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,ARDS,respiratorias,3
+153,vivo,f,blanco,53,2014-03-01,2014-03-08,25.35,,6,f,2014-03-01,2014-03-05,Neurocirugía,Afecciones no traumáticas del SNC,30,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,,,,,Intoxicación Exógena,no respiratorias,4
+154,vivo,f,blanco,75,2014-03-27,2014-04-01,39.63,,7,f,2014-03-27,2014-03-29,Medicina,EPOC,24,tubo endotraqueal,sin traqueotomia,ARDS,,,,,Materna Crítica,respiratorias,2
+154,vivo,f,blanco,75,2014-03-27,2014-04-01,39.63,,7,f,2014-03-27,2014-03-29,Medicina,EPOC,24,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,Materna Crítica,respiratorias,2
+154,vivo,f,blanco,75,2014-03-27,2014-04-01,39.63,,7,f,2014-03-27,2014-03-29,Medicina,EPOC,24,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,2
+154,vivo,f,blanco,75,2014-03-27,2014-04-01,39.63,,7,f,2014-03-27,2014-03-29,Medicina,EPOC,24,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,ARDS,respiratorias,2
+155,vivo,f,blanco,48,2014-03-27,2014-04-05,25.81,,4,f,2014-03-28,2014-04-02,Cardiología,Afecciones no traumáticas del SNC,24,tubo endotraqueal,sin traqueotomia,Síndrome Apn-Hipo del sueño,,,,,Síndrome Apn-Hipo del sueño,no respiratorias,5
+156,vivo,m,blanco,75,2014-04-02,2014-04-09,35.94,,8,f,2014-04-02,2014-04-04,Cardiología,EPOC,24,tubo endotraqueal,sin traqueotomia,ARDS,,,,,BNB-IH,respiratorias,2
+156,vivo,m,blanco,75,2014-04-02,2014-04-09,35.94,,8,f,2014-04-02,2014-04-04,Cardiología,EPOC,24,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,ARDS,respiratorias,2
+156,vivo,m,blanco,75,2014-04-02,2014-04-09,35.94,,8,f,2014-04-02,2014-04-04,Cardiología,EPOC,24,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,BNB-IH,respiratorias,2
+156,vivo,m,blanco,75,2014-04-02,2014-04-09,35.94,,8,f,2014-04-02,2014-04-04,Cardiología,EPOC,24,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,2
+157,vivo,m,blanco,80,2014-04-19,2014-05-15,36.87,,10,f,2014-04-22,2014-05-07,Angiología,Estatus posoperatorio,72,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,15
+158,fallecido,f,blanco,75,2014-05-13,2014-06-17,57.14,Medicina,18,f,2014-05-13,2014-05-27,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Estatus Asmático,Disfunción múltiple de órganos,directa,,,Ahorcamiento Incompleto,no respiratorias,14
+158,fallecido,f,blanco,75,2014-05-13,2014-06-17,57.14,Medicina,18,f,2014-05-13,2014-05-27,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Estatus Asmático,BNB-IH,intermedia,,,PCR recuperado,no respiratorias,14
+158,fallecido,f,blanco,75,2014-05-13,2014-06-17,57.14,Medicina,18,f,2014-05-13,2014-05-27,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,PCR recuperado,Disfunción múltiple de órganos,directa,,,Ahorcamiento Incompleto,no respiratorias,14
+158,fallecido,f,blanco,75,2014-05-13,2014-06-17,57.14,Medicina,18,f,2014-05-13,2014-05-27,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Estatus Asmático,Disfunción múltiple de órganos,directa,,,PCR recuperado,no respiratorias,14
+158,fallecido,f,blanco,75,2014-05-13,2014-06-17,57.14,Medicina,18,f,2014-05-13,2014-05-27,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,PCR recuperado,PCR,basica,,,PCR recuperado,no respiratorias,14
+158,fallecido,f,blanco,75,2014-05-13,2014-06-17,57.14,Medicina,18,f,2014-05-13,2014-05-27,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,PCR recuperado,PCR,basica,,,Ahorcamiento Incompleto,no respiratorias,14
+158,fallecido,f,blanco,75,2014-05-13,2014-06-17,57.14,Medicina,18,f,2014-05-13,2014-05-27,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Estatus Asmático,PCR,basica,,,Ahorcamiento Incompleto,no respiratorias,14
+158,fallecido,f,blanco,75,2014-05-13,2014-06-17,57.14,Medicina,18,f,2014-05-13,2014-05-27,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Estatus Asmático,PCR,basica,,,PCR recuperado,no respiratorias,14
+158,fallecido,f,blanco,75,2014-05-13,2014-06-17,57.14,Medicina,18,f,2014-05-13,2014-05-27,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,PCR recuperado,Disfunción múltiple de órganos,directa,,,PCR recuperado,no respiratorias,14
+158,fallecido,f,blanco,75,2014-05-13,2014-06-17,57.14,Medicina,18,f,2014-05-13,2014-05-27,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,PCR recuperado,BNB-IH,intermedia,,,PCR recuperado,no respiratorias,14
+158,fallecido,f,blanco,75,2014-05-13,2014-06-17,57.14,Medicina,18,f,2014-05-13,2014-05-27,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,PCR recuperado,BNB-IH,intermedia,,,Ahorcamiento Incompleto,no respiratorias,14
+158,fallecido,f,blanco,75,2014-05-13,2014-06-17,57.14,Medicina,18,f,2014-05-13,2014-05-27,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Estatus Asmático,BNB-IH,intermedia,,,Ahorcamiento Incompleto,no respiratorias,14
+159,vivo,m,blanco,72,2014-05-18,2014-05-26,34.10,,8,f,2014-05-20,2014-05-23,Neurocirugía,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,3
+160,vivo,m,blanco,61,2014-08-03,2014-08-12,29.95,,7,f,2014-08-05,2014-08-11,Neurocirugía,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,6
+161,fallecido,f,blanco,51,2014-08-07,2014-10-12,46.54,Medicina,18,f,2014-08-07,2014-09-10,Angiología,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,TCE severo,TCE,basica,,,SPO neurología,no respiratorias,34
+161,fallecido,f,blanco,51,2014-08-07,2014-10-12,46.54,Medicina,18,f,2014-08-07,2014-09-10,Angiología,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,TCE severo,BNB-IH,intermedia,,,SPO neurología,no respiratorias,34
+161,fallecido,f,blanco,51,2014-08-07,2014-10-12,46.54,Medicina,18,f,2014-08-07,2014-09-10,Angiología,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,SPO neurología,TCE,basica,,,SPO neurología,no respiratorias,34
+161,fallecido,f,blanco,51,2014-08-07,2014-10-12,46.54,Medicina,18,f,2014-08-07,2014-09-10,Angiología,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,TCE severo,Disfunción múltiple de órganos,directa,,,SPO neurología,no respiratorias,34
+161,fallecido,f,blanco,51,2014-08-07,2014-10-12,46.54,Medicina,18,f,2014-08-07,2014-09-10,Angiología,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,SPO neurología,BNB-IH,intermedia,,,SPO neurología,no respiratorias,34
+161,fallecido,f,blanco,51,2014-08-07,2014-10-12,46.54,Medicina,18,f,2014-08-07,2014-09-10,Angiología,Estatus posoperatorio,48,tubo endotraqueal,sin traqueotomia,SPO neurología,Disfunción múltiple de órganos,directa,,,SPO neurología,no respiratorias,34
+162,fallecido,f,blanco,54,2014-08-28,2014-09-14,53.00,Medicina,18,f,2014-08-28,2014-08-30,Medicina,Afecciones no traumáticas del SNC,48,tubo endotraqueal,sin traqueotomia,PCR recuperado,PCR,basica,,,PCR recuperado,no respiratorias,2
+162,fallecido,f,blanco,54,2014-08-28,2014-09-14,53.00,Medicina,18,f,2014-08-28,2014-08-30,Medicina,Afecciones no traumáticas del SNC,48,tubo endotraqueal,sin traqueotomia,PCR recuperado,Disfunción múltiple de órganos,directa,,,PCR recuperado,no respiratorias,2
+162,fallecido,f,blanco,54,2014-08-28,2014-09-14,53.00,Medicina,18,f,2014-08-28,2014-08-30,Medicina,Afecciones no traumáticas del SNC,48,tubo endotraqueal,sin traqueotomia,PCR recuperado,BNB-IH,intermedia,,,PCR recuperado,no respiratorias,2
+163,vivo,f,blanco,74,2014-10-01,2014-10-10,29.49,,4,f,2014-10-03,2014-10-07,Angiología,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,4
+164,vivo,f,blanco,72,2014-10-13,2014-10-20,44.24,,8,f,2014-10-13,2014-10-17,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,BNB-IH,,,,,ARDS,respiratorias,4
+164,vivo,f,blanco,72,2014-10-13,2014-10-20,44.24,,8,f,2014-10-13,2014-10-17,Medicina,EPOC,48,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,4
+165,vivo,f,blanco,47,2014-11-01,2014-11-09,25.81,,6,f,2014-11-04,2014-11-07,Neurocirugía,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,3
+166,vivo,f,blanco,69,2014-11-11,2014-11-29,38.25,,12,f,2014-11-13,2014-11-17,Neurocirugía,Otras,48,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,SPO laparotomía,respiratorias,4
+166,vivo,f,blanco,69,2014-11-11,2014-11-29,38.25,,12,f,2014-11-13,2014-11-17,Neurocirugía,Otras,48,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,Shock cardiogénico,respiratorias,4
+166,vivo,f,blanco,69,2014-11-11,2014-11-29,38.25,,12,f,2014-11-13,2014-11-17,Neurocirugía,Otras,48,tubo endotraqueal,sin traqueotomia,Shock cardiogénico,,,,,Shock cardiogénico,respiratorias,4
+166,vivo,f,blanco,69,2014-11-11,2014-11-29,38.25,,12,f,2014-11-13,2014-11-17,Neurocirugía,Otras,48,tubo endotraqueal,sin traqueotomia,Shock cardiogénico,,,,,SPO laparotomía,respiratorias,4
+167,vivo,f,blanco,78,2014-11-20,2014-11-27,33.64,,8,f,2014-11-20,2014-11-24,Cardiología,Afecciones no traumáticas del SNC,24,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,,,,,Intoxicación Exógena,no respiratorias,4
+168,vivo,f,blanco,85,2014-12-06,2014-12-13,35.02,,7,f,2014-12-06,2014-12-09,Medicina,EPOC,36,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,3
+168,vivo,f,blanco,85,2014-12-06,2014-12-13,35.02,,7,f,2014-12-06,2014-12-09,Medicina,EPOC,36,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,Materna Crítica,respiratorias,3
+168,vivo,f,blanco,85,2014-12-06,2014-12-13,35.02,,7,f,2014-12-06,2014-12-09,Medicina,EPOC,36,tubo endotraqueal,sin traqueotomia,ARDS,,,,,Materna Crítica,respiratorias,3
+168,vivo,f,blanco,85,2014-12-06,2014-12-13,35.02,,7,f,2014-12-06,2014-12-09,Medicina,EPOC,36,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,ARDS,respiratorias,3
+169,vivo,f,blanco,67,2014-12-08,2014-12-15,43.78,,10,f,2014-12-08,2014-12-11,Medicina,EPOC,24,tubo endotraqueal,sin traqueotomia,ARDS,,,,,Materna Crítica,respiratorias,3
+169,vivo,f,blanco,67,2014-12-08,2014-12-15,43.78,,10,f,2014-12-08,2014-12-11,Medicina,EPOC,24,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,Materna Crítica,respiratorias,3
+169,vivo,f,blanco,67,2014-12-08,2014-12-15,43.78,,10,f,2014-12-08,2014-12-11,Medicina,EPOC,24,tubo endotraqueal,sin traqueotomia,Materna Crítica,,,,,ARDS,respiratorias,3
+169,vivo,f,blanco,67,2014-12-08,2014-12-15,43.78,,10,f,2014-12-08,2014-12-11,Medicina,EPOC,24,tubo endotraqueal,sin traqueotomia,ARDS,,,,,ARDS,respiratorias,3
+170,vivo,f,blanco,33,2014-12-19,2014-12-29,33.18,,10,f,2014-12-19,2014-12-23,Cardiología,Estatus Asmático,48,tubo endotraqueal,sin traqueotomia,Emergencia hipertensiva,,,,,Emergencia hipertensiva,respiratorias,4
+171,vivo,f,blanco,45,2014-12-25,2014-12-30,30.88,,8,f,2014-12-25,2014-12-27,Cardiología,Estatus Asmático,24,tubo endotraqueal,sin traqueotomia,Emergencia hipertensiva,,,,,Emergencia hipertensiva,respiratorias,2
+172,vivo,f,blanco,54,2014-12-14,2015-01-03,35.94,,14,f,2014-12-14,2014-12-24,Angiología,TCE,192,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,10
+172,vivo,f,blanco,54,2014-12-14,2015-01-03,35.94,,14,f,2014-12-14,2014-12-24,Angiología,TCE,192,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,10
+172,vivo,f,blanco,54,2014-12-14,2015-01-03,35.94,,14,f,2014-12-14,2014-12-24,Angiología,TCE,192,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,SPO neurología,no respiratorias,10
+172,vivo,f,blanco,54,2014-12-14,2015-01-03,35.94,,14,f,2014-12-14,2014-12-24,Angiología,TCE,192,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,TCE severo,no respiratorias,10
+173,vivo,m,blanco,71,2014-08-04,2014-09-30,35.48,,10,f,2014-08-11,2014-09-19,Otros,Causas extrapulmonares,384,tubo endotraqueal,sin traqueotomia,Politraumatizado,,,,,BNV,no respiratorias,39
+173,vivo,m,blanco,71,2014-08-04,2014-09-30,35.48,,10,f,2014-08-11,2014-09-19,Otros,Causas extrapulmonares,384,tubo endotraqueal,sin traqueotomia,Politraumatizado,,,,,Politraumatizado,no respiratorias,39
+174,vivo,m,blanco,57,2015-01-02,2015-01-29,39.17,,14,f,2015-01-07,2015-01-16,UCIM,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,Shock séptico,,,,,Shock séptico,no respiratorias,9
+174,vivo,m,blanco,57,2015-01-02,2015-01-29,39.17,,14,f,2015-01-07,2015-01-16,UCIM,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,PCR recuperado,,,,,Shock séptico,no respiratorias,9
+174,vivo,m,blanco,57,2015-01-02,2015-01-29,39.17,,14,f,2015-01-07,2015-01-16,UCIM,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,Shock séptico,,,,,PCR recuperado,no respiratorias,9
+174,vivo,m,blanco,57,2015-01-02,2015-01-29,39.17,,14,f,2015-01-07,2015-01-16,UCIM,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,PCR recuperado,,,,,PCR recuperado,no respiratorias,9
+175,vivo,m,blanco,33,2015-01-15,2015-01-23,25.35,,6,f,2015-01-16,2015-01-21,UCIM,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,Guillain Barre,,,,,Guillain Barre,no respiratorias,5
+176,vivo,f,mestizo,65,2015-02-07,2015-02-15,22.58,,8,f,2015-02-07,2015-02-09,Angiología,TCE,2,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,SPO neurología,no respiratorias,2
+176,vivo,f,mestizo,65,2015-02-07,2015-02-15,22.58,,8,f,2015-02-07,2015-02-09,Angiología,TCE,2,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,TCE severo,no respiratorias,2
+176,vivo,f,mestizo,65,2015-02-07,2015-02-15,22.58,,8,f,2015-02-07,2015-02-09,Angiología,TCE,2,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,2
+176,vivo,f,mestizo,65,2015-02-07,2015-02-15,22.58,,8,f,2015-02-07,2015-02-09,Angiología,TCE,2,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,2
+177,vivo,m,blanco,68,2015-03-02,2015-03-14,31.34,,6,f,2015-03-03,2015-03-06,Neurocirugía,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,3
+178,vivo,m,blanco,62,2015-02-15,2015-03-27,35.02,,12,f,2015-03-04,2015-03-09,Neurocirugía,Estatus posoperatorio,36,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,5
+179,vivo,m,mestizo,46,2015-03-07,2015-03-21,19.82,,10,f,2015-03-07,2015-03-09,Neurocirugía,Estatus posoperatorio,2,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,DMO,no respiratorias,2
+179,vivo,m,mestizo,46,2015-03-07,2015-03-21,19.82,,10,f,2015-03-07,2015-03-09,Neurocirugía,Estatus posoperatorio,2,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,SPO laparotomía,no respiratorias,2
+179,vivo,m,mestizo,46,2015-03-07,2015-03-21,19.82,,10,f,2015-03-07,2015-03-09,Neurocirugía,Estatus posoperatorio,2,tubo endotraqueal,sin traqueotomia,DMO,,,,,SPO laparotomía,no respiratorias,2
+179,vivo,m,mestizo,46,2015-03-07,2015-03-21,19.82,,10,f,2015-03-07,2015-03-09,Neurocirugía,Estatus posoperatorio,2,tubo endotraqueal,sin traqueotomia,DMO,,,,,DMO,no respiratorias,2
+180,vivo,m,blanco,44,2015-03-08,2015-03-25,26.73,,6,f,2015-03-12,2015-03-17,Neurocirugía,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,5
+181,vivo,f,blanco,50,2015-04-15,2015-04-30,25.35,,6,f,2015-04-21,2015-04-24,Neurocirugía,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,3
+182,vivo,f,blanco,27,2015-04-27,2015-05-03,28.57,,8,f,2015-04-27,2015-04-29,Cardiología,Afecciones no traumáticas del SNC,24,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,,,,,Intoxicación Exógena,no respiratorias,2
+183,vivo,f,blanco,62,2015-04-25,2015-05-07,32.26,,10,f,2015-04-28,2015-04-30,Neurocirugía,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,2
+184,vivo,m,blanco,39,2015-05-13,2015-06-02,39.17,,23,f,2015-05-13,2015-05-19,Angiología,TCE,72,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,6
+184,vivo,m,blanco,39,2015-05-13,2015-06-02,39.17,,23,f,2015-05-13,2015-05-19,Angiología,TCE,72,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,TCE severo,no respiratorias,6
+184,vivo,m,blanco,39,2015-05-13,2015-06-02,39.17,,23,f,2015-05-13,2015-05-19,Angiología,TCE,72,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,SPO neurología,no respiratorias,6
+184,vivo,m,blanco,39,2015-05-13,2015-06-02,39.17,,23,f,2015-05-13,2015-05-19,Angiología,TCE,72,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,6
+185,vivo,m,blanco,23,2015-06-14,2015-06-28,35.48,,13,f,2015-06-14,2015-06-20,Angiología,TCE,72,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,SPO neurología,no respiratorias,6
+185,vivo,m,blanco,23,2015-06-14,2015-06-28,35.48,,13,f,2015-06-14,2015-06-20,Angiología,TCE,72,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,TCE severo,no respiratorias,6
+185,vivo,m,blanco,23,2015-06-14,2015-06-28,35.48,,13,f,2015-06-14,2015-06-20,Angiología,TCE,72,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,6
+185,vivo,m,blanco,23,2015-06-14,2015-06-28,35.48,,13,f,2015-06-14,2015-06-20,Angiología,TCE,72,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,6
+186,vivo,m,blanco,42,2015-06-27,2015-07-11,24.42,,2,f,2015-06-30,2015-07-03,Neurocirugía,Estatus posoperatorio,36,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,3
+187,vivo,f,blanco,57,2015-07-25,2015-07-30,27.19,,4,f,2015-07-25,2015-07-28,Cardiología,Afecciones no traumáticas del SNC,36,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,,,,,Intoxicación Exógena,no respiratorias,3
+188,vivo,m,blanco,36,2015-08-03,2015-08-10,39.17,,14,f,2015-08-03,2015-08-08,Cardiología,Afecciones no traumáticas del SNC,48,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,,,,,Intoxicación Exógena,no respiratorias,5
+189,vivo,f,blanco,33,2015-08-17,2015-08-21,34.10,,13,f,2015-08-17,2015-08-21,UCIM,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,PCR recuperado,,,,,PCR recuperado,no respiratorias,4
+189,vivo,f,blanco,33,2015-08-17,2015-08-21,34.10,,13,f,2015-08-17,2015-08-21,UCIM,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,PCR recuperado,no respiratorias,4
+189,vivo,f,blanco,33,2015-08-17,2015-08-21,34.10,,13,f,2015-08-17,2015-08-21,UCIM,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,EPOC descompensada,,,,,EPOC descompensada,no respiratorias,4
+189,vivo,f,blanco,33,2015-08-17,2015-08-21,34.10,,13,f,2015-08-17,2015-08-21,UCIM,Causas extrapulmonares,48,tubo endotraqueal,sin traqueotomia,PCR recuperado,,,,,EPOC descompensada,no respiratorias,4
+190,vivo,m,blanco,51,2015-08-08,2015-08-29,26.27,,4,f,2015-08-20,2015-08-22,Neurocirugía,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,SPO toracotomía,no respiratorias,2
+190,vivo,m,blanco,51,2015-08-08,2015-08-29,26.27,,4,f,2015-08-20,2015-08-22,Neurocirugía,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,Insuficiencia Renal Crónica,no respiratorias,2
+190,vivo,m,blanco,51,2015-08-08,2015-08-29,26.27,,4,f,2015-08-20,2015-08-22,Neurocirugía,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,2
+190,vivo,m,blanco,51,2015-08-08,2015-08-29,26.27,,4,f,2015-08-20,2015-08-22,Neurocirugía,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,2
+191,fallecido,f,blanco,89,2015-08-23,2015-09-03,51.15,Medicina,23,f,2015-08-23,2015-08-29,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,Insuficiencia respiratoria,directa,,,Intoxicación Exógena,no respiratorias,6
+191,fallecido,f,blanco,89,2015-08-23,2015-09-03,51.15,Medicina,23,f,2015-08-23,2015-08-29,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,Diabetes Mellitus,basica,,,BNB-IH,no respiratorias,6
+191,fallecido,f,blanco,89,2015-08-23,2015-09-03,51.15,Medicina,23,f,2015-08-23,2015-08-29,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,Diabetes Mellitus,basica,,,BNB-IH,no respiratorias,6
+191,fallecido,f,blanco,89,2015-08-23,2015-09-03,51.15,Medicina,23,f,2015-08-23,2015-08-29,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,Diabetes Mellitus,basica,,,Intoxicación Exógena,no respiratorias,6
+191,fallecido,f,blanco,89,2015-08-23,2015-09-03,51.15,Medicina,23,f,2015-08-23,2015-08-29,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,Insuficiencia respiratoria,directa,,,BNB-IH,no respiratorias,6
+191,fallecido,f,blanco,89,2015-08-23,2015-09-03,51.15,Medicina,23,f,2015-08-23,2015-08-29,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,Insuficiencia respiratoria,directa,,,Intoxicación Exógena,no respiratorias,6
+191,fallecido,f,blanco,89,2015-08-23,2015-09-03,51.15,Medicina,23,f,2015-08-23,2015-08-29,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,Diabetes Mellitus,basica,,,Intoxicación Exógena,no respiratorias,6
+191,fallecido,f,blanco,89,2015-08-23,2015-09-03,51.15,Medicina,23,f,2015-08-23,2015-08-29,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,BNB-EH,intermedia,,,BNB-IH,no respiratorias,6
+191,fallecido,f,blanco,89,2015-08-23,2015-09-03,51.15,Medicina,23,f,2015-08-23,2015-08-29,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,Insuficiencia respiratoria,directa,,,BNB-IH,no respiratorias,6
+191,fallecido,f,blanco,89,2015-08-23,2015-09-03,51.15,Medicina,23,f,2015-08-23,2015-08-29,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,BNB-IH,BNB-EH,intermedia,,,Intoxicación Exógena,no respiratorias,6
+191,fallecido,f,blanco,89,2015-08-23,2015-09-03,51.15,Medicina,23,f,2015-08-23,2015-08-29,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,BNB-EH,intermedia,,,BNB-IH,no respiratorias,6
+191,fallecido,f,blanco,89,2015-08-23,2015-09-03,51.15,Medicina,23,f,2015-08-23,2015-08-29,Medicina,Afecciones no traumáticas del SNC,72,tubo endotraqueal,sin traqueotomia,Intoxicación Exógena,BNB-EH,intermedia,,,Intoxicación Exógena,no respiratorias,6
+192,vivo,m,blanco,69,2015-12-03,2015-12-19,40.55,,16,f,2015-12-09,2015-12-12,Neurocirugía,Estatus posoperatorio,24,tubo endotraqueal,sin traqueotomia,SPO toracotomía,,,,,SPO toracotomía,no respiratorias,3
+193,vivo,m,blanco,71,2015-01-29,2015-02-09,38.71,,12,f,2015-01-30,2015-02-05,UCIM,Causas extrapulmonares,72,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,SPO laparotomía,no respiratorias,6
+193,vivo,m,blanco,71,2015-01-29,2015-02-09,38.71,,12,f,2015-01-30,2015-02-05,UCIM,Causas extrapulmonares,72,tubo endotraqueal,sin traqueotomia,SPO laparotomía,,,,,Shock cardiogénico,no respiratorias,6
+193,vivo,m,blanco,71,2015-01-29,2015-02-09,38.71,,12,f,2015-01-30,2015-02-05,UCIM,Causas extrapulmonares,72,tubo endotraqueal,sin traqueotomia,Shock cardiogénico,,,,,Shock cardiogénico,no respiratorias,6
+193,vivo,m,blanco,71,2015-01-29,2015-02-09,38.71,,12,f,2015-01-30,2015-02-05,UCIM,Causas extrapulmonares,72,tubo endotraqueal,sin traqueotomia,Shock cardiogénico,,,,,SPO laparotomía,no respiratorias,6
+194,fallecido,f,blanco,68,2015-05-28,2015-06-18,58.06,Cardiología,23,f,2015-05-30,2015-06-08,Medicina,EPOC,144,tubo endotraqueal,sin traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,,,ARDS,respiratorias,9
+194,fallecido,f,blanco,68,2015-05-28,2015-06-18,58.06,Cardiología,23,f,2015-05-30,2015-06-08,Medicina,EPOC,144,tubo endotraqueal,sin traqueotomia,ARDS,Insuficiencia cardiaca,basica,,,Materna Crítica,respiratorias,9
+194,fallecido,f,blanco,68,2015-05-28,2015-06-18,58.06,Cardiología,23,f,2015-05-30,2015-06-08,Medicina,EPOC,144,tubo endotraqueal,sin traqueotomia,Materna Crítica,Insuficiencia cardiaca,basica,,,Materna Crítica,respiratorias,9
+194,fallecido,f,blanco,68,2015-05-28,2015-06-18,58.06,Cardiología,23,f,2015-05-30,2015-06-08,Medicina,EPOC,144,tubo endotraqueal,sin traqueotomia,Materna Crítica,BNB-IH,intermedia,,,Materna Crítica,respiratorias,9
+194,fallecido,f,blanco,68,2015-05-28,2015-06-18,58.06,Cardiología,23,f,2015-05-30,2015-06-08,Medicina,EPOC,144,tubo endotraqueal,sin traqueotomia,Materna Crítica,BNB-IH,intermedia,,,ARDS,respiratorias,9
+194,fallecido,f,blanco,68,2015-05-28,2015-06-18,58.06,Cardiología,23,f,2015-05-30,2015-06-08,Medicina,EPOC,144,tubo endotraqueal,sin traqueotomia,ARDS,BNB-IH,intermedia,,,Materna Crítica,respiratorias,9
+194,fallecido,f,blanco,68,2015-05-28,2015-06-18,58.06,Cardiología,23,f,2015-05-30,2015-06-08,Medicina,EPOC,144,tubo endotraqueal,sin traqueotomia,ARDS,BNB-IH,intermedia,,,ARDS,respiratorias,9
+194,fallecido,f,blanco,68,2015-05-28,2015-06-18,58.06,Cardiología,23,f,2015-05-30,2015-06-08,Medicina,EPOC,144,tubo endotraqueal,sin traqueotomia,ARDS,Insuficiencia respiratoria,directa,,,ARDS,respiratorias,9
+194,fallecido,f,blanco,68,2015-05-28,2015-06-18,58.06,Cardiología,23,f,2015-05-30,2015-06-08,Medicina,EPOC,144,tubo endotraqueal,sin traqueotomia,ARDS,Insuficiencia respiratoria,directa,,,Materna Crítica,respiratorias,9
+194,fallecido,f,blanco,68,2015-05-28,2015-06-18,58.06,Cardiología,23,f,2015-05-30,2015-06-08,Medicina,EPOC,144,tubo endotraqueal,sin traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,,,Materna Crítica,respiratorias,9
+194,fallecido,f,blanco,68,2015-05-28,2015-06-18,58.06,Cardiología,23,f,2015-05-30,2015-06-08,Medicina,EPOC,144,tubo endotraqueal,sin traqueotomia,ARDS,Insuficiencia cardiaca,basica,,,ARDS,respiratorias,9
+194,fallecido,f,blanco,68,2015-05-28,2015-06-18,58.06,Cardiología,23,f,2015-05-30,2015-06-08,Medicina,EPOC,144,tubo endotraqueal,sin traqueotomia,Materna Crítica,Insuficiencia cardiaca,basica,,,ARDS,respiratorias,9
+195,fallecido,m,blanco,37,2015-06-27,2015-08-03,39.63,Angiología,29,f,2015-06-27,2015-07-10,Angiología,TCE,168,TET-TQ,con traqueotomia,SPO neurología,BNB-IH,intermedia,,,SPO neurología,no respiratorias,13
+195,fallecido,m,blanco,37,2015-06-27,2015-08-03,39.63,Angiología,29,f,2015-06-27,2015-07-10,Angiología,TCE,168,TET-TQ,con traqueotomia,TCE severo,TCE,basica,,,TCE severo,no respiratorias,13
+195,fallecido,m,blanco,37,2015-06-27,2015-08-03,39.63,Angiología,29,f,2015-06-27,2015-07-10,Angiología,TCE,168,TET-TQ,con traqueotomia,TCE severo,TCE,basica,,,SPO neurología,no respiratorias,13
+195,fallecido,m,blanco,37,2015-06-27,2015-08-03,39.63,Angiología,29,f,2015-06-27,2015-07-10,Angiología,TCE,168,TET-TQ,con traqueotomia,SPO neurología,TCE,basica,,,TCE severo,no respiratorias,13
+195,fallecido,m,blanco,37,2015-06-27,2015-08-03,39.63,Angiología,29,f,2015-06-27,2015-07-10,Angiología,TCE,168,TET-TQ,con traqueotomia,SPO neurología,TCE,basica,,,SPO neurología,no respiratorias,13
+195,fallecido,m,blanco,37,2015-06-27,2015-08-03,39.63,Angiología,29,f,2015-06-27,2015-07-10,Angiología,TCE,168,TET-TQ,con traqueotomia,SPO neurología,Disfunción múltiple de órganos,directa,,,SPO neurología,no respiratorias,13
+195,fallecido,m,blanco,37,2015-06-27,2015-08-03,39.63,Angiología,29,f,2015-06-27,2015-07-10,Angiología,TCE,168,TET-TQ,con traqueotomia,SPO neurología,Disfunción múltiple de órganos,directa,,,TCE severo,no respiratorias,13
+195,fallecido,m,blanco,37,2015-06-27,2015-08-03,39.63,Angiología,29,f,2015-06-27,2015-07-10,Angiología,TCE,168,TET-TQ,con traqueotomia,TCE severo,Disfunción múltiple de órganos,directa,,,SPO neurología,no respiratorias,13
+195,fallecido,m,blanco,37,2015-06-27,2015-08-03,39.63,Angiología,29,f,2015-06-27,2015-07-10,Angiología,TCE,168,TET-TQ,con traqueotomia,TCE severo,BNB-IH,intermedia,,,TCE severo,no respiratorias,13
+195,fallecido,m,blanco,37,2015-06-27,2015-08-03,39.63,Angiología,29,f,2015-06-27,2015-07-10,Angiología,TCE,168,TET-TQ,con traqueotomia,TCE severo,BNB-IH,intermedia,,,SPO neurología,no respiratorias,13
+195,fallecido,m,blanco,37,2015-06-27,2015-08-03,39.63,Angiología,29,f,2015-06-27,2015-07-10,Angiología,TCE,168,TET-TQ,con traqueotomia,TCE severo,Disfunción múltiple de órganos,directa,,,TCE severo,no respiratorias,13
+195,fallecido,m,blanco,37,2015-06-27,2015-08-03,39.63,Angiología,29,f,2015-06-27,2015-07-10,Angiología,TCE,168,TET-TQ,con traqueotomia,SPO neurología,BNB-IH,intermedia,,,TCE severo,no respiratorias,13
+196,fallecido,f,blanco,76,2015-09-02,2015-09-23,51.15,Nefrología,23,f,2015-09-02,2015-09-12,Cardiología,EPOC,168,tubo endotraqueal,sin traqueotomia,Materna Crítica,BNB-EH,intermedia,,,Materna Crítica,respiratorias,10
+196,fallecido,f,blanco,76,2015-09-02,2015-09-23,51.15,Nefrología,23,f,2015-09-02,2015-09-12,Cardiología,EPOC,168,tubo endotraqueal,sin traqueotomia,ARDS,Insuficiencia cardiaca,basica,,,Materna Crítica,respiratorias,10
+196,fallecido,f,blanco,76,2015-09-02,2015-09-23,51.15,Nefrología,23,f,2015-09-02,2015-09-12,Cardiología,EPOC,168,tubo endotraqueal,sin traqueotomia,ARDS,Insuficiencia cardiaca,basica,,,ARDS,respiratorias,10
+196,fallecido,f,blanco,76,2015-09-02,2015-09-23,51.15,Nefrología,23,f,2015-09-02,2015-09-12,Cardiología,EPOC,168,tubo endotraqueal,sin traqueotomia,ARDS,Insuficiencia respiratoria,directa,,,ARDS,respiratorias,10
+196,fallecido,f,blanco,76,2015-09-02,2015-09-23,51.15,Nefrología,23,f,2015-09-02,2015-09-12,Cardiología,EPOC,168,tubo endotraqueal,sin traqueotomia,Materna Crítica,Insuficiencia cardiaca,basica,,,Materna Crítica,respiratorias,10
+196,fallecido,f,blanco,76,2015-09-02,2015-09-23,51.15,Nefrología,23,f,2015-09-02,2015-09-12,Cardiología,EPOC,168,tubo endotraqueal,sin traqueotomia,Materna Crítica,Insuficiencia cardiaca,basica,,,ARDS,respiratorias,10
+196,fallecido,f,blanco,76,2015-09-02,2015-09-23,51.15,Nefrología,23,f,2015-09-02,2015-09-12,Cardiología,EPOC,168,tubo endotraqueal,sin traqueotomia,ARDS,Insuficiencia respiratoria,directa,,,Materna Crítica,respiratorias,10
+196,fallecido,f,blanco,76,2015-09-02,2015-09-23,51.15,Nefrología,23,f,2015-09-02,2015-09-12,Cardiología,EPOC,168,tubo endotraqueal,sin traqueotomia,Materna Crítica,BNB-EH,intermedia,,,ARDS,respiratorias,10
+196,fallecido,f,blanco,76,2015-09-02,2015-09-23,51.15,Nefrología,23,f,2015-09-02,2015-09-12,Cardiología,EPOC,168,tubo endotraqueal,sin traqueotomia,ARDS,BNB-EH,intermedia,,,Materna Crítica,respiratorias,10
+196,fallecido,f,blanco,76,2015-09-02,2015-09-23,51.15,Nefrología,23,f,2015-09-02,2015-09-12,Cardiología,EPOC,168,tubo endotraqueal,sin traqueotomia,ARDS,BNB-EH,intermedia,,,ARDS,respiratorias,10
+196,fallecido,f,blanco,76,2015-09-02,2015-09-23,51.15,Nefrología,23,f,2015-09-02,2015-09-12,Cardiología,EPOC,168,tubo endotraqueal,sin traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,,,ARDS,respiratorias,10
+196,fallecido,f,blanco,76,2015-09-02,2015-09-23,51.15,Nefrología,23,f,2015-09-02,2015-09-12,Cardiología,EPOC,168,tubo endotraqueal,sin traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,,,Materna Crítica,respiratorias,10
+197,fallecido,f,negro,73,2015-03-02,2015-03-22,38.71,Neurología,24,f,2015-03-03,2015-03-14,Cardiología,EPOC,192,tubo endotraqueal,sin traqueotomia,BNB-IH,BNB-IH,intermedia,,,ARDS,respiratorias,11
+197,fallecido,f,negro,73,2015-03-02,2015-03-22,38.71,Neurología,24,f,2015-03-03,2015-03-14,Cardiología,EPOC,192,tubo endotraqueal,sin traqueotomia,BNB-IH,BNB-EH,basica,,,ARDS,respiratorias,11
+197,fallecido,f,negro,73,2015-03-02,2015-03-22,38.71,Neurología,24,f,2015-03-03,2015-03-14,Cardiología,EPOC,192,tubo endotraqueal,sin traqueotomia,BNB-IH,Insuficiencia respiratoria,directa,,,BNB-IH,respiratorias,11
+197,fallecido,f,negro,73,2015-03-02,2015-03-22,38.71,Neurología,24,f,2015-03-03,2015-03-14,Cardiología,EPOC,192,tubo endotraqueal,sin traqueotomia,BNB-IH,Insuficiencia respiratoria,directa,,,ARDS,respiratorias,11
+197,fallecido,f,negro,73,2015-03-02,2015-03-22,38.71,Neurología,24,f,2015-03-03,2015-03-14,Cardiología,EPOC,192,tubo endotraqueal,sin traqueotomia,ARDS,Insuficiencia respiratoria,directa,,,ARDS,respiratorias,11
+197,fallecido,f,negro,73,2015-03-02,2015-03-22,38.71,Neurología,24,f,2015-03-03,2015-03-14,Cardiología,EPOC,192,tubo endotraqueal,sin traqueotomia,ARDS,Insuficiencia respiratoria,directa,,,BNB-IH,respiratorias,11
+197,fallecido,f,negro,73,2015-03-02,2015-03-22,38.71,Neurología,24,f,2015-03-03,2015-03-14,Cardiología,EPOC,192,tubo endotraqueal,sin traqueotomia,BNB-IH,BNB-IH,intermedia,,,BNB-IH,respiratorias,11
+197,fallecido,f,negro,73,2015-03-02,2015-03-22,38.71,Neurología,24,f,2015-03-03,2015-03-14,Cardiología,EPOC,192,tubo endotraqueal,sin traqueotomia,ARDS,BNB-IH,intermedia,,,BNB-IH,respiratorias,11
+197,fallecido,f,negro,73,2015-03-02,2015-03-22,38.71,Neurología,24,f,2015-03-03,2015-03-14,Cardiología,EPOC,192,tubo endotraqueal,sin traqueotomia,ARDS,BNB-EH,basica,,,ARDS,respiratorias,11
+197,fallecido,f,negro,73,2015-03-02,2015-03-22,38.71,Neurología,24,f,2015-03-03,2015-03-14,Cardiología,EPOC,192,tubo endotraqueal,sin traqueotomia,ARDS,BNB-EH,basica,,,BNB-IH,respiratorias,11
+197,fallecido,f,negro,73,2015-03-02,2015-03-22,38.71,Neurología,24,f,2015-03-03,2015-03-14,Cardiología,EPOC,192,tubo endotraqueal,sin traqueotomia,ARDS,BNB-IH,intermedia,,,ARDS,respiratorias,11
+197,fallecido,f,negro,73,2015-03-02,2015-03-22,38.71,Neurología,24,f,2015-03-03,2015-03-14,Cardiología,EPOC,192,tubo endotraqueal,sin traqueotomia,BNB-IH,BNB-EH,basica,,,BNB-IH,respiratorias,11
+198,vivo,m,blanco,17,2015-05-20,2015-06-16,34.56,,6,f,2015-05-20,2015-06-01,Medicina,TCE,96,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,Insuficiencia Renal Crónica,no respiratorias,12
+198,vivo,m,blanco,17,2015-05-20,2015-06-16,34.56,,6,f,2015-05-20,2015-06-01,Medicina,TCE,96,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,TCE severo,no respiratorias,12
+198,vivo,m,blanco,17,2015-05-20,2015-06-16,34.56,,6,f,2015-05-20,2015-06-01,Medicina,TCE,96,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,12
+198,vivo,m,blanco,17,2015-05-20,2015-06-16,34.56,,6,f,2015-05-20,2015-06-01,Medicina,TCE,96,tubo endotraqueal,sin traqueotomia,Insuficiencia Renal Crónica,,,,,Insuficiencia Renal Crónica,no respiratorias,12
+199,vivo,m,negro,33,2015-06-08,2015-07-07,27.19,,17,f,2015-06-11,2015-06-26,Angiología,TCE,192,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,15
+200,vivo,f,blanco,75,2015-06-11,2015-07-08,50.23,,19,f,2015-06-11,2015-06-24,Medicina,Estatus posoperatorio,240,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,13
+201,fallecido,m,blanco,68,2015-06-29,2015-08-01,39.17,Neurología,36,f,2015-06-29,2015-07-10,Angiología,TCE,240,TET-TQ,con traqueotomia,TCE severo,Disfunción múltiple de órganos,directa,,,TCE severo,no respiratorias,11
+201,fallecido,m,blanco,68,2015-06-29,2015-08-01,39.17,Neurología,36,f,2015-06-29,2015-07-10,Angiología,TCE,240,TET-TQ,con traqueotomia,SPO neurología,Disfunción múltiple de órganos,directa,,,TCE severo,no respiratorias,11
+201,fallecido,m,blanco,68,2015-06-29,2015-08-01,39.17,Neurología,36,f,2015-06-29,2015-07-10,Angiología,TCE,240,TET-TQ,con traqueotomia,TCE severo,Disfunción múltiple de órganos,directa,,,SPO neurología,no respiratorias,11
+201,fallecido,m,blanco,68,2015-06-29,2015-08-01,39.17,Neurología,36,f,2015-06-29,2015-07-10,Angiología,TCE,240,TET-TQ,con traqueotomia,TCE severo,BNB-IH,intermedia,,,SPO neurología,no respiratorias,11
+201,fallecido,m,blanco,68,2015-06-29,2015-08-01,39.17,Neurología,36,f,2015-06-29,2015-07-10,Angiología,TCE,240,TET-TQ,con traqueotomia,SPO neurología,BNB-IH,intermedia,,,TCE severo,no respiratorias,11
+201,fallecido,m,blanco,68,2015-06-29,2015-08-01,39.17,Neurología,36,f,2015-06-29,2015-07-10,Angiología,TCE,240,TET-TQ,con traqueotomia,TCE severo,TCE,basica,,,SPO neurología,no respiratorias,11
+201,fallecido,m,blanco,68,2015-06-29,2015-08-01,39.17,Neurología,36,f,2015-06-29,2015-07-10,Angiología,TCE,240,TET-TQ,con traqueotomia,SPO neurología,BNB-IH,intermedia,,,SPO neurología,no respiratorias,11
+201,fallecido,m,blanco,68,2015-06-29,2015-08-01,39.17,Neurología,36,f,2015-06-29,2015-07-10,Angiología,TCE,240,TET-TQ,con traqueotomia,SPO neurología,TCE,basica,,,TCE severo,no respiratorias,11
+201,fallecido,m,blanco,68,2015-06-29,2015-08-01,39.17,Neurología,36,f,2015-06-29,2015-07-10,Angiología,TCE,240,TET-TQ,con traqueotomia,SPO neurología,TCE,basica,,,SPO neurología,no respiratorias,11
+201,fallecido,m,blanco,68,2015-06-29,2015-08-01,39.17,Neurología,36,f,2015-06-29,2015-07-10,Angiología,TCE,240,TET-TQ,con traqueotomia,TCE severo,TCE,basica,,,TCE severo,no respiratorias,11
+201,fallecido,m,blanco,68,2015-06-29,2015-08-01,39.17,Neurología,36,f,2015-06-29,2015-07-10,Angiología,TCE,240,TET-TQ,con traqueotomia,TCE severo,BNB-IH,intermedia,,,TCE severo,no respiratorias,11
+201,fallecido,m,blanco,68,2015-06-29,2015-08-01,39.17,Neurología,36,f,2015-06-29,2015-07-10,Angiología,TCE,240,TET-TQ,con traqueotomia,SPO neurología,Disfunción múltiple de órganos,directa,,,SPO neurología,no respiratorias,11
+202,vivo,m,blanco,57,2015-07-24,2015-08-27,37.79,,13,f,2015-07-24,2015-08-11,Angiología,TCE,192,TET-TQ,con traqueotomia,TCE severo,,,,,BNV,no respiratorias,18
+202,vivo,m,blanco,57,2015-07-24,2015-08-27,37.79,,13,f,2015-07-24,2015-08-11,Angiología,TCE,192,TET-TQ,con traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,18
+203,fallecido,f,blanco,67,2015-08-18,2015-09-12,52.07,Angiología,18,f,2015-08-18,2015-09-02,Cardiología,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,BNB-IH,intermedia,,,ARDS,respiratorias,15
+203,fallecido,f,blanco,67,2015-08-18,2015-09-12,52.07,Angiología,18,f,2015-08-18,2015-09-02,Cardiología,EPOC,312,TET-TQ,con traqueotomia,ARDS,BNB-IH,intermedia,,,ARDS,respiratorias,15
+203,fallecido,f,blanco,67,2015-08-18,2015-09-12,52.07,Angiología,18,f,2015-08-18,2015-09-02,Cardiología,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,,,ARDS,respiratorias,15
+203,fallecido,f,blanco,67,2015-08-18,2015-09-12,52.07,Angiología,18,f,2015-08-18,2015-09-02,Cardiología,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,EPOC,basica,,,Materna Crítica,respiratorias,15
+203,fallecido,f,blanco,67,2015-08-18,2015-09-12,52.07,Angiología,18,f,2015-08-18,2015-09-02,Cardiología,EPOC,312,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,,,ARDS,respiratorias,15
+203,fallecido,f,blanco,67,2015-08-18,2015-09-12,52.07,Angiología,18,f,2015-08-18,2015-09-02,Cardiología,EPOC,312,TET-TQ,con traqueotomia,ARDS,Insuficiencia respiratoria,directa,,,Materna Crítica,respiratorias,15
+203,fallecido,f,blanco,67,2015-08-18,2015-09-12,52.07,Angiología,18,f,2015-08-18,2015-09-02,Cardiología,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,Insuficiencia respiratoria,directa,,,Materna Crítica,respiratorias,15
+203,fallecido,f,blanco,67,2015-08-18,2015-09-12,52.07,Angiología,18,f,2015-08-18,2015-09-02,Cardiología,EPOC,312,TET-TQ,con traqueotomia,ARDS,EPOC,basica,,,ARDS,respiratorias,15
+203,fallecido,f,blanco,67,2015-08-18,2015-09-12,52.07,Angiología,18,f,2015-08-18,2015-09-02,Cardiología,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,EPOC,basica,,,ARDS,respiratorias,15
+203,fallecido,f,blanco,67,2015-08-18,2015-09-12,52.07,Angiología,18,f,2015-08-18,2015-09-02,Cardiología,EPOC,312,TET-TQ,con traqueotomia,ARDS,BNB-IH,intermedia,,,Materna Crítica,respiratorias,15
+203,fallecido,f,blanco,67,2015-08-18,2015-09-12,52.07,Angiología,18,f,2015-08-18,2015-09-02,Cardiología,EPOC,312,TET-TQ,con traqueotomia,ARDS,EPOC,basica,,,Materna Crítica,respiratorias,15
+203,fallecido,f,blanco,67,2015-08-18,2015-09-12,52.07,Angiología,18,f,2015-08-18,2015-09-02,Cardiología,EPOC,312,TET-TQ,con traqueotomia,Materna Crítica,BNB-IH,intermedia,,,Materna Crítica,respiratorias,15
+204,vivo,m,blanco,64,2015-09-11,2015-10-10,41.47,,13,f,2015-09-11,2015-09-25,Cardiología,TCE,192,TET-TQ,con traqueotomia,TCE severo,,,,,BNB-IH,no respiratorias,14
+204,vivo,m,blanco,64,2015-09-11,2015-10-10,41.47,,13,f,2015-09-11,2015-09-25,Cardiología,TCE,192,TET-TQ,con traqueotomia,BNV,,,,,BNB-IH,no respiratorias,14
+204,vivo,m,blanco,64,2015-09-11,2015-10-10,41.47,,13,f,2015-09-11,2015-09-25,Cardiología,TCE,192,TET-TQ,con traqueotomia,BNV,,,,,TCE severo,no respiratorias,14
+204,vivo,m,blanco,64,2015-09-11,2015-10-10,41.47,,13,f,2015-09-11,2015-09-25,Cardiología,TCE,192,TET-TQ,con traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,14
+205,fallecido,m,blanco,43,2015-10-16,2015-12-27,53.00,Medicina,21,f,2015-10-16,2015-11-01,Medicina,TCE,312,TET-TQ,con traqueotomia,TCE severo,BNB-IH,intermedia,,,Insuficiencia Renal Crónica,no respiratorias,16
+205,fallecido,m,blanco,43,2015-10-16,2015-12-27,53.00,Medicina,21,f,2015-10-16,2015-11-01,Medicina,TCE,312,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,BNB-IH,intermedia,,,TCE severo,no respiratorias,16
+205,fallecido,m,blanco,43,2015-10-16,2015-12-27,53.00,Medicina,21,f,2015-10-16,2015-11-01,Medicina,TCE,312,TET-TQ,con traqueotomia,TCE severo,BNB-IH,intermedia,,,TCE severo,no respiratorias,16
+205,fallecido,m,blanco,43,2015-10-16,2015-12-27,53.00,Medicina,21,f,2015-10-16,2015-11-01,Medicina,TCE,312,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,TCE,basica,,,TCE severo,no respiratorias,16
+205,fallecido,m,blanco,43,2015-10-16,2015-12-27,53.00,Medicina,21,f,2015-10-16,2015-11-01,Medicina,TCE,312,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,TCE,basica,,,Insuficiencia Renal Crónica,no respiratorias,16
+205,fallecido,m,blanco,43,2015-10-16,2015-12-27,53.00,Medicina,21,f,2015-10-16,2015-11-01,Medicina,TCE,312,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,Disfunción múltiple de órganos,directa,,,TCE severo,no respiratorias,16
+205,fallecido,m,blanco,43,2015-10-16,2015-12-27,53.00,Medicina,21,f,2015-10-16,2015-11-01,Medicina,TCE,312,TET-TQ,con traqueotomia,TCE severo,Disfunción múltiple de órganos,directa,,,TCE severo,no respiratorias,16
+205,fallecido,m,blanco,43,2015-10-16,2015-12-27,53.00,Medicina,21,f,2015-10-16,2015-11-01,Medicina,TCE,312,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,Disfunción múltiple de órganos,directa,,,Insuficiencia Renal Crónica,no respiratorias,16
+205,fallecido,m,blanco,43,2015-10-16,2015-12-27,53.00,Medicina,21,f,2015-10-16,2015-11-01,Medicina,TCE,312,TET-TQ,con traqueotomia,Insuficiencia Renal Crónica,BNB-IH,intermedia,,,Insuficiencia Renal Crónica,no respiratorias,16
+205,fallecido,m,blanco,43,2015-10-16,2015-12-27,53.00,Medicina,21,f,2015-10-16,2015-11-01,Medicina,TCE,312,TET-TQ,con traqueotomia,TCE severo,TCE,basica,,,Insuficiencia Renal Crónica,no respiratorias,16
+205,fallecido,m,blanco,43,2015-10-16,2015-12-27,53.00,Medicina,21,f,2015-10-16,2015-11-01,Medicina,TCE,312,TET-TQ,con traqueotomia,TCE severo,TCE,basica,,,TCE severo,no respiratorias,16
+205,fallecido,m,blanco,43,2015-10-16,2015-12-27,53.00,Medicina,21,f,2015-10-16,2015-11-01,Medicina,TCE,312,TET-TQ,con traqueotomia,TCE severo,Disfunción múltiple de órganos,directa,,,Insuficiencia Renal Crónica,no respiratorias,16
+206,vivo,m,blanco,23,2015-10-25,2015-12-02,36.87,,17,f,2015-10-25,2015-11-09,Angiología,TCE,192,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,SPO neurología,no respiratorias,15
+206,vivo,m,blanco,23,2015-10-25,2015-12-02,36.87,,17,f,2015-10-25,2015-11-09,Angiología,TCE,192,tubo endotraqueal,sin traqueotomia,SPO neurología,,,,,TCE severo,no respiratorias,15
+206,vivo,m,blanco,23,2015-10-25,2015-12-02,36.87,,17,f,2015-10-25,2015-11-09,Angiología,TCE,192,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,TCE severo,no respiratorias,15
+206,vivo,m,blanco,23,2015-10-25,2015-12-02,36.87,,17,f,2015-10-25,2015-11-09,Angiología,TCE,192,tubo endotraqueal,sin traqueotomia,TCE severo,,,,,SPO neurología,no respiratorias,15
+207,vivo,m,mestizo,25,2015-12-18,2016-01-03,23.96,,14,f,2015-12-18,2016-01-01,Cardiología,ARDS,192,tubo endotraqueal,sin traqueotomia,BNB-EH,,,,,Sepsis grave,respiratorias,14
+207,vivo,m,mestizo,25,2015-12-18,2016-01-03,23.96,,14,f,2015-12-18,2016-01-01,Cardiología,ARDS,192,tubo endotraqueal,sin traqueotomia,BNB-EH,,,,,BNB-EH,respiratorias,14
+207,vivo,m,mestizo,25,2015-12-18,2016-01-03,23.96,,14,f,2015-12-18,2016-01-01,Cardiología,ARDS,192,tubo endotraqueal,sin traqueotomia,Sepsis grave,,,,,BNB-EH,respiratorias,14
+207,vivo,m,mestizo,25,2015-12-18,2016-01-03,23.96,,14,f,2015-12-18,2016-01-01,Cardiología,ARDS,192,tubo endotraqueal,sin traqueotomia,Sepsis grave,,,,,Sepsis grave,respiratorias,14
+208,fallecido,f,blanco,55,2015-06-17,2016-02-03,43.33,Cardiología,27,f,2015-06-17,2015-12-29,Medicina,Otras,3456,TET-TQ,con traqueotomia,Guillain Barre,Disfunción múltiple de órganos,directa,,,BNV,respiratorias,195
+208,fallecido,f,blanco,55,2015-06-17,2016-02-03,43.33,Cardiología,27,f,2015-06-17,2015-12-29,Medicina,Otras,3456,TET-TQ,con traqueotomia,Guillain Barre,Guillain Barre,basica,,,Guillain Barre,respiratorias,195
+208,fallecido,f,blanco,55,2015-06-17,2016-02-03,43.33,Cardiología,27,f,2015-06-17,2015-12-29,Medicina,Otras,3456,TET-TQ,con traqueotomia,Guillain Barre,Disfunción múltiple de órganos,directa,,,Guillain Barre,respiratorias,195
+208,fallecido,f,blanco,55,2015-06-17,2016-02-03,43.33,Cardiología,27,f,2015-06-17,2015-12-29,Medicina,Otras,3456,TET-TQ,con traqueotomia,Guillain Barre,Guillain Barre,basica,,,BNV,respiratorias,195
+208,fallecido,f,blanco,55,2015-06-17,2016-02-03,43.33,Cardiología,27,f,2015-06-17,2015-12-29,Medicina,Otras,3456,TET-TQ,con traqueotomia,Guillain Barre,BNB-IH,intermedia,,,BNV,respiratorias,195
+208,fallecido,f,blanco,55,2015-06-17,2016-02-03,43.33,Cardiología,27,f,2015-06-17,2015-12-29,Medicina,Otras,3456,TET-TQ,con traqueotomia,Guillain Barre,BNB-IH,intermedia,,,Guillain Barre,respiratorias,195
