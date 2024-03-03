@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="modelos/modelo_ventana_simulacion_v1.0.svg" alt="modelo" />
-</p>
+<p align="center"> <img src="modelos/modelo_ventana_simulacion_v1.0.svg" alt="modelo" /> </p>
 
 ## Situación problémica
 La asociación de la ventilación artificial mecánica con la mortalidad en UCI ha sido ampliamente demostrada (30–33), sin embargo, existen pocos estudios internacionales y en el país que evidencien qué ocurre cuando el paciente ventilado sale de alta de la UCI; y no existe en Cuba ningún score pronóstico cuantitativo diseñado para evaluar el riesgo de muerte de estos pacientes que complemente la toma de decisiones relativas al egreso en UCI, aspectos estos que es necesario conocer en este medio y que pueden ser de importancia nacional e internacional.
