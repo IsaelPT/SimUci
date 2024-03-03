@@ -10,5 +10,5 @@ Construir un score pronóstico implementado computacionalmente como predictor de
 
 ## Tecnologías
 Recursos open-source:
-- **Simpy**: Paquete que nos brinda la ventaja de realizar _simulaciones_ con datos en poseción y generar otros datos de utilidad.
+- **Simpy**: Nos brinda la ventaja de realizar _simulaciones_ con datos en posesión y generar otros datos de utilidad.
 - **PyQt5**: A fin de brindar una interfaz gráfica de usuario para el personal de Salud que interactúe con la aplicación.
