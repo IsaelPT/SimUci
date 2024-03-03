@@ -9,6 +9,6 @@ La asociación de la ventilación artificial mecánica con la mortalidad en UCI 
 Construir un score pronóstico implementado computacionalmente como predictor de la supervivencia intrahospitalaria post egreso de UCI en los pacientes ventilados por 24 horas o más en Terapia Intensiva.
 
 ## Tecnologías
-- Python
-- Recursos open-source:
-  - Simpy
+Recursos open-source:
+- Simpy: Paquete que nos brinda la ventaja de realizar simulaciones con datos en poseción y generar otros datos de utilidad.
+- PyQt5: A fin de brindar una interfaz gráfica amigable para los personales de la salud que interactúen con la aplicación.
