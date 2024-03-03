@@ -7,3 +7,8 @@ La asociación de la ventilación artificial mecánica con la mortalidad en UCI 
 
 ## Objetivo
 Construir un score pronóstico implementado computacionalmente como predictor de la supervivencia intrahospitalaria post egreso de UCI en los pacientes ventilados por 24 horas o más en Terapia Intensiva.
+
+## Tecnologías
+- Python
+- Recursos open-source:
+  - Simpy
