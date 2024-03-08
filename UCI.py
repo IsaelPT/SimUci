@@ -2,7 +2,7 @@ from simpy import Environment
 from procesar_datos import *
 from datetime import timedelta
 
-class UCI():
+class UCI:
     def __init__(self, env:Environment, path:str) -> None:
         self.env = env
         #se crea un evento para un nuevo paciente
@@ -28,8 +28,7 @@ class UCI():
             espera_ingreso = fecha_siguiente - fecha
             yield self.env.timeout(espera_ingreso.days * 24)
 
-    def entrada_paciente_uci(self, path:str):
-
+    def entrada_paciente_uci(self, path: str):
         fecha_ing_uci = get_fecha_ing_uci(path)
         fecha_ingreso = get_fecha_ingreso(path)
 
