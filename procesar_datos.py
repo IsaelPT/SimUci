@@ -50,9 +50,9 @@ def get_estadia_uci(path: str):
 
 def get_sala_egreso(path: str):
 
-    estadia = cargar_fichero(path, "sala_egreso")
-    for est in estadia:
-        yield est
+    salas = cargar_fichero(path, "sala_egreso")
+    for sala in salas:
+        yield sala
 
 def get_evolucion(path: str):
 

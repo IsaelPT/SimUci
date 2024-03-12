@@ -4,8 +4,6 @@ from procesar_datos import *
 class UCI:
     def __init__(self, env:Environment, path:str) -> None:
         self.env = env
-        #se crea un evento para un nuevo paciente
-        self.nuevo_paciente = env.event()
 
         self.env.process(self.entrada_paciente(path))
 
@@ -21,6 +19,7 @@ class UCI:
 
             #Se calcula la espera y se espera hasta que llegue un nuevo paciente
             try:
+                next(gen_fecha_ing)
                 fecha_siguiente, fecha = next(gen_fecha_ing)
                 espera_ingreso = fecha_siguiente - fecha
                 yield self.env.timeout(espera_ingreso.days * 24)
