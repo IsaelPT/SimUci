@@ -7,6 +7,7 @@ def cargar_fichero(path: str, column:str) -> list:
         parse_dates=["fecha_ingreso", "fecha_egreso", "fecha_ing_uci", "fecha_egr_uci"],
     )
     df["tiempo_vam"] = df["tiempo_vam"].astype(int)
+    df["diagnostico_preuci"] = df["diagnostico_preuci"].astype("category")
     estadia = list(df.sort_values("fecha_ingreso")[column])
     return estadia
 def get_fecha_ingreso(path: str):
@@ -59,3 +60,9 @@ def get_evolucion(path: str):
     evoluciones = cargar_fichero(path, "evolucion")
     for evolucion in evoluciones:
         yield evolucion
+
+def get_diagnostico(path: str):
+
+    diagnosticos = cargar_fichero(path, "diagnostico_preuci")
+    for daignostico in diagnosticos:
+        yield daignostico

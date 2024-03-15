@@ -2,12 +2,18 @@ from simpy import Environment
 from procesar_datos import *
 
 class UCI:
-    def __init__(self, env:Environment, path:str) -> None:
+    def __init__(self, env:Environment, path:str, diagnostico: list, porcientos: list) -> None:
         self.env = env
 
+        #Se inicializan las variables necesarias para la simulacion
+        self.diagnosticos_paciente = diagnostico
+        self.porcientos_paciente = porcientos
+
+        #Se comienza a simular
         self.env.process(self.entrada_paciente(path))
 
     def entrada_paciente(self, path:str):
+        """Funcion que controla la entrada de cada paciente al hospital"""
 
         #Se obtienen los datos del archivo de entrada y se agregan a la cola de pacientes
         gen_fecha_ing = get_fecha_ingreso(path)
@@ -22,19 +28,21 @@ class UCI:
                 next(gen_fecha_ing)
                 fecha_siguiente, fecha = next(gen_fecha_ing)
                 espera_ingreso = fecha_siguiente - fecha
+                self.env.process(self.entrada_paciente_uci(path, paciente))
                 yield self.env.timeout(espera_ingreso.days * 24)
             except StopIteration:
                 break
-            finally:
-                self.env.process(self.entrada_paciente_uci(path, paciente))
 
     def entrada_paciente_uci(self, path: str, paciente: int):
+        """Funcion que controla el transcito de cada paciente dentro del hospital"""
 
         #Se inicializan los generadores necesarios
         gen_fecha_ing_uci = get_fecha_ing_uci(path)
         gen_fecha_ingreso = get_fecha_ingreso(path)
         gen_estadia_uci = get_estadia_uci(path)
         gen_tiempo_van = get_tiempo_vam(path)
+        gen_diagnostico = get_diagnostico(path)
+        gen_fecha_egreso = get_fecha_egreso(path)
 
         while True:
 
@@ -46,43 +54,70 @@ class UCI:
             yield self.env.timeout(espera_uci.days * 24)
 
             print(f"El paciente {paciente} llega a la uci a las {self.env.now}h")
+
+            #Se calcula los tiempos antes del van y despues de el y se espera a que se le ponga van
+            porcientos = self.porcientos(self.diagnosticos_paciente, self.porcientos_paciente)
+            diagnostico = next(gen_diagnostico)
+            estadia_uci = next(gen_estadia_uci)
+            tiempo_van = next(gen_tiempo_van)
+            espera_antes_vam = int(porcientos[diagnostico] / 100 * estadia_uci * 24)
+            espera_despues_vam = estadia_uci * 24 - espera_antes_vam - tiempo_van
+
+            yield self.env.timeout(espera_antes_vam)
+
             print(f"El paciente {paciente} se le pone ventilacion artificial a las {self.env.now}h")
 
             #Se espera el tiempo que el paciente pasa en van
-            tiempo_van = next(gen_tiempo_van)
 
             yield self.env.timeout(tiempo_van)
 
             print(f"Al paciente {paciente} se le quita la ventilacion a las {self.env.now}h")
 
-            #Se calcula la salida de la uci y se espera a que suceda
-            estadia_uci = next(gen_estadia_uci)
-            salida_uci = estadia_uci * 24 - tiempo_van
+            #Se espera la salida del paciente de la uci
 
-            yield self.env.timeout(salida_uci)
+            yield self.env.timeout(espera_despues_vam)
 
             #Se decide a que sala ira el paciente
             gen_sala_egreso = get_sala_egreso(path)
             sala_egreso = next(gen_sala_egreso)
-            print(f"El paciente {paciente} salio de la uci y fue trasladado hacia {sala_egreso}")
+            print(f"El paciente {paciente} salio de la uci a las {self.env.now}h y fue trasladado hacia {sala_egreso}")
 
             #Se espera el egreso del paciente
-            gen_fecha_egreso = get_fecha_egreso(path)
-            egreso = next(gen_fecha_egreso)
+            fecha_egreso = next(gen_fecha_egreso)
+            t = fecha_egreso - fecha_ingreso[1] - espera_uci
+            espera_egreso = t.days - estadia_uci
 
-            yield self.env.timeout(egreso.day * 24)
+            yield self.env.timeout(espera_egreso * 24)
 
             #Se termina la simulacion
             gen_evolucion = get_evolucion(path)
             evolucion = next(gen_evolucion)
 
             if evolucion == "vivo":
-                print(f"El paciente {paciente} se mantiene vivo y fue dado de alta a las {self.env.now}")
+                print(f"El paciente {paciente} se mantiene vivo y fue dado de alta a las {self.env.now}h")
                 break
             else:
-                print(f"El paciente {paciente} fallece a las {self.env.now}")
+                print(f"El paciente {paciente} fallece a las {self.env.now}h")
                 break
 
+    def porcientos(self, diagnosticos:list, porcientos:list):
+        diccionario = dict(zip(diagnosticos,porcientos))
+        return diccionario
+
+diagnosticos = ['ACV', 'ARDS', 'Ahorcamiento Incompleto', 'BNB-EH', 'BNB-IH', 'BNV',
+       'Coma', 'Crisis miasténica', 'DMO', 'EPOC descompensada',
+       'Embolismo graso', 'Emergencia hipertensiva',
+       'Encefalopatía metabólica', 'Estatus Asmático', 'Estatus Epiléptico',
+       'Guillain Barre', 'ICC descompensada', 'Insuficiencia Renal Aguda',
+       'Insuficiencia Renal Crónica', 'Intoxicación Exógena',
+       'Leptospirosis complicada', 'Materna Crítica', 'Miocarditis',
+       'PCR recuperado', 'Pancreatitis', 'Politraumatizado', 'SPO amputación',
+       'SPO laparotomía', 'SPO neurología', 'SPO toracotomía', 'Sepsis grave',
+       'Shock cardiogénico', 'Shock hipovolémico', 'Shock séptico',
+       'Síndrome Apn-Hipo del sueño', 'TCE severo']
+
+porcientos = [10 for _ in diagnosticos]
+
 env = Environment()
-uci = UCI(env, "datos.csv")
+uci = UCI(env, "datos.csv", diagnosticos, porcientos)
 env.run()
