@@ -2,3 +2,4 @@ datos.csv
 __pycache__/
 modelos qt_design
 modelos UI
+.vscode/settings.json
