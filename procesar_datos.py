@@ -66,3 +66,8 @@ def get_diagnostico(path: str):
     diagnosticos = cargar_fichero(path, "diagnostico_preuci")
     for daignostico in diagnosticos:
         yield daignostico
+
+def get_diagnostico_list(path: str):
+    df = pd.read_csv(path)
+    diagnostico_list = df["diagnostico_preuci"].unique()
+    return diagnostico_list
