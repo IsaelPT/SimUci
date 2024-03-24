@@ -27,8 +27,12 @@ class MainApplication:
 
         # TODO: Esta inicialización del modelo quizás trasladarla luego a otra parte del código.
         # Definir el modelo del QListView para visualizar los datos en 'simulation_window'.
-        self.model = QStandardItemModel()
-        self.simulation_window.listView_simulacion.setModel(self.model)
+        self.modelo_listView = QStandardItemModel()
+        self.simulation_window.listView_simulacion.setModel(self.modelo_listView)
+
+        # Definir el modelo del QColumnView para visualizar los diagnosticos y % que se obtienen de los pacientes.
+        self.model_columnView = QStandardItemModel()
+        self.simulation_window.columnView_diagnosticos.setModel(self.model_columnView)
 
         # Conexiones de los componentes de 'main_window'
         self.main_window.pushButton_simulacion.clicked.connect(
@@ -123,7 +127,7 @@ class MainApplication:
         Detiene la simulación a medio proceso.
         """
         if self.hilo_simulacion.isRunning():
-            self.hilo_simulacion.quit()
+            self.hilo_simulacion.wait()
 
     def cargar_csv(self) -> None:
         """
@@ -169,7 +173,15 @@ class MainApplication:
         """
 
         item = QStandardItem(texto)
-        self.model.appendRow(item)
+        self.modelo_listView.appendRow(item)
+
+    def agregar_lista_diagnosticos_columnView(self):
+        """
+        - simulation_window
+
+        Agrega los elementos al ColumnView.
+        """
+        pass
 
     def limpiar_datos_simulationWindow(self):
         """
@@ -179,8 +191,8 @@ class MainApplication:
         """
 
         # Limpia los datos del modelo de la QListView que muestra datos de simulación.
-        if self.model is not None:
-            self.model.clear()
+        if self.modelo_listView is not None:
+            self.modelo_listView.clear()
 
         # Vuelve a 0 el progreso de la barra de progreso de simulación.
         self.simulation_window.progressBar.setValue(0)
