@@ -196,6 +196,7 @@ class MainApplication:
     def setup_tabla_diagnosticos(self):
         """Definir el modelo del QColumnView para visualizar los diagnosticos y % que se obtienen de los pacientes."""
 
+        # TODO: Datos de ejemplo
         FILAS = 10
         COLUMNAS = 2
 
@@ -205,9 +206,10 @@ class MainApplication:
         modelo_tabla.setHorizontalHeaderItem(1, QStandardItem("Porcientos"))
 
         for fila in range(FILAS):
-            for columna in range(COLUMNAS):
-                item = QStandardItem(f"Diagnóstico {fila}, Porciento {columna + 1}")
-                modelo_tabla.setItem(fila, columna, item)
+            diagnostico = QStandardItem(f"Diagnostico {fila + 1}")
+            porciento = QStandardItem(f"Porciento {fila + 1}")
+            modelo_tabla.setItem(fila, 0, diagnostico)
+            modelo_tabla.setItem(fila, 1, porciento)
 
         # Definir el model del QTableView para visualizar los diagnosticos en 'simulation_window'.
         self.table_view = self.simulation_window.tableView_diagnosticos

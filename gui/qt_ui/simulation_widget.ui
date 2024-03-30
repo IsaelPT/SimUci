@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>732</height>
+    <height>800</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,14 +18,14 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>600</width>
-    <height>732</height>
+    <width>0</width>
+    <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>600</width>
-    <height>732</height>
+    <width>1200</width>
+    <height>1200</height>
    </size>
   </property>
   <property name="palette">
@@ -476,6 +476,9 @@
     <pointsize>12</pointsize>
    </font>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::ClickFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>Simulación</string>
   </property>
@@ -485,7 +488,7 @@
      <x>10</x>
      <y>10</y>
      <width>580</width>
-     <height>711</height>
+     <height>781</height>
     </rect>
    </property>
    <property name="focusPolicy">
@@ -501,7 +504,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>520</y>
+      <y>590</y>
       <width>561</width>
       <height>31</height>
      </rect>
@@ -514,7 +517,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>560</y>
+      <y>630</y>
       <width>561</width>
       <height>141</height>
      </rect>
@@ -579,7 +582,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>370</y>
+      <y>440</y>
       <width>561</width>
       <height>141</height>
      </rect>
@@ -595,9 +598,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>90</y>
+      <y>140</y>
       <width>561</width>
-      <height>271</height>
+      <height>291</height>
      </rect>
     </property>
     <property name="font">
@@ -606,6 +609,28 @@
       <pointsize>10</pointsize>
      </font>
     </property>
+   </widget>
+   <widget class="QWidget" name="formLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>318</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_tiempo_simulacion">
+       <property name="text">
+        <string>Tiempo de Simulación (años)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QSpinBox" name="spinBox_tiempo"/>
+     </item>
+    </layout>
    </widget>
   </widget>
  </widget>
