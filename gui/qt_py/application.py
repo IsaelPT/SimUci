@@ -2,7 +2,14 @@ import time
 import sys
 import pandas as pd
 from PyQt5.QtCore import QThread, pyqtSignal
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QMessageBox, QFileDialog
+from PyQt5.QtWidgets import (
+    QMainWindow,
+    QApplication,
+    QWidget,
+    QMessageBox,
+    QFileDialog,
+    QLineEdit,
+)
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.uic import loadUi
 
@@ -13,7 +20,10 @@ class MainApplication:
     ARCHIVO_UI_MAINWINDOW = "gui/qt_ui/main_window.ui"
     ARCHIVO_UI_SIMULATIONWIDGET = "gui/qt_ui/simulation_widget.ui"
 
+    MENSAJE_LINE_EDIT = "Ruta del archivo..."
+
     def __init__(self) -> None:
+
         # Definir la Aplicación Principal.
         self.app = QApplication(sys.argv)
 
@@ -24,15 +34,16 @@ class MainApplication:
         # Definir el QWidget para Simulación.
         self.simulation_window = QWidget()
         loadUi(self.ARCHIVO_UI_SIMULATIONWIDGET, self.simulation_window)
+        self.simulation_window.lineEdit_ruta_datos.setText(self.MENSAJE_LINE_EDIT)
 
         # TODO: Esta inicialización del modelo quizás trasladarla luego a otra parte del código.
         # Definir el modelo del QListView para visualizar los datos en 'simulation_window'.
         self.modelo_listView = QStandardItemModel()
         self.simulation_window.listView_simulacion.setModel(self.modelo_listView)
 
-        # Definir el modelo del QColumnView para visualizar los diagnosticos y % que se obtienen de los pacientes.
-        self.model_columnView = QStandardItemModel()
-        self.simulation_window.columnView_diagnosticos.setModel(self.model_columnView)
+        # Definir el lineEdit donde se visualiza la dirección donde se lcoaliza el archivo.
+        self.linea_de_ruta = QLineEdit()
+        self.linea_de_ruta = self.simulation_window.lineEdit_ruta_datos
 
         # Conexiones de los componentes de 'main_window'
         self.main_window.pushButton_simulacion.clicked.connect(
@@ -70,10 +81,12 @@ class MainApplication:
         try:
             if self.simulation_window is not None:
                 self.simulation_window.show()
+                self.setup_tabla_diagnosticos()
                 self.main_window.hide()
                 print("Se abrió la ventana de simulación.")
             else:
                 print("No se pudo abrir la ventana de simulación.")
+
         except Exception as e:
             print(f"{e}")
             QMessageBox.warning(
@@ -88,6 +101,11 @@ class MainApplication:
         """
         try:
             self.simulation_window.close()
+            print("Se cerró la ventana de simulación.")
+            if self.linea_de_ruta is not None:
+                self.simulation_window.lineEdit_ruta_datos.setText(
+                    self.MENSAJE_LINE_EDIT
+                )
             self.main_window.show()
         except Exception as e:
             print(f"{e}")
@@ -175,13 +193,26 @@ class MainApplication:
         item = QStandardItem(texto)
         self.modelo_listView.appendRow(item)
 
-    def agregar_lista_diagnosticos_columnView(self):
-        """
-        - simulation_window
+    def setup_tabla_diagnosticos(self):
+        """Definir el modelo del QColumnView para visualizar los diagnosticos y % que se obtienen de los pacientes."""
 
-        Agrega los elementos al ColumnView.
-        """
-        pass
+        FILAS = 10
+        COLUMNAS = 2
+
+        modelo_tabla = QStandardItemModel(FILAS, COLUMNAS)
+
+        modelo_tabla.setHorizontalHeaderItem(0, QStandardItem("Diagnosticos"))
+        modelo_tabla.setHorizontalHeaderItem(1, QStandardItem("Porcientos"))
+
+        for fila in range(FILAS):
+            for columna in range(COLUMNAS):
+                item = QStandardItem(f"Diagnóstico {fila}, Porciento {columna + 1}")
+                modelo_tabla.setItem(fila, columna, item)
+
+        # Definir el model del QTableView para visualizar los diagnosticos en 'simulation_window'.
+        self.table_view = self.simulation_window.tableView_diagnosticos
+        self.table_view.setModel(modelo_tabla)
+        self.table_view.resizeColumnsToContents()
 
     def limpiar_datos_simulationWindow(self):
         """
