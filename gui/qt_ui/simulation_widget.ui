@@ -524,21 +524,21 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QPushButton" name="pushButton_comenzar">
+      <widget class="QPushButton" name="pB_comenzar">
        <property name="text">
         <string>Comenzar Simulación</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_detener">
+      <widget class="QPushButton" name="pB_detener">
        <property name="text">
         <string>Detener Simulación</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_salir">
+      <widget class="QPushButton" name="pB_salir">
        <property name="text">
         <string>Salir</string>
        </property>
@@ -546,7 +546,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QPushButton" name="pushButton_cargar">
+   <widget class="QPushButton" name="pB_cargar">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -609,28 +609,6 @@
       <pointsize>10</pointsize>
      </font>
     </property>
-   </widget>
-   <widget class="QWidget" name="formLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>90</y>
-      <width>318</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_tiempo_simulacion">
-       <property name="text">
-        <string>Tiempo de Simulación (años)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QSpinBox" name="spinBox_tiempo"/>
-     </item>
-    </layout>
    </widget>
   </widget>
  </widget>
