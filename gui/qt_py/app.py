@@ -1,18 +1,25 @@
 import sys
 from PyQt5.QtWidgets import QApplication
-from main_window import MainWindow
+from gui.qt_py.main_window import MainWindow
 
 
 class Application(QApplication):
-    """Clase que inicia la aplicación. Invoca al menú principal (MainMenu) y sus componentes."""
+    """
+    Clase Aplicación. Inicia la aplicación.
+
+    Responsabilidades
+    -----------------
+
+    - `run()`: Da inicio a la aplicación invocando a la ventana del Menú Principal.
+    """
 
     def __init__(self) -> None:
-        self.app = QApplication(sys.argv)
+        super().__init__(sys.argv)
+        self.main_win = MainWindow()
 
     def run(self):
-        self.main_win = MainWindow()
-        self.main_win.run()
-        sys.exit(self.app.exec_())
+        self.main_win.show()
+        sys.exit(self.exec_())
 
 
 if __name__ == "__main__":

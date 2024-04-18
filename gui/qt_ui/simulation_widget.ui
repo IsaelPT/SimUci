@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>800</height>
+    <height>669</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -504,7 +504,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>590</y>
+      <y>440</y>
       <width>561</width>
       <height>31</height>
      </rect>
@@ -517,7 +517,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>630</y>
+      <y>480</y>
       <width>561</width>
       <height>141</height>
      </rect>
@@ -578,29 +578,13 @@
      </font>
     </property>
    </widget>
-   <widget class="QListView" name="listView_simulacion">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>440</y>
-      <width>561</width>
-      <height>141</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Segoe UI</family>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-   </widget>
    <widget class="QTableView" name="tableView_diagnosticos">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>140</y>
+      <y>90</y>
       <width>561</width>
-      <height>291</height>
+      <height>341</height>
      </rect>
     </property>
     <property name="font">
