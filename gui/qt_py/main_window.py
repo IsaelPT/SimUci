@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.uic import loadUi
-from gui.utils.constantes import Rutas
-from gui.qt_py.simulation_window import SimulationWindow
+from utils.constantes import Rutas
+from simulation_window import SimulationWindow
 
 
 class MainWindow(QMainWindow):

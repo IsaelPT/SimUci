@@ -2,7 +2,7 @@ import pandas as pd
 from PyQt5.QtWidgets import QWidget, QFileDialog
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.uic import loadUi
-from gui.utils.constantes import Rutas
+from utils.constantes import Rutas
 
 
 class SimulationWindow(QWidget):
