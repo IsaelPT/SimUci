@@ -16,7 +16,7 @@ class SimulationWindow(QWidget):
         loadUi(Rutas.RUTA_ARCHIVO_UI_SIMULATIONWIDGET, self.sim_win)
 
         # QListView para visualizar los datos.
-        self.sim_win.listView_model = QStandardItemModel()
+        self.listView_model = QStandardItemModel()
         self.sim_win.listView_simulacion.setModel(self.listView_model)  # QListView()
 
         # QLineEdit para visualizar la dirección donde se localiza el archivo.

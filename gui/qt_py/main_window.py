@@ -5,25 +5,19 @@ from simulation_window import SimulationWindow
 
 
 class MainWindow(QMainWindow):
-    """QtWidget que es la Ventana Principal de la aplicación que primeramente sale al iniciar el programa."""
-
-    def __init__(self) -> None:
+    def __init__(self):
         super().__init__()
-        self.main_win = QMainWindow()
-        loadUi(Rutas.ARCHIVO_UI_MAINWINDOW, self.main_win)
+        loadUi(Rutas.ARCHIVO_UI_MAINWINDOW, self)  # Cargar la UI en la ventana principal 'self'
 
-        # Conexiones de los componentes.
-        self.main_win.pB_simulacion.clicked.connect(self.abrir_ventana_simulacion)
-        self.main_win.pB_salir.clicked.connect(self.cerrar_app)
+        # Conexiones de los componentes
+        self.pB_simulacion.clicked.connect(self.abrir_ventana_simulacion)
+        self.pB_salir.clicked.connect(self.cerrar_app)
 
-    def abrir_ventana_simulacion(self) -> None:
-        """Abre la ventana de Simulaciones."""
-
+    def abrir_ventana_simulacion(self):
         try:
             self.sim_win = SimulationWindow(self)
-            loadUi(Rutas.RUTA_ARCHIVO_UI_SIMULATIONWIDGET, self.sim_win)
             self.sim_win.show()
-            self.main_win.hide()
+            self.hide()  # Ocultar la ventana principal
         except Exception as e:
             print(f"{e}")
             QMessageBox.warning(self, "Error inesperado", f"Se produjo un error: {e}")
@@ -32,7 +26,7 @@ class MainWindow(QMainWindow):
         self.sim_win.close()
 
     def cerrar_app(self):
-        self.main_win.close()
+        self.close()
 
     def run(self):
-        self.main_win.show()
+        self.show()
