@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.uic import loadUi
-from utils.constantes import Rutas
-from simulation_window import SimulationWindow
+
+from qt_py.simulation_window import SimulationWindow
+from qt_py.constantes import Rutas
 
 
 class MainWindow(QMainWindow):
@@ -12,7 +13,8 @@ class MainWindow(QMainWindow):
     -----------------
 
     - `abrir_ventana_simulacion(self)`: Abre una ventana para realizar simulaciones con datos.
-    - `cerrar_ventana_simulacion(self)`: Cierra la aplicación.
+    - `cerrar_ventana_simulacion(self)`: Cierra la ventana de simulación.
+    - `cerrar_app(self)`: Cierra la aplicación.
     """
 
     def __init__(self) -> None:
@@ -35,14 +37,14 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(f"Error al abrir la ventana: {e}")
 
-    def cerrar_ventana_simulacion(self):
+    def cerrar_ventana_simulacion(self) -> None:
         try:
             self.simulation_win.close()
             self.show()
         except Exception as e:
             print(f"Error al cerrar la ventana: {e}")
 
-    def cerrar_app(self):
+    def cerrar_app(self) -> None:
         try:
             self.close()
         except Exception as e:
