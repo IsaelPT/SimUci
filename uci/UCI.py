@@ -1,5 +1,7 @@
 from simpy import Environment
-from procesar_datos import *
+from uci import procesar_datos
+
+import pandas as pd
 
 class UCI:
     def __init__(self, env:Environment, path:str, diagnostico: list, porcientos: list) -> None:
@@ -23,7 +25,7 @@ class UCI:
         """Funcion que controla la entrada de cada paciente al hospital"""
 
         #Se obtienen los datos del archivo de entrada y se agregan a la cola de pacientes
-        gen_fecha_ing = get_fecha_ingreso(path)
+        gen_fecha_ing = procesar_datos.get_fecha_ingreso(path)
         next(gen_fecha_ing)
         paciente = 0
 
@@ -45,12 +47,12 @@ class UCI:
         """Funcion que controla el transcito de cada paciente dentro del hospital"""
 
         #Se inicializan los generadores necesarios
-        gen_fecha_ing_uci = get_fecha_ing_uci(path)
-        gen_fecha_ingreso = get_fecha_ingreso(path)
-        gen_estadia_uci = get_estadia_uci(path)
-        gen_tiempo_van = get_tiempo_vam(path)
-        gen_diagnostico = get_diagnostico(path)
-        gen_fecha_egreso = get_fecha_egreso(path)
+        gen_fecha_ing_uci = procesar_datos.get_fecha_ing_uci(path)
+        gen_fecha_ingreso = procesar_datos.get_fecha_ingreso(path)
+        gen_estadia_uci = procesar_datos.get_estadia_uci(path)
+        gen_tiempo_van = procesar_datos.get_tiempo_vam(path)
+        gen_diagnostico = procesar_datos.get_diagnostico(path)
+        gen_fecha_egreso = procesar_datos.get_fecha_egreso(path)
 
         while True:
 
@@ -89,7 +91,7 @@ class UCI:
             yield self.env.timeout(espera_despues_vam)
 
             #Se decide a que sala ira el paciente
-            gen_sala_egreso = get_sala_egreso(path)
+            gen_sala_egreso = procesar_datos.get_sala_egreso(path)
             sala_egreso = next(gen_sala_egreso)
             #print(f"El paciente {paciente} salio de la uci a las {self.env.now}h y fue trasladado hacia {sala_egreso}")
             self.hora_salida_uci.append(self.env.now)
@@ -102,7 +104,7 @@ class UCI:
             yield self.env.timeout(espera_egreso * 24)
 
             #Se termina la simulacion
-            gen_evolucion = get_evolucion(path)
+            gen_evolucion = procesar_datos.get_evolucion(path)
             evolucion = next(gen_evolucion)
 
             if evolucion == "vivo":
@@ -122,22 +124,3 @@ class UCI:
                "Hora_salida_uci":self.hora_salida_uci}
         dataFrame = pd.DataFrame(data)
         dataFrame.to_csv("Datos de simulacion.csv", index=False)
-
-diagnosticos = ['ACV', 'ARDS', 'Ahorcamiento Incompleto', 'BNB-EH', 'BNB-IH', 'BNV',
-       'Coma', 'Crisis miasténica', 'DMO', 'EPOC descompensada',
-       'Embolismo graso', 'Emergencia hipertensiva',
-       'Encefalopatía metabólica', 'Estatus Asmático', 'Estatus Epiléptico',
-       'Guillain Barre', 'ICC descompensada', 'Insuficiencia Renal Aguda',
-       'Insuficiencia Renal Crónica', 'Intoxicación Exógena',
-       'Leptospirosis complicada', 'Materna Crítica', 'Miocarditis',
-       'PCR recuperado', 'Pancreatitis', 'Politraumatizado', 'SPO amputación',
-       'SPO laparotomía', 'SPO neurología', 'SPO toracotomía', 'Sepsis grave',
-       'Shock cardiogénico', 'Shock hipovolémico', 'Shock séptico',
-       'Síndrome Apn-Hipo del sueño', 'TCE severo']
-
-porcientos = [10 for _ in diagnosticos]
-
-env = Environment()
-uci = UCI(env, "datos.csv", diagnosticos, porcientos)
-env.run()
-uci.exportar_datos()

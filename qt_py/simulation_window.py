@@ -6,9 +6,11 @@ from PyQt5.QtCore import QObject, QThread
 from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.uic import loadUi
+from simpy import Environment
 
 from qt_py.constantes import Rutas
 from uci import procesar_datos as proc_d
+from uci import UCI
 
 
 class SimulationWindow(QWidget):
@@ -80,7 +82,7 @@ class SimulationWindow(QWidget):
         try:
             print("-- Se presionó el botón de 'Comenzar Simulacion' --")
             self.thread[1] = Simulation_Thread(self)
-            self.thread[1].start()
+            self.thread[1].start(self.ruta_archivo_csv, proc_d.get_diagnostico_list, self.modelo_tabla.takeColumn(1))
             self.pB_comenzar.setEnabled(False)
             self.thread[1].signal_progBarr.connect(self._update_progress_bar)
             self.thread[1].signal_terminated.connect(self.pB_comenzar.setEnabled)
@@ -153,21 +155,25 @@ class Simulation_Thread(QThread):
         super(Simulation_Thread, self).__init__(parent)
         self.index = 0
         self.is_running = True
+        self.env = Environment()
 
     # Nota: Cuando se llama a `start()` se llama directamente a esta función: `run()`
-    def run(self):
+    def run(self, path , diagnosticos , porcientos):
         print("Comenzando simulación...")
+        uci_run = UCI(self.env, path, diagnosticos, porcientos)
+        self.env.run()
         proceso = 0
         t_comienzo = time.time()
         while True:
-            proceso += 1
+            proceso += self.env.now
             time.sleep(0.05)
             if proceso == 101:
                 t_final = time.time()
                 print(f"La simulación terminó a los {(t_final - t_comienzo):.2f} seg.")
                 self.signal_terminated.emit(True)
                 break
-            self.signal_progBarr.emit(proceso)
+            self.signal_progBarr.emit(proceso/18864*100)
+        uci_run.exportar_datos()
 
     def stop(self):
         print("Deteniendo la simulación....")

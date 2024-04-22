@@ -1,4 +1,4 @@
-gui/qt_py/__pycache__
+gui/qt_py/__pycache__/
 uci/__pycache__/
 .vscode/settings.json
 Datos de simulacion.csv
