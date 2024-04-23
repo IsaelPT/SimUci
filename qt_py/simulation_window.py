@@ -82,7 +82,12 @@ class SimulationWindow(QWidget):
         try:
             print("-- Se presionó el botón de 'Comenzar Simulacion' --")
             self.thread[1] = Simulation_Thread(self)
-            self.thread[1].start(self.ruta_archivo_csv, proc_d.get_diagnostico_list, self.modelo_tabla.takeColumn(1))
+            self.thread[1].run(
+                self.ruta_archivo_csv,
+                proc_d.get_diagnostico_list,
+                self.modelo_tabla.takeColumn(1),
+            )
+            self.pB_cargar_csv.setEnnabled(False)
             self.pB_comenzar.setEnabled(False)
             self.thread[1].signal_progBarr.connect(self._update_progress_bar)
             self.thread[1].signal_terminated.connect(self.pB_comenzar.setEnabled)
@@ -98,6 +103,7 @@ class SimulationWindow(QWidget):
             print("Se presionó el botón de 'Detener Simulación'.")
             self.thread[1].stop()
             self.progressBar.setValue(0)
+            self.pB_cargar_csv.setEnnabled(True)
             self.pB_comenzar.setEnabled(True)
             QMessageBox().warning(
                 self, "Detención de simulación", "Se ha detenido la simulación."
@@ -158,7 +164,7 @@ class Simulation_Thread(QThread):
         self.env = Environment()
 
     # Nota: Cuando se llama a `start()` se llama directamente a esta función: `run()`
-    def run(self, path , diagnosticos , porcientos):
+    def run(self, path, diagnosticos, porcientos):
         print("Comenzando simulación...")
         uci_run = UCI(self.env, path, diagnosticos, porcientos)
         self.env.run()
@@ -172,7 +178,7 @@ class Simulation_Thread(QThread):
                 print(f"La simulación terminó a los {(t_final - t_comienzo):.2f} seg.")
                 self.signal_terminated.emit(True)
                 break
-            self.signal_progBarr.emit(proceso/18864*100)
+            self.signal_progBarr.emit(proceso / 18864 * 100)
         uci_run.exportar_datos()
 
     def stop(self):
