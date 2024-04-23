@@ -9,6 +9,7 @@ from PyQt5.uic import loadUi
 
 from qt_py.constantes import Rutas
 from uci import procesar_datos as proc_d
+from uci.uci_simulacion import UCI
 
 
 class SimulationWindow(QWidget):
@@ -26,6 +27,8 @@ class SimulationWindow(QWidget):
     - `_init_tabla_diagnosticos(self, diagnosticos):` Inicializa la tabla de diagnósticos.
     - `_upgrade_progressBarr(self, contador)`: Actualiza el progreso de la barra que visualiza el proceso de la simulación.
     """
+
+    ruta_archivo_csv: str = None
 
     def __init__(self, main_win) -> None:
 
@@ -60,7 +63,7 @@ class SimulationWindow(QWidget):
             self, "Abrir CSV", "", "Archivos CSV (*.csv)"
         )
 
-        if self.ruta_archivo_csv:
+        if self.ruta_archivo_csv is not None:
             try:
                 self.datos_csv = pd.read_csv(self.ruta_archivo_csv)
                 diagnosticos = proc_d.get_diagnostico_list(self.ruta_archivo_csv)
@@ -80,7 +83,12 @@ class SimulationWindow(QWidget):
         try:
             print("-- Se presionó el botón de 'Comenzar Simulacion' --")
             self.thread[1] = Simulation_Thread(self)
-            self.thread[1].start()
+            if self.ruta_archivo_csv is not None:
+                self.thread[1].run(
+                    self.ruta_archivo_csv,
+                    proc_d.get_diagnostico_list,
+                    self.modelo_tabla.takeColumn(1),
+                )
             self.pB_comenzar.setEnabled(False)
             self.thread[1].signal_progBarr.connect(self._update_progressBarr)
             self.thread[1].signal_terminated.connect(self.pB_comenzar.setEnabled)
@@ -161,7 +169,7 @@ class Simulation_Thread(QThread):
         self.index = 0
         self.is_running = True
 
-    def run(self):
+    def run(self, path, diagnosticos, porcientos):
         print("Comenzando simulación...")
         proceso = 0
         t_comienzo = time.time()
@@ -173,7 +181,8 @@ class Simulation_Thread(QThread):
                 print(f"La simulación terminó a los {(t_final - t_comienzo):.2f} seg.")
                 self.signal_terminated.emit(True)
                 break
-            self.signal_progBarr.emit(proceso)
+            self.signal_progBarr.emit(proceso / 18864 * 100)
+        uci_run.exportar_datos()
 
     def stop(self):
         print("Deteniendo la simulación....")
