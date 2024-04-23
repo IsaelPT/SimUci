@@ -10,7 +10,7 @@ from simpy import Environment
 
 from qt_py.constantes import Rutas
 from uci import procesar_datos as proc_d
-from uci import UCI
+from uci.uci_simulacion import Uci
 
 
 class SimulationWindow(QWidget):
@@ -27,6 +27,8 @@ class SimulationWindow(QWidget):
     - `cerrar_ventana(self)`: Método para cerrar la ventana de simulación.
     - `init_tabla_diagnosticos():`
     """
+
+    ruta_archivo_csv: str = None
 
     def __init__(self, main_win) -> None:
 
@@ -92,7 +94,7 @@ class SimulationWindow(QWidget):
             self.thread[1].signal_progBarr.connect(self._update_progress_bar)
             self.thread[1].signal_terminated.connect(self.pB_comenzar.setEnabled)
         except Exception as e:
-            print(f"Ocurrió un error inesperado: {e}")
+            print(f"Ocurrió un error inesperado a la hora de correr la simulación: {e}")
 
     def detener_simulacion(self) -> None:
         """
@@ -166,7 +168,7 @@ class Simulation_Thread(QThread):
     # Nota: Cuando se llama a `start()` se llama directamente a esta función: `run()`
     def run(self, path, diagnosticos, porcientos):
         print("Comenzando simulación...")
-        uci_run = UCI(self.env, path, diagnosticos, porcientos)
+        uci_run = Uci(self.env, path, diagnosticos, porcientos)
         self.env.run()
         proceso = 0
         t_comienzo = time.time()
