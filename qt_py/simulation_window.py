@@ -23,7 +23,8 @@ class SimulationWindow(QWidget):
     - `comenzar_simulacion(self)`: Método que inicia el proceso de simulación.
     - `detener_simulacion(self)`: Método para detener la simulación en curso.
     - `cerrar_ventana(self)`: Método para cerrar la ventana de simulación.
-    - `init_tabla_diagnosticos():`
+    - `_init_tabla_diagnosticos(self, diagnosticos):` Inicializa la tabla de diagnósticos.
+    - `_upgrade_progressBarr(self, contador)`: Actualiza el progreso de la barra que visualiza el proceso de la simulación.
     """
 
     def __init__(self, main_win) -> None:
@@ -39,7 +40,6 @@ class SimulationWindow(QWidget):
         self.modelo_tabla = QStandardItemModel(0, 2)
         self.modelo_tabla.setHorizontalHeaderItem(0, QStandardItem("Diagnosticos"))
         self.modelo_tabla.setHorizontalHeaderItem(1, QStandardItem("Porcientos"))
-        # self.tableView_diagnosticos = self.tableView_diagnosticos
         self.tableView_diagnosticos.setModel(self.modelo_tabla)
         self.tableView_diagnosticos.resizeColumnsToContents()
 
@@ -82,7 +82,7 @@ class SimulationWindow(QWidget):
             self.thread[1] = Simulation_Thread(self)
             self.thread[1].start()
             self.pB_comenzar.setEnabled(False)
-            self.thread[1].signal_progBarr.connect(self._update_progress_bar)
+            self.thread[1].signal_progBarr.connect(self._update_progressBarr)
             self.thread[1].signal_terminated.connect(self.pB_comenzar.setEnabled)
         except Exception as e:
             print(f"Ocurrió un error inesperado: {e}")
@@ -130,7 +130,7 @@ class SimulationWindow(QWidget):
 
         self.tableView_diagnosticos.resizeColumnsToContents()
 
-    def _update_progress_bar(self, contador):
+    def _update_progressBarr(self, contador) -> None:
         self.progressBar.setValue(contador)
 
 
@@ -142,8 +142,8 @@ class Simulation_Thread(QThread):
     Responsabilidades
     -----------------
 
-    - `start()`: Inicia la simulación. Al llamar a la función `start()`, directamente se llama a esta función.
-    - `run()`: Detiene la simulación. Pone fin al hilo de la simulación.
+    - `run(self)`: Inicia la simulación. Al llamar a la función `start()`, directamente se llama a esta función.
+    - `stop(self)`: Detiene la simulación. Pone fin al hilo de la simulación.
     """
 
     signal_progBarr = QtCore.pyqtSignal(int)
@@ -154,15 +154,14 @@ class Simulation_Thread(QThread):
         self.index = 0
         self.is_running = True
 
-    # Nota: Cuando se llama a `start()` se llama directamente a esta función: `run()`
     def run(self):
         print("Comenzando simulación...")
         proceso = 0
         t_comienzo = time.time()
         while True:
             proceso += 1
-            time.sleep(0.05)
-            if proceso == 101:
+            time.sleep(0.01)
+            if proceso > 100:
                 t_final = time.time()
                 print(f"La simulación terminó a los {(t_final - t_comienzo):.2f} seg.")
                 self.signal_terminated.emit(True)

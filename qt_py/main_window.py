@@ -26,10 +26,6 @@ class MainWindow(QMainWindow):
         self.pB_salir.clicked.connect(self.cerrar_app)
 
     def abrir_ventana_simulacion(self) -> None:
-        """
-        Abre la ventana de Simulaciones.
-        """
-
         try:
             self.simulation_win = SimulationWindow(self)
             self.simulation_win.show()
