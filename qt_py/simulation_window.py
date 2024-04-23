@@ -87,9 +87,14 @@ class SimulationWindow(QWidget):
         except Exception as e:
             print(f"Ocurrió un error inesperado: {e}")
 
-    def detener_simulacion(self) -> None:
+    def detener_simulacion(self, show_warning_message: bool) -> None:
         """
         Detiene la simulación a medio proceso.
+
+        Parámetros
+        ----------
+        show_warning_message : bool
+            Indica si se debe mostrar un mensaje de advertencia.
         """
 
         try:
@@ -97,9 +102,10 @@ class SimulationWindow(QWidget):
             self.thread[1].stop()
             self.progressBar.setValue(0)
             self.pB_comenzar.setEnabled(True)
-            QMessageBox().warning(
-                self, "Detención de simulación", "Se ha detenido la simulación."
-            )
+            if not show_warning_message:
+                QMessageBox().warning(
+                    self, "Detención de simulación", "Se ha detenido la simulación."
+                )
         except Exception as e:
             print(f"Ocurrió un error inesperado: {e}")
 
@@ -109,6 +115,7 @@ class SimulationWindow(QWidget):
         """
 
         try:
+            self.detener_simulacion(True)
             self.close()
             self.main_win.show()
         except Exception as e:
@@ -160,7 +167,7 @@ class Simulation_Thread(QThread):
         t_comienzo = time.time()
         while True:
             proceso += 1
-            time.sleep(0.01)
+            time.sleep(0.02)
             if proceso > 100:
                 t_final = time.time()
                 print(f"La simulación terminó a los {(t_final - t_comienzo):.2f} seg.")
