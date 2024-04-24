@@ -475,7 +475,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Simulacion</string>
+        <string>Simulación</string>
        </property>
       </widget>
      </item>
@@ -495,16 +495,6 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QMenuBar" name="barraMenu">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>517</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="accionAbrir_simulacion">
    <property name="text">
@@ -512,6 +502,11 @@
    </property>
    <property name="shortcutContext">
     <enum>Qt::WidgetShortcut</enum>
+   </property>
+  </action>
+  <action name="actionSimulationWin">
+   <property name="text">
+    <string>Simulación</string>
    </property>
   </action>
  </widget>
