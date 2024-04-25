@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.uic import loadUi
 from simpy import Environment
+import threading
 
 from qt_py.constantes import Rutas
 from uci import procesar_datos as proc_d
@@ -49,7 +50,7 @@ class SimulationWindow(QWidget):
         self.tableView_diagnosticos.setModel(self.modelo_tabla)
         self.tableView_diagnosticos.resizeColumnsToContents()
 
-        self.thread = {}  # Hilos de esta ventana.
+        self.threads = []  # Hilos de esta ventana.
 
         # Conexiones de los componentes.
         self.pB_cargar.clicked.connect(self.cargar_csv)
@@ -94,18 +95,17 @@ class SimulationWindow(QWidget):
             return
         try:
             print("-- Se presionó el botón de 'Comenzar Simulacion' --")
-            self.thread[1] = Simulation_Thread(
-                self,
+            self.threads.append(Simulation_Thread(
                 self.ruta_archivo_csv,
-                proc_d.get_diagnostico_list,
-                self._get_porcientos_de_tabla,
-            )
+                proc_d.get_diagnostico_list(self.ruta_archivo_csv),
+                self._get_porcientos_de_tabla(),
+            ))
+            self.threads[-1].signal.signal_progBarr.connect(self._update_progressBarr)
+            self.threads[-1].signal.signal_terminated.connect(self.pB_comenzar.setEnabled)
             if self.ruta_archivo_csv is not None:
-                self.thread[1].run()
-            self.pB_comenzar.setEnabled(False)
-            self.pB_cargar.setEnabled(False)
-            self.thread[1].signal_progBarr.connect(self._update_progressBarr)
-            self.thread[1].signal_terminated.connect(self.pB_comenzar.setEnabled)
+                self.pB_comenzar.setEnabled(False)
+                self.pB_cargar.setEnabled(False)
+                self.threads[-1].run()
         except:
             print(
                 f"Ocurrió un error inesperado a la hora de correr la simulación:\n{traceback.format_exc()}"
@@ -123,7 +123,7 @@ class SimulationWindow(QWidget):
 
         try:
             print("Se presionó el botón de 'Detener Simulación'.")
-            self.thread[1].stop()
+            self.threads[-1].stop()
             self.progressBar.setValue(0)
             self.pB_cargar.setEnabled(True)
             self.pB_comenzar.setEnabled(True)
@@ -198,12 +198,12 @@ class SimulationWindow(QWidget):
         porcentajes = []
         for i in range(self.modelo_tabla.rowCount()):
             item_porcentaje = self.modelo_tabla.item(i, 1)
-            porcentajes.append(float(item_porcentaje))
+            porcentajes.append(float(item_porcentaje.text()))
         print(f"Lista de porcentajes:\n{porcentajes}")
         return porcentajes
 
 
-class Simulation_Thread(QThread):
+class Simulation_Thread(threading.Thread):
     """
     Clase para el procesamiento en hilos de la simulación.
     Esto permite tener el proceso de simulación en paralelo y no interrumpir toda la aplicación.
@@ -230,35 +230,36 @@ class Simulation_Thread(QThread):
     - `stop(self)`: Detiene la simulación. Pone fin al hilo de la simulación.
     """
 
-    signal_progBarr = QtCore.pyqtSignal(int)
-    signal_terminated = QtCore.pyqtSignal(bool)
 
-    def __init__(self, parent: QObject, path: str, diagnosticos, porcientos) -> None:
-        super(Simulation_Thread, self).__init__(parent)
+    def __init__(self, path: str, diagnosticos, porcientos) -> None:
+        super().__init__()
+        class Signal(QObject):
+            signal_progBarr = QtCore.pyqtSignal(int)
+            signal_terminated = QtCore.pyqtSignal(bool)
+        self.signal = Signal()
         self.index = 0
         self.is_running = True
         self.env = Environment()
-        self.path = path
-        self.diagnosticos = diagnosticos
-        self.porcientos = porcientos
+        self.uci_run = Uci(self.env, path, diagnosticos, porcientos)
 
     def run(self):
         print("Comenzando simulación...")
-        uci_run = Uci(self.env, self.path, self.diagnosticos, self.porcientos)
-        self.env.run()
         proceso = 0
+        signal_emiter = 0
         t_comienzo = time.time()
         while True:
-            proceso += self.env.now
-            print(proceso)
-            time.sleep(0.05)
+            proceso = int(self.env.now / 17880 * 100)
+            #print(proceso)
             if proceso > 100:
                 t_final = time.time()
                 print(f"La simulación terminó a los {(t_final - t_comienzo):.2f} seg.")
-                self.signal_terminated.emit(True)
+                self.signal.signal_terminated.emit(True)
                 break
-            self.signal_progBarr.emit(proceso / 18864 * 100)
-        uci_run.exportar_datos()
+            elif  signal_emiter != proceso:
+                self.signal.signal_progBarr.emit(proceso)
+                signal_emiter = proceso
+            self.env.run(until=self.env.now+1)
+        self.uci_run.exportar_datos()
 
     def stop(self):
         print("Deteniendo la simulación....")
