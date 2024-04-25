@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5.uic import loadUi
 
 from qt_py.simulation_window import SimulationWindow
-from qt_py.constantes import Rutas
+from qt_py.constantes import Rutas, Estilos
 
 
 class MainWindow(QMainWindow):
@@ -24,8 +24,13 @@ class MainWindow(QMainWindow):
         loadUi(Rutas.MAINWINDOW_UI, self)  # baseinstance: MainWindow
 
         # Conexiones de los componentes.
+        self.actionVentana_simulacion.triggered.connect(self.abrir_ventana_simulacion)
         self.pB_simulacion.clicked.connect(self.abrir_ventana_simulacion)
         self.pB_salir.clicked.connect(self.cerrar_app)
+
+        # Estilos personalizados a los componentes.
+        self.pB_simulacion.setStyleSheet(Estilos.botones["botones_acciones_verdes"])
+        self.pB_salir.setStyleSheet(Estilos.botones["botones_acciones_verdes"])
 
     def abrir_ventana_simulacion(self) -> None:
         try:

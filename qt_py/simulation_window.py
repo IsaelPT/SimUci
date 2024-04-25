@@ -10,7 +10,7 @@ from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.uic import loadUi
 from simpy import Environment
 
-from qt_py.constantes import Rutas
+from qt_py.constantes import Rutas, Estilos
 from uci import procesar_datos as proc_d
 
 from uci.uci_simulacion import Uci
@@ -57,6 +57,15 @@ class SimulationWindow(QWidget):
         self.pB_detener.clicked.connect(self.detener_simulacion)
         self.pB_salir.clicked.connect(self.cerrar_ventana)
 
+        # Estilos personalizados a los componentes.
+        self.pB_cargar.setStyleSheet(Estilos.botones["botones_acciones_verdes"])
+        self.pB_comenzar.setStyleSheet(Estilos.botones["botones_acciones_verdes"])
+        self.pB_detener.setStyleSheet(Estilos.botones["botones_acciones_verdes"])
+        self.pB_salir.setStyleSheet(Estilos.botones["botones_acciones_verdes"])
+
+        # Ajustes iniciales a botones.
+        self.pB_detener.setEnabled(False)
+
     def cargar_csv(self) -> None:
         """
         Carga el archivo .csv a través de un `QFileDialog`.
@@ -97,15 +106,19 @@ class SimulationWindow(QWidget):
             self.thread[1] = Simulation_Thread(
                 self,
                 self.ruta_archivo_csv,
-                proc_d.get_diagnostico_list,
-                self._get_porcientos_de_tabla,
+                proc_d.get_diagnostico_list(self.ruta_archivo_csv),
+                self._get_porcientos_de_tabla(),
             )
             if self.ruta_archivo_csv is not None:
-                self.thread[1].run()
+                self.thread[1].start()
+            else:
+                raise Exception("La ruta del archivo .csv está vacía.")
             self.pB_comenzar.setEnabled(False)
+            self.pB_detener.setEnabled(True)
             self.pB_cargar.setEnabled(False)
             self.thread[1].signal_progBarr.connect(self._update_progressBarr)
             self.thread[1].signal_terminated.connect(self.pB_comenzar.setEnabled)
+            self.thread[1].signal_terminated.connect(self.pB_detener.setEnabled)
         except:
             print(
                 f"Ocurrió un error inesperado a la hora de correr la simulación:\n{traceback.format_exc()}"
@@ -127,6 +140,7 @@ class SimulationWindow(QWidget):
             self.progressBar.setValue(0)
             self.pB_cargar.setEnabled(True)
             self.pB_comenzar.setEnabled(True)
+            self.pB_detener.setEnabled(False)
             if not show_warning_message:
                 QMessageBox().warning(
                     self, "Detención de simulación", "Se ha detenido la simulación."
@@ -196,9 +210,22 @@ class SimulationWindow(QWidget):
         """
 
         porcentajes = []
-        for i in range(self.modelo_tabla.rowCount()):
-            item_porcentaje = self.modelo_tabla.item(i, 1)
-            porcentajes.append(float(item_porcentaje))
+        incorrectos = []
+        for index in range(self.modelo_tabla.rowCount()):
+            item_porcentaje = self.modelo_tabla.item(index, 1)
+            porcentaje: str = item_porcentaje.text()
+            if porcentaje.isdigit():
+                porcentajes.append(float(item_porcentaje.text()))
+            else:
+                incorrectos.append(index + 1)
+        if len(incorrectos) == 1:
+            title = "Porciento incorrecto"
+            msg = f"Se ha encontrado que en la columna de porcentajes, precisamente en la fila {incorrectos[0]}, un porciento ha sido ingresado incorrectamente. Por favor, rectifique para poder iniciar la simulación."
+            QMessageBox.warning(self, title, msg)
+        if len(incorrectos) > 1:
+            title = "Porcientos incorrectos"
+            msg = f"Se han encontrado que en la columna de porcentajes, precisamente en las filas {incorrectos}, porcientos han sido ingresado incorrectamente. Por favor, rectifique para poder iniciar la simulación."
+            QMessageBox.warning(self, title, msg)
         print(f"Lista de porcentajes:\n{porcentajes}")
         return porcentajes
 
@@ -242,23 +269,39 @@ class Simulation_Thread(QThread):
         self.diagnosticos = diagnosticos
         self.porcientos = porcientos
 
+    # def run(self):
+    #     print("Comenzando simulación...")
+    #     uci_run = Uci(self.env, self.path, self.diagnosticos, self.porcientos)
+    #     self.env.run()
+    #     proceso = 0
+    #     t_comienzo = time.time()
+    #     while True:
+    #         proceso += self.env.now
+    #         print(proceso)
+    #         time.sleep(0.05)
+    #         if proceso > 100:
+    #             t_final = time.time()
+    #             print(f"La simulación terminó a los {(t_final - t_comienzo):.2f} seg.")
+    #             self.signal_terminated.emit(True)
+    #             break
+    #         self.signal_progBarr.emit(proceso / 18864 * 100)
+    #     uci_run.exportar_datos()
+
     def run(self):
         print("Comenzando simulación...")
-        uci_run = Uci(self.env, self.path, self.diagnosticos, self.porcientos)
-        self.env.run()
         proceso = 0
         t_comienzo = time.time()
         while True:
-            proceso += self.env.now
-            print(proceso)
+            proceso += 1
+            self.signal_progBarr.emit(proceso)
             time.sleep(0.05)
             if proceso > 100:
                 t_final = time.time()
                 print(f"La simulación terminó a los {(t_final - t_comienzo):.2f} seg.")
                 self.signal_terminated.emit(True)
                 break
-            self.signal_progBarr.emit(proceso / 18864 * 100)
-        uci_run.exportar_datos()
+            # self.signal_progBarr.emit(proceso / 18864 * 100)
+        # uci_run.exportar_datos()
 
     def stop(self):
         print("Deteniendo la simulación....")
