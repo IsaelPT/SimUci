@@ -110,15 +110,15 @@ class SimulationWindow(QWidget):
                 self._get_porcientos_de_tabla(),
             )
             if self.ruta_archivo_csv is not None:
+                self.pB_comenzar.setEnabled(False)
+                self.pB_detener.setEnabled(True)
+                self.pB_cargar.setEnabled(False)
+                self.thread[1].signal_progBarr.connect(self._update_progressBarr)
+                self.thread[1].signal_terminated.connect(self.pB_comenzar.setEnabled)
+                self.thread[1].signal_terminated.connect(self.pB_detener.setEnabled)
                 self.thread[1].start()
             else:
                 raise Exception("La ruta del archivo .csv está vacía.")
-            self.pB_comenzar.setEnabled(False)
-            self.pB_detener.setEnabled(True)
-            self.pB_cargar.setEnabled(False)
-            self.thread[1].signal_progBarr.connect(self._update_progressBarr)
-            self.thread[1].signal_terminated.connect(self.pB_comenzar.setEnabled)
-            self.thread[1].signal_terminated.connect(self.pB_detener.setEnabled)
         except:
             print(
                 f"Ocurrió un error inesperado a la hora de correr la simulación:\n{traceback.format_exc()}"
@@ -163,7 +163,7 @@ class SimulationWindow(QWidget):
     def _init_tabla_diagnosticos(self, diagnosticos) -> None:
         """
         Define el modelo del `QColumnView` para visualizar los diagnosticos y porcientos
-        que se obtienen de los pacientes.
+        que se obtienen de los pacientes. También inicia la columna de porcientos con valores de 0.
 
         Parámetros
         ----------

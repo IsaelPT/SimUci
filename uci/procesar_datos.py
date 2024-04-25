@@ -1,6 +1,7 @@
 import pandas as pd
 
-def cargar_fichero(path: str, column:str) -> list:
+
+def cargar_fichero(path: str, column: str) -> list:
     """
     Retorna una columna organizada por fecha de ingreso
 
@@ -21,6 +22,7 @@ def cargar_fichero(path: str, column:str) -> list:
     estadia = list(df.sort_values("fecha_ingreso")[column])
     return estadia
 
+
 def get_fecha_ingreso(path: str):
     """
     Genrador de las fechas de ingreso
@@ -38,6 +40,7 @@ def get_fecha_ingreso(path: str):
         yield (fecha_siguiente, fecha)
         fecha = fecha_siguiente
 
+
 def get_fecha_egreso(path: str):
     """
     Generador de fecha de egreso
@@ -51,6 +54,7 @@ def get_fecha_egreso(path: str):
     fecha_ingreso = cargar_fichero(path, "fecha_egreso")
     for fecha in fecha_ingreso:
         yield fecha
+
 
 def get_fecha_ing_uci(path: str):
     """
@@ -66,7 +70,8 @@ def get_fecha_ing_uci(path: str):
     for fecha in fecha_ingreso:
         yield fecha
 
-def get_tiempo_vam(path:str):
+
+def get_tiempo_vam(path: str):
     """
     Generador del tiempo en VAM
 
@@ -77,8 +82,9 @@ def get_tiempo_vam(path:str):
         int: Tiempo que esta en VAM
     """
     tiempo_vam = cargar_fichero(path, "tiempo_vam")
-    for horas in  tiempo_vam:
+    for horas in tiempo_vam:
         yield horas
+
 
 def get_fecha_egr_uci(path: str):
     """
@@ -94,6 +100,7 @@ def get_fecha_egr_uci(path: str):
     for fecha in fecha_ingreso:
         yield fecha
 
+
 def get_estadia_uci(path: str):
     """
     Genreador de la estadia en la UCI
@@ -107,6 +114,7 @@ def get_estadia_uci(path: str):
     estadia = cargar_fichero(path, "estadia_uci")
     for est in estadia:
         yield est
+
 
 def get_sala_egreso(path: str):
     """
@@ -122,6 +130,7 @@ def get_sala_egreso(path: str):
     for sala in salas:
         yield sala
 
+
 def get_evolucion(path: str):
     """
     Generador de la evolucion del paciente(vive o fallece)
@@ -135,6 +144,7 @@ def get_evolucion(path: str):
     evoluciones = cargar_fichero(path, "evolucion")
     for evolucion in evoluciones:
         yield evolucion
+
 
 def get_diagnostico(path: str):
     """
@@ -150,6 +160,7 @@ def get_diagnostico(path: str):
     for daignostico in diagnosticos:
         yield daignostico
 
+
 def get_diagnostico_list(path: str):
     """
     Obtiene los diagnosticos de los paciente
@@ -163,6 +174,7 @@ def get_diagnostico_list(path: str):
     df = pd.read_csv(path)
     diagnostico_list = df["diagnostico_preuci"].unique()
     return diagnostico_list
+
 
 def get_time_simulation(path: str):
     """
