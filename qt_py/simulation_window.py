@@ -69,7 +69,7 @@ class SimulationWindow(QWidget):
 
         if self.ruta_archivo_csv is not None:
             try:
-                self.datos_csv = pd.read_csv(self.ruta_archivo_csv)
+                #self.datos_csv = pd.read_csv(self.ruta_archivo_csv)
                 diagnosticos = proc_d.get_diagnostico_list(self.ruta_archivo_csv)
                 self._init_tabla_diagnosticos(diagnosticos)  # Ingresar datos en Tabla.
                 self.lineEdit_ruta_datos.setText(self.ruta_archivo_csv)
@@ -95,17 +95,16 @@ class SimulationWindow(QWidget):
             return
         try:
             print("-- Se presionó el botón de 'Comenzar Simulacion' --")
-            self.threads.append(Simulation_Thread(
-                self.ruta_archivo_csv,
-                proc_d.get_diagnostico_list(self.ruta_archivo_csv),
-                self._get_porcientos_de_tabla(),
-            ))
-            self.threads[-1].signal.signal_progBarr.connect(self._update_progressBarr)
-            self.threads[-1].signal.signal_terminated.connect(self.pB_comenzar.setEnabled)
             if self.ruta_archivo_csv is not None:
+                runner = Uci(self.ruta_archivo_csv,
+                             proc_d.get_diagnostico_list(self.ruta_archivo_csv),
+                             self._get_porcientos_de_tabla())
+                runner.signal.signal_progBarr.connect(self._update_progressBarr)
+                runner.signal.signal_terminated.connect(self.pB_comenzar.setEnabled)
                 self.pB_comenzar.setEnabled(False)
                 self.pB_cargar.setEnabled(False)
-                self.threads[-1].run()
+                runner.start()
+                self.threads.append(runner)
         except:
             print(
                 f"Ocurrió un error inesperado a la hora de correr la simulación:\n{traceback.format_exc()}"
@@ -123,7 +122,8 @@ class SimulationWindow(QWidget):
 
         try:
             print("Se presionó el botón de 'Detener Simulación'.")
-            self.threads[-1].stop()
+            for runner in self.threads:
+                runner.stop()
             self.progressBar.setValue(0)
             self.pB_cargar.setEnabled(True)
             self.pB_comenzar.setEnabled(True)
@@ -142,7 +142,7 @@ class SimulationWindow(QWidget):
         try:
             self.detener_simulacion(True)
             self.close()
-            self.main_win.show()
+            #self.main_win.show()
         except:
             print(f"Ocurrió un error al cerrar la ventana:\n{traceback.format_exc()}")
 
@@ -158,8 +158,7 @@ class SimulationWindow(QWidget):
             Una lista que contiene todos los diagnosticos que se obtuvieron del archivo `.csv`.
         """
 
-        self.FILAS = len(diagnosticos)
-        print(f"Cantidad de diagnosticos: {self.FILAS}")
+        print(f"Cantidad de diagnosticos: {len(diagnosticos)}")
         print(f"Lista de diagnosticos importada:\n{diagnosticos}")
 
         for d in diagnosticos:
@@ -180,7 +179,7 @@ class SimulationWindow(QWidget):
             El número a colocar en la barra del contador.
         """
 
-        self.progressBar.setValue(contador)
+        self.progressBar.setValue(int(contador / 17880 * 100))
 
     def _get_porcientos_de_tabla(self) -> List[float]:
         """
@@ -198,70 +197,6 @@ class SimulationWindow(QWidget):
         porcentajes = []
         for i in range(self.modelo_tabla.rowCount()):
             item_porcentaje = self.modelo_tabla.item(i, 1)
-            porcentajes.append(float(item_porcentaje.text()))
+            porcentajes.append(int(item_porcentaje.text()))
         print(f"Lista de porcentajes:\n{porcentajes}")
         return porcentajes
-
-
-class Simulation_Thread(threading.Thread):
-    """
-    Clase para el procesamiento en hilos de la simulación.
-    Esto permite tener el proceso de simulación en paralelo y no interrumpir toda la aplicación.
-
-    Parámetros
-    ----------
-
-    - `parent`
-        `QObject` que representa el objeto padre donde se instanciará el hilo.
-
-    - `path`
-        `str` que representa la ruta del archivo de entrada.
-
-    - `diagnosticos`
-        `list` que contiene los nombres de los diagnósticos.
-
-    - `porcientos`
-        `list` que contiene los porcientos destinados para cada diagnóstico.
-
-    Responsabilidades
-    -----------------
-
-    - `run(self)`: Inicia la simulación. Al llamar a la función `start()`, directamente se llama a esta función.
-    - `stop(self)`: Detiene la simulación. Pone fin al hilo de la simulación.
-    """
-
-
-    def __init__(self, path: str, diagnosticos, porcientos) -> None:
-        super().__init__()
-        class Signal(QObject):
-            signal_progBarr = QtCore.pyqtSignal(int)
-            signal_terminated = QtCore.pyqtSignal(bool)
-        self.signal = Signal()
-        self.index = 0
-        self.is_running = True
-        self.env = Environment()
-        self.uci_run = Uci(self.env, path, diagnosticos, porcientos)
-
-    def run(self):
-        print("Comenzando simulación...")
-        proceso = 0
-        signal_emiter = 0
-        t_comienzo = time.time()
-        while True:
-            proceso = int(self.env.now / 17880 * 100)
-            #print(proceso)
-            if proceso > 100:
-                t_final = time.time()
-                print(f"La simulación terminó a los {(t_final - t_comienzo):.2f} seg.")
-                self.signal.signal_terminated.emit(True)
-                break
-            elif  signal_emiter != proceso:
-                self.signal.signal_progBarr.emit(proceso)
-                signal_emiter = proceso
-            self.env.run(until=self.env.now+1)
-        self.uci_run.exportar_datos()
-
-    def stop(self):
-        print("Deteniendo la simulación....")
-        self.is_running = False
-        self.terminate()
