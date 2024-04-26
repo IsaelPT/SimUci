@@ -1,4 +1,3 @@
-.idea/
-.vscode/
-**/__pycache__/*
-experimentos/*
+.vscode/settings.json
+qt_py/__pycache__
+uci/__pycache__
