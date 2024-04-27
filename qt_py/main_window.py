@@ -9,14 +9,8 @@ from qt_py.constantes import Rutas, Estilos
 
 class MainWindow(QMainWindow):
     """
-    Es la Ventana Menú Principal de la aplicación.
-
-    Responsabilidades
-    -----------------
-
-    - `abrir_ventana_simulacion(self)`: Abre una ventana para realizar simulaciones con datos.
-    - `cerrar_ventana_simulacion(self)`: Cierra la ventana de simulación.
-    - `cerrar_app(self)`: Cierra la aplicación.
+    Es la Ventana del Menú Principal de la aplicación.
+    Desde esta ventana se acceden a las diferentes opciones que dispone la aplicación.
     """
 
     def __init__(self) -> None:
@@ -36,7 +30,6 @@ class MainWindow(QMainWindow):
         try:
             self.simulation_win = SimulationWindow(self)
             self.simulation_win.show()
-            self.hide()
         except:
             print(f"Error al abrir la ventana de simulación:\n{traceback.format_exc()}")
 

@@ -1,14 +1,32 @@
-from simpy import Environment
-from uci import procesar_datos
+import time
+import threading
 
 import pandas as pd
 
+from simpy import Environment
 
-class Uci:
-    def __init__(
-        self, env: Environment, path: str, diagnostico: list, porcientos: list
-    ) -> None:
-        self.env = env
+from PyQt5 import QtCore
+from PyQt5.QtCore import QObject
+
+from uci.procesar_datos import *
+
+
+class Uci(threading.Thread):
+    def __init__(self, path: str, diagnostico: list, porcientos: list) -> None:
+        super().__init__()
+
+        class Signal(QObject):
+            signal_progBarr = QtCore.pyqtSignal(int)
+            """Usado para actualizar con un valor la barra de progreso de simulación"""
+            signal_terminated = QtCore.pyqtSignal(bool)
+            """Usado para enviar señal cuando termine la simulación"""
+            signal_tiempo = QtCore.pyqtSignal(float)
+            """Usado para el tiempo de simulación resultante."""
+
+        # Se inicializan las variables necesarias para la simulacion
+        self.signal = Signal()
+        self.index = 0
+        self.env = Environment()
 
         # Se inicializan las variables necesarias para la simulacion
         self.diagnosticos_paciente = diagnostico
@@ -21,14 +39,35 @@ class Uci:
         self.hora_fin_vam = list()
         self.hora_salida_uci = list()
 
+        self._stop_event = threading.Event()
+
         # Se comienza a simular
         self.env.process(self.entrada_paciente(path))
 
+    def run(self):
+        print("-- Comenzando simulación --")
+        t_comienzo = time.time()
+        for i in range(17881):
+            self.signal.signal_progBarr.emit(i)
+            self.env.run(until=i + 1)
+            if self._stop_event.is_set():
+                break
+        self.signal.signal_terminated.emit(True)
+        self.signal.signal_progBarr.emit(0)  # Volviendo a 0 la barra de progreso.
+        t_final = time.time()
+        tiempo: float = round((t_final - t_comienzo), 1)
+        self.signal.signal_tiempo.emit(tiempo)
+        print(f"La simulación terminó a los {tiempo} segundos.")
+
+    def stop(self):
+        print("-- Deteniendo la simulación --")
+        self._stop_event.set()
+
     def entrada_paciente(self, path: str):
-        """Funcion que controla la entrada de cada paciente al hospital"""
+        """Controla la entrada de cada paciente al hospital."""
 
         # Se obtienen los datos del archivo de entrada y se agregan a la cola de pacientes
-        gen_fecha_ing = procesar_datos.get_fecha_ingreso(path)
+        gen_fecha_ing = get_fecha_ingreso(path)
         next(gen_fecha_ing)
         paciente = 0
 
@@ -47,15 +86,15 @@ class Uci:
                 break
 
     def entrada_paciente_uci(self, path: str, paciente: int):
-        """Funcion que controla el transcito de cada paciente dentro del hospital"""
+        """Funcion que controla el tránsito de cada paciente dentro del hospital."""
 
         # Se inicializan los generadores necesarios
-        gen_fecha_ing_uci = procesar_datos.get_fecha_ing_uci(path)
-        gen_fecha_ingreso = procesar_datos.get_fecha_ingreso(path)
-        gen_estadia_uci = procesar_datos.get_estadia_uci(path)
-        gen_tiempo_van = procesar_datos.get_tiempo_vam(path)
-        gen_diagnostico = procesar_datos.get_diagnostico(path)
-        gen_fecha_egreso = procesar_datos.get_fecha_egreso(path)
+        gen_fecha_ing_uci = get_fecha_ing_uci(path)
+        gen_fecha_ingreso = get_fecha_ingreso(path)
+        gen_estadia_uci = get_estadia_uci(path)
+        gen_tiempo_van = get_tiempo_vam(path)
+        gen_diagnostico = get_diagnostico(path)
+        gen_fecha_egreso = get_fecha_egreso(path)
 
         while True:
 
@@ -96,7 +135,7 @@ class Uci:
             yield self.env.timeout(espera_despues_vam)
 
             # Se decide a que sala ira el paciente
-            gen_sala_egreso = procesar_datos.get_sala_egreso(path)
+            gen_sala_egreso = get_sala_egreso(path)
             sala_egreso = next(gen_sala_egreso)
             # print(f"El paciente {paciente} salio de la uci a las {self.env.now}h y fue trasladado hacia {sala_egreso}")
             self.hora_salida_uci.append(self.env.now)
@@ -109,7 +148,7 @@ class Uci:
             yield self.env.timeout(espera_egreso * 24)
 
             # Se termina la simulacion
-            gen_evolucion = procesar_datos.get_evolucion(path)
+            gen_evolucion = get_evolucion(path)
             evolucion = next(gen_evolucion)
 
             if evolucion == "vivo":

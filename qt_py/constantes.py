@@ -6,7 +6,10 @@ class Rutas:
 
 
 class Estilos:
-    """Contiene estilos personalizados que se utilizan en botones y otros componentes en las interfaces gráficas."""
+    """
+    Contiene estilos personalizados que se utilizan en botones y otros componentes
+    en las diversas interfaces gráficas.
+    """
 
     botones = {
         "botones_acciones_verdes": """
@@ -21,8 +24,3 @@ class Estilos:
         """,
     }
     """Para botones `Comenzar Simulacion`, `Detener Simulacion`, `Salir` y otros."""
-
-
-class Colores:
-    VERDE_CLARO = "#b2f2bb"
-    GRIS = "#8f8f91"

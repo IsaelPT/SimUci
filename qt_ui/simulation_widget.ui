@@ -578,7 +578,7 @@
      </font>
     </property>
    </widget>
-   <widget class="QTableView" name="tableView_diagnosticos">
+   <widget class="QTableWidget" name="tableWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -593,6 +593,25 @@
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="rowCount">
+     <number>0</number>
+    </property>
+    <property name="columnCount">
+     <number>2</number>
+    </property>
+    <attribute name="horizontalHeaderDefaultSectionSize">
+     <number>250</number>
+    </attribute>
+    <column>
+     <property name="text">
+      <string>Diagnosticos</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Porcientos(%)</string>
+     </property>
+    </column>
    </widget>
   </widget>
  </widget>
