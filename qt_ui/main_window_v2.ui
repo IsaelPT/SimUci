@@ -1,32 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SimulationWidget</class>
- <widget class="QWidget" name="SimulationWidget">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>617</width>
-    <height>672</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>0</width>
-    <height>0</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>1200</width>
-    <height>800</height>
-   </size>
   </property>
   <property name="palette">
    <palette>
@@ -470,148 +452,141 @@
     </disabled>
    </palette>
   </property>
-  <property name="font">
-   <font>
-    <family>Segoe UI</family>
-    <pointsize>12</pointsize>
-   </font>
-  </property>
-  <property name="focusPolicy">
-   <enum>Qt::ClickFocus</enum>
-  </property>
   <property name="windowTitle">
-   <string>Ventana Simulación</string>
+   <string>MainWindow</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="1">
-    <widget class="QFrame" name="frame">
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_4">
-      <item row="0" column="0">
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <widget class="QFrame" name="frame_2">
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0">
-            <layout class="QVBoxLayout" name="verticalLayout_2">
-             <item>
-              <widget class="QPushButton" name="pB_cargar">
-               <property name="text">
-                <string>Cargar datos</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="lineEdit_ruta_datos">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="font">
-                <font>
-                 <family>Segoe UI</family>
-                 <pointsize>8</pointsize>
-                </font>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QTableWidget" name="tableWidget">
-               <property name="font">
-                <font>
-                 <family>Segoe UI</family>
-                 <pointsize>10</pointsize>
-                </font>
-               </property>
-               <property name="rowCount">
-                <number>0</number>
-               </property>
-               <property name="columnCount">
-                <number>2</number>
-               </property>
-               <attribute name="horizontalHeaderDefaultSectionSize">
-                <number>250</number>
-               </attribute>
-               <column>
-                <property name="text">
-                 <string>Diagnosticos</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Porcientos(%)</string>
-                </property>
-               </column>
-              </widget>
-             </item>
-             <item>
-              <widget class="QProgressBar" name="progressBar">
-               <property name="value">
-                <number>0</number>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QFrame" name="frame_3">
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_3">
-           <item row="0" column="0">
-            <layout class="QVBoxLayout" name="verticalLayout">
-             <item>
-              <widget class="QPushButton" name="pB_comenzar">
-               <property name="text">
-                <string>Comenzar Simulación</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pB_detener">
-               <property name="text">
-                <string>Detener Simulación</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pB_salir">
-               <property name="text">
-                <string>Salir</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-  </layout>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_3">
+    <item row="0" column="0">
+     <widget class="QFrame" name="frame_grande">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QFrame" name="frame_izquierda">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="imagen">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap>../ui_utils/images/example.jpg</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame_derecha">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <layout class="QVBoxLayout" name="layout_botones">
+            <item>
+             <widget class="QPushButton" name="pB_simulacion">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Simulación</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pB_ajustes">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Ajustes</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pB_salir">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Salir</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuVentanas">
+    <property name="title">
+     <string>Ventanas</string>
+    </property>
+    <addaction name="actionVentana_simulacion"/>
+   </widget>
+   <addaction name="menuVentanas"/>
+  </widget>
+  <action name="accionAbrir_simulacion">
+   <property name="text">
+    <string>Simulación</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+  </action>
+  <action name="actionSimulationWin">
+   <property name="text">
+    <string>Simulación</string>
+   </property>
+  </action>
+  <action name="actionVentana_simulacion">
+   <property name="text">
+    <string>Simulación</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

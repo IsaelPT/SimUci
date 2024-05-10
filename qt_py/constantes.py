@@ -1,8 +1,8 @@
 class Rutas:
     """Para variables con rutas estáticas para cargar componentes necesarios."""
 
+    MAINWINDOW_UI = "qt_ui/main_window_v2.ui"
     SIMULATIONWIDGET_UI = "qt_ui/simulation_widget.ui"
-    MAINWINDOW_UI = "qt_ui/main_window.ui"
 
 
 class Estilos:

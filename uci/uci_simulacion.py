@@ -18,8 +18,10 @@ class Uci(threading.Thread):
         class Signal(QObject):
             signal_progBarr = QtCore.pyqtSignal(int)
             """Usado para actualizar con un valor la barra de progreso de simulación"""
+
             signal_terminated = QtCore.pyqtSignal(bool)
             """Usado para enviar señal cuando termine la simulación"""
+
             signal_tiempo = QtCore.pyqtSignal(float)
             """Usado para el tiempo de simulación resultante."""
 
@@ -46,18 +48,25 @@ class Uci(threading.Thread):
 
     def run(self):
         print("-- Comenzando simulación --")
-        t_comienzo = time.time()
+
+        t_comienzo = time.time()  # Marcar el tiempo de inicio.
+        self.signal.signal_terminated.emit(False)
+
+        # Simulación.
         for i in range(17881):
             self.signal.signal_progBarr.emit(i)
             self.env.run(until=i + 1)
             if self._stop_event.is_set():
                 break
-        self.signal.signal_terminated.emit(True)
-        self.signal.signal_progBarr.emit(0)  # Volviendo a 0 la barra de progreso.
-        t_final = time.time()
-        tiempo: float = round((t_final - t_comienzo), 1)
-        self.signal.signal_tiempo.emit(tiempo)
-        print(f"La simulación terminó a los {tiempo} segundos.")
+
+        t_final = time.time()  # Marcar el tiempo de finalizacion.
+        tiempo_transcurrido = round((t_final - t_comienzo), 1)
+
+        self.signal.signal_progBarr.emit(0)  # Volviendo a 0 la barra de progreso
+        self.signal.signal_terminated.emit(True)  # Señal booleana de terminación
+        self.signal.signal_tiempo.emit(tiempo_transcurrido)  # Señal con valor de tiempo
+
+        print(f"-- La simulación terminó a los {tiempo_transcurrido} segundos. --")
 
     def stop(self):
         print("-- Deteniendo la simulación --")

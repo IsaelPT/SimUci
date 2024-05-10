@@ -1,5 +1,6 @@
 import traceback
 
+from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.uic import loadUi
 
@@ -13,6 +14,8 @@ class MainWindow(QMainWindow):
     Desde esta ventana se acceden a las diferentes opciones que dispone la aplicación.
     """
 
+    simulation_win: SimulationWindow = None
+
     def __init__(self) -> None:
         super().__init__()
         loadUi(Rutas.MAINWINDOW_UI, self)  # baseinstance: MainWindow
@@ -24,6 +27,7 @@ class MainWindow(QMainWindow):
 
         # Estilos personalizados a los componentes.
         self.pB_simulacion.setStyleSheet(Estilos.botones["botones_acciones_verdes"])
+        self.pB_ajustes.setStyleSheet(Estilos.botones["botones_acciones_verdes"])
         self.pB_salir.setStyleSheet(Estilos.botones["botones_acciones_verdes"])
 
     def abrir_ventana_simulacion(self) -> None:
@@ -42,6 +46,18 @@ class MainWindow(QMainWindow):
 
     def cerrar_app(self) -> None:
         try:
-            self.close()
+            self.close()  # Cerrar Main Window.
         except:
-            print(f"Error al cerrar la aplicación:\n{traceback.format_exc}")
+            print(f"Error al cerrar la aplicación:\n{traceback.format_exc()}")
+
+    def closeEvent(self, event: QCloseEvent | None) -> None:
+        """Método `closeEvent` sobrescrito donde su función es cerrar las ventanas que estén posiblemente
+        abiertas en el momento de cerrar esta ventana en Main Window.
+
+
+        Args:
+            `event (QCloseEvent | None)`: Su propósito por el momento es para servir de firma de sobrescritura del método original.
+        """
+
+        if self.simulation_win:
+            self.simulation_win.cerrar_ventana()
