@@ -154,7 +154,7 @@ class SimulationWindow(QWidget):
         """Cierra esta ventana de Simulación."""
 
         try:
-            if self.runner.is_alive():
+            if self.runner is not None and self.runner.is_alive():
                 self.detener_simulacion()
                 self._show_mensaje_interrupcion()
             self.close()
