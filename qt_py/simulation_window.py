@@ -1,10 +1,17 @@
 import traceback
-from typing import List
+import typing
 
-from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox, QTableWidgetItem
+from PyQt5.QtWidgets import (
+    QWidget,
+    QFileDialog,
+    QMessageBox,
+    QTableWidgetItem,
+    QMainWindow,
+)
 from PyQt5.uic import loadUi
+from PyQt5.QtGui import QIcon
 
-from qt_py.constantes import Rutas, Estilos
+from qt_py.resources import Rutas, Estilos, CustomQMessageBox
 
 from uci import procesar_datos as proc_d
 from uci.uci_simulacion import Uci
@@ -23,10 +30,15 @@ class SimulationWindow(QWidget):
 
     def __init__(self, main_win) -> None:
         super().__init__()
-        self.main_win = main_win  # Referencia a la clase padre (MainWindow).
-        loadUi(Rutas.SIMULATIONWIDGET_UI, self)  # baseinstance: SimulationWindow
 
-        self.threads = []  # Hilos de esta ventana.
+        # Referencia a la clase padre (MainWindow).
+        self.main_win: QMainWindow = main_win
+
+        # baseinstance: SimulationWindow
+        loadUi(Rutas.Ui_Files.SIMULATIONWIDGET_UI, self)
+
+        # self.threads: list[Uci] = []  # Hilos de esta ventana.
+        self.runner: Uci = None
 
         # Conexiones de los componentes.
         self.pB_cargar.clicked.connect(self.cargar_csv)
@@ -40,8 +52,9 @@ class SimulationWindow(QWidget):
         self.pB_detener.setStyleSheet(Estilos.botones["botones_acciones_verdes"])
         self.pB_salir.setStyleSheet(Estilos.botones["botones_acciones_verdes"])
 
-        # Ajustes iniciales a botones.
+        # Ajustes iniciales a componentes.
         self.pB_detener.setEnabled(False)
+        self.setWindowIcon(QIcon(Rutas.Iconos.WINDOWICON_SIMULATION))
 
         # Otros componentes.
         self.lineEdit_ruta_datos.setText("Ruta de archivo...")
@@ -55,18 +68,16 @@ class SimulationWindow(QWidget):
             self, "Abrir CSV", "", "Archivos CSV (*.csv)"
         )
 
-        if self.ruta_archivo_csv is not None:
-            try:
-                diagnosticos = proc_d.get_diagnostico_list(self.ruta_archivo_csv)
-                self._init_tabla_diagnosticos(diagnosticos)  # Ingresar datos en Tabla.
-                self.lineEdit_ruta_datos.setText(self.ruta_archivo_csv)
-                print(f"Archivo CSV '{self.ruta_archivo_csv}' cargado correctamente!")
-            except:
-                print(
-                    f"Ocurrió un error al cargar el archivo:\n{traceback.format_exc()}"
-                )
-        else:
-            raise Exception("La ruta de archivos no existe u ocurrió un error.")
+        if self.ruta_archivo_csv == "":
+            return
+
+        try:
+            diagnosticos = proc_d.get_diagnostico_list(self.ruta_archivo_csv)
+            self._init_tabla_diagnosticos(diagnosticos)  # Ingresar datos en Tabla.
+            self.lineEdit_ruta_datos.setText(self.ruta_archivo_csv)
+            print(f"Archivo CSV '{self.ruta_archivo_csv}' cargado correctamente!")
+        except:
+            print(f"Ocurrió un error al cargar el archivo:\n{traceback.format_exc()}")
 
     def comenzar_simulacion(self) -> None:
         """
@@ -106,57 +117,46 @@ class SimulationWindow(QWidget):
             if ruta is None or diagnosticos_tabla is None or porcientos_tabla is None:
                 raise RuntimeError("Hubo un error al momento de iniciar la simulacion.")
 
-            runner = Uci(ruta, diagnosticos_tabla, porcientos_tabla)
+            self.runner = Uci(ruta, diagnosticos_tabla, porcientos_tabla)
 
-            def switch(trigger):
-                """Propósito de la función es cambiar la visualización de los botones
-                acorde a una señal booleana que se emite en el procesamiento en la simulación
-                """
-                if trigger:
-                    self.pB_comenzar.setEnabled(True)
-                    self.pB_cargar.setEnabled(True)
-                    self.pB_detener.setEnabled(False)
-                else:
-                    self.pB_comenzar.setEnabled(False)
-                    self.pB_cargar.setEnabled(False)
-                    self.pB_detener.setEnabled(True)
+            self.runner.signal.signal_progBarr.connect(self._update_progressBarr)
+            self.runner.signal.signal_tiempo.connect(self._show_mensaje_finalizado)
+            self.runner.signal.signal_terminated.connect(self.__switch)
+            self.runner.signal.signal_interruption.connect(
+                self._show_mensaje_interrupcion
+            )
 
-            runner.signal.signal_progBarr.connect(self._update_progressBarr)
-            runner.signal.signal_terminated.connect(switch)
-            runner.signal.signal_tiempo.connect(self._show_mensaje_finalizado)
+            self.runner.start()
 
-            runner.start()
-            self.threads.append(runner)
+            # Para tener constancia de los hilos que están activos.
+            print(f"{self.runner.name} esta corriendo: {self.runner.is_alive()}")
         except:
             print(f"Error a la hora de correr la simulación:\n{traceback.format_exc()}")
 
-    def detener_simulacion(self, show_warning_message: bool) -> None:
+    def detener_simulacion(self) -> None:
         """Detiene la simulación a medio proceso.
 
         Args:
-            show_warning_message (bool): Útil para establecer si se mostrará un mensaje de advertencia o no tras cancelar la simulación. `True` mostrará el mensaje, en caso contrario, no.
+            show_warning_msg (bool): Útil para establecer si se mostrará un mensaje de advertencia o no tras cancelar la simulación. True mostrará el mensaje, en caso contrario, no.
         """
 
         try:
             print("-- Se presionó el botón de 'Detener Simulación' --")
-            for runner in self.threads:
-                runner.stop()
+            self.runner.stop()
             self.progressBar.setValue(0)
             self.pB_cargar.setEnabled(True)
             self.pB_comenzar.setEnabled(True)
             self.pB_detener.setEnabled(False)
-            if show_warning_message:
-                QMessageBox().warning(
-                    self, "Detención de simulación", "Se ha detenido la simulación."
-                )
         except:
-            print(f"Ocurrió un error inesperado:\n{traceback.format_exc()}")
+            print(f"Error deteniendo la simulación:\n{traceback.format_exc()}")
 
     def cerrar_ventana(self) -> None:
         """Cierra esta ventana de Simulación."""
 
         try:
-            self.detener_simulacion(False)
+            if self.runner.is_alive():
+                self.detener_simulacion()
+                self._show_mensaje_interrupcion()
             self.close()
         except:
             print(f"Ocurrió un error al cerrar la ventana:\n{traceback.format_exc()}")
@@ -167,7 +167,7 @@ class SimulationWindow(QWidget):
 
 
         Args:
-            diagnosticos (_type_): Lista con los diagnosticos extraidos del archivo de datos `.csv`.
+            diagnosticos (list): Lista con los diagnosticos extraidos del archivo de datos `.csv`.
         """
 
         self.FILAS = len(diagnosticos)
@@ -191,14 +191,14 @@ class SimulationWindow(QWidget):
 
         self.progressBar.setValue(int(contador / 17880 * 100))
 
-    def _get_porcientos_de_tabla(self) -> List[float] | None:
+    def _get_porcientos_de_tabla(self) -> list[float] | None:
         """Obtiene del QTableWidget los porcentajes que actualmente se han ingresado y se validan.
         En caso de que haya un porcentaje incorrecto, se muestra por pantalla un mensaje de advertencia
         con instrucciones al usuario para corregir los errores.
 
 
         Returns:
-            List[float] | None: Lista con los porcentajes extraidos de la tabla o None en caso de error.
+            list[float] | None: Lista con los porcentajes extraidos de la tabla o None en caso de error.
         """
 
         porcentajes = []
@@ -264,18 +264,40 @@ class SimulationWindow(QWidget):
                 return True
         return False
 
-    def _show_mensaje_finalizado(self, tiempo: float):
+    def _show_mensaje_finalizado(self, tiempo: float) -> None:
         """Muestra un mensaje de que la simulación ha finalizado y se muestra además el tiempo que duró esta simulación.
 
         Args:
             tiempo (float): Tiempo transcurrido en la simulación.
         """
 
-        QMessageBox.warning(
+        CustomQMessageBox.finalizado(
             self,
             "Simulación finalizada",
             f"La simulación terminó a los {tiempo} segundos.",
         )
 
-    def _cambiar_botones_simulacion():
-        pass
+    def _show_mensaje_interrupcion(self) -> None:
+        """Muestra un mensaje de que se ha interrumpido la simulación"""
+
+        CustomQMessageBox.interrupcion(
+            self,
+            "Simulación interrumpida",
+            "La simulación ha sido interrumpida por el usuario.",
+        )
+
+    def __switch(self, trigger: bool):
+        """Propósito de la función es cambiar la visualización de los botones
+        atendiendo a una señal booleana que se emite en el proceso de la simulación.
+
+        Args:
+            trigger (bool): Si es `True` fue que se terminó la simulación y los botones se activarán de nuevo, caso contrario es que la simulación está en proceso.
+        """
+        if trigger:
+            self.pB_comenzar.setEnabled(True)
+            self.pB_cargar.setEnabled(True)
+            self.pB_detener.setEnabled(False)
+        else:
+            self.pB_comenzar.setEnabled(False)
+            self.pB_cargar.setEnabled(False)
+            self.pB_detener.setEnabled(True)

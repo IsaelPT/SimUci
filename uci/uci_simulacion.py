@@ -17,10 +17,13 @@ class Uci(threading.Thread):
 
         class Signal(QObject):
             signal_progBarr = QtCore.pyqtSignal(int)
-            """Usado para actualizar con un valor la barra de progreso de simulación"""
+            """Usado para actualizar con un valor la barra de progreso de simulación."""
 
             signal_terminated = QtCore.pyqtSignal(bool)
-            """Usado para enviar señal cuando termine la simulación"""
+            """Usado para enviar una señal cuando termine la simulación satisfactoriamente."""
+
+            signal_interruption = QtCore.pyqtSignal()
+            """Usado para enviar una señal cuando se interrumpa la simulación."""
 
             signal_tiempo = QtCore.pyqtSignal(float)
             """Usado para el tiempo de simulación resultante."""
@@ -46,30 +49,40 @@ class Uci(threading.Thread):
         # Se comienza a simular
         self.env.process(self.entrada_paciente(path))
 
-    def run(self):
-        print("-- Comenzando simulación --")
+    def run(self) -> None:
+        print(f"-- Comenzando simulación de {self.name} --")
 
         t_comienzo = time.time()  # Marcar el tiempo de inicio.
+
+        # Para indicar que no ha concluido la simulación.
         self.signal.signal_terminated.emit(False)
 
         # Simulación.
         for i in range(17881):
             self.signal.signal_progBarr.emit(i)
             self.env.run(until=i + 1)
-            if self._stop_event.is_set():
-                break
+            if self._stop_event.is_set():  # Simulación interrumpida.
+                self.signal.signal_progBarr.emit(0)
+                self.signal.signal_interruption.emit()
+                print(f"La simulación -{self.name}- fue interrumpida.")
+                return
 
-        t_final = time.time()  # Marcar el tiempo de finalizacion.
-        tiempo_transcurrido = round((t_final - t_comienzo), 1)
+        # Si no se interrumpe la simulación.
+        if not self._stop_event.is_set():
+            # Calcular tiempo que tardó en terminar.
+            t_final = time.time()
+            tiempo_transcurrido = round((t_final - t_comienzo), 1)
+            self.signal.signal_tiempo.emit(tiempo_transcurrido)
 
-        self.signal.signal_progBarr.emit(0)  # Volviendo a 0 la barra de progreso
-        self.signal.signal_terminated.emit(True)  # Señal booleana de terminación
-        self.signal.signal_tiempo.emit(tiempo_transcurrido)  # Señal con valor de tiempo
+            self.signal.signal_progBarr.emit(0)
+            self.signal.signal_terminated.emit(True)
 
-        print(f"-- La simulación terminó a los {tiempo_transcurrido} segundos. --")
+            print(f"-- La simulación terminó a los {tiempo_transcurrido} segundos. --")
 
-    def stop(self):
-        print("-- Deteniendo la simulación --")
+    def stop(self) -> None:
+        """Detiene el proceso de simulación"""
+
+        print(f"-- Deteniendo la simulación en {self.name} --")
         self._stop_event.set()
 
     def entrada_paciente(self, path: str):

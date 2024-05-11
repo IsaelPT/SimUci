@@ -22,6 +22,10 @@ class Application(QApplication):
         sys.exit(self.exec_())
 
 
-if __name__ == "__main__":
+def main() -> None:
     app = Application()
     app.run()
+
+
+if __name__ == "__main__":
+    main()

@@ -2,10 +2,11 @@ import traceback
 
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtGui import QIcon
 from PyQt5.uic import loadUi
 
 from qt_py.simulation_window import SimulationWindow
-from qt_py.constantes import Rutas, Estilos
+from qt_py.resources import Rutas, Estilos
 
 
 class MainWindow(QMainWindow):
@@ -18,7 +19,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self) -> None:
         super().__init__()
-        loadUi(Rutas.MAINWINDOW_UI, self)  # baseinstance: MainWindow
+        loadUi(Rutas.Ui_Files.MAINWINDOW_UI, self)  # baseinstance: MainWindow
 
         # Conexiones de los componentes.
         self.actionVentana_simulacion.triggered.connect(self.abrir_ventana_simulacion)
@@ -29,6 +30,9 @@ class MainWindow(QMainWindow):
         self.pB_simulacion.setStyleSheet(Estilos.botones["botones_acciones_verdes"])
         self.pB_ajustes.setStyleSheet(Estilos.botones["botones_acciones_verdes"])
         self.pB_salir.setStyleSheet(Estilos.botones["botones_acciones_verdes"])
+
+        # Ajustes iniciales a componentes.
+        self.setWindowIcon(QIcon(Rutas.Iconos.WINDOWICON_HEALTH))
 
     def abrir_ventana_simulacion(self) -> None:
         try:
