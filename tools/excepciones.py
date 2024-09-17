@@ -3,7 +3,7 @@ import traceback
 
 class ExceptionSaver:
     """Permite guardar en un archivo `.log` las excepciones y errores que van ocurriendo."""
-    __PATH__ = "tools/errorslog/errors.log"
+    __PATH = "tools/errorslog/errors.log"
 
     def save(self, excepcion: Exception) -> None:
         """
@@ -14,7 +14,7 @@ class ExceptionSaver:
             excepcion (Exception): La excepción a guardar.
         """
         if isinstance(excepcion, Exception):
-            with open(self.__PATH__, 'a', encoding="UTF-8") as error_file:
+            with open(self.__PATH, 'a', encoding="UTF-8") as error_file:
                 msg = (
                     f"[{self.__get_time__()}] -> [Excepción]: {excepcion}\nDetalles de la excepción"
                     f":\n{traceback.format_exc()}{'-' * 132}\n"

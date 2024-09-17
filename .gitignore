@@ -1,3 +1,3 @@
 .vscode/settings.json
-ui_code/__pycache__/
-uci/__pycache__/
+**/__pycache__/
+errors.log

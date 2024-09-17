@@ -8,7 +8,6 @@ from ui_code.simulation_win import SimulationWindow
 from tools.excepciones import ExceptionSaver
 from tools.utils import Rutas
 
-
 class MainMenuWindow(QMainWindow):
     simulation_win: 'SimulationWindow' = None
 

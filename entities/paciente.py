@@ -1,13 +1,19 @@
+from tools import utils
+
+DIAGNOSTICOS = utils.VariablesConstantes.DIAG_PREUCI
+TIPOS_VA = utils.VariablesConstantes.TIPO_VENT
+
+
 class Paciente:
     """Entidad que representa un paciente."""
 
     def __init__(
             self,
             edad=1,
-            diag1=0,
-            diag2=0,
-            diag3=0,
-            diag4=0,
+            diag_ing1=1,
+            diag_ing2=1,
+            diag_ing3=1,
+            diag_ing4=1,
             apache=.0,
             est_uti=0,
             est_pre_uti=0,
@@ -22,10 +28,10 @@ class Paciente:
         por motivos de análisis de datos.
         Args:
             edad: Edad del paciente en el rango de 1 a 120 años de edad.
-            diag1: Categoría 1 del diagnóstico del paciente.
-            diag2: Categoría 2 del diagnóstico del paciente.
-            diag3: Categoría 3 del diagnóstico del paciente.
-            diag4: Categoría 4 del diagnóstico del paciente.
+            diag_ing1: Categoría 1 del diagnóstico del paciente.
+            diag_ing2: Categoría 2 del diagnóstico del paciente.
+            diag_ing3: Categoría 3 del diagnóstico del paciente.
+            diag_ing4: Categoría 4 del diagnóstico del paciente.
             apache: Indicador de Apache del paciente.
             est_uti: Tiempo de estancia en UTI.
             est_pre_uti: Tiempo de estancia Pre-UTI.
@@ -35,16 +41,90 @@ class Paciente:
         """
 
         self._edad = edad
-        self._diag1 = diag1
-        self._diag2 = diag2
-        self._diag3 = diag3
-        self._diag4 = diag4
+        self._diag_ing1 = diag_ing1
+        self._diag_ing2 = diag_ing2
+        self._diag_ing3 = diag_ing3
+        self._diag_ing4 = diag_ing4
         self._apache = apache
         self._est_uti = est_uti
         self._est_pre_uti = est_pre_uti
         self._tipo_va = tipo_va
         self._tiempo_va = tiempo_va
         self._porciento_tiempo = porciento_tiempo
+
+    def to_dict(self, int_str: bool = True) -> dict[str, int | float]:
+        """
+        Devuelve los datos del paciente como un diccionario.
+
+        Args:
+            int_str: Define el formato del diccionario. `True` por defecto (`dict[int: int | float]`).
+
+        Returns:
+            Diccionario con estructura definida por parámetro con pares de datos de diagnósticos enumerados y valores.
+            Si `True`, diccionario será un set `dict[str: int | float]`, caso contrario, `dict[str: str | int | float]`.
+        """
+        if int_str:
+            return {
+                0: self.edad, 1: self.apache, 2: self.diag_ing1, 3: self.diag_ing2, 4: self.diag_ing3, 5: self.diag_ing4,
+                6: self.est_uti, 7: self.est_pre_uti, 8: self.tipo_va, 9: self.tiempo_va, 10: self.porciento_tiempo,
+            }
+        else:
+            return {
+                "edad": self.edad, "apache": self.apache, "diag1": self.diag_ing1, "diag2": self.diag_ing2, "diag3": self.diag_ing3,
+                "diag4": self.diag_ing4, "est_uti": self.est_uti, "est_pre_uti": self.est_pre_uti, "tipo_va": self.tipo_va,
+                "tiempo_va": self.tiempo_va, "porciento_tiempo": self.porciento_tiempo,
+            }
+
+    @staticmethod
+    def translate_diag(diag: str | int) -> int | str:
+        """
+        Convierte el diagnóstico de un tipo de dato a otro. Si está expresado como `string` y está en la lista
+        de diagnósticos, se expresa con su `key` numérico respectivo.
+        Args:
+            diag: diagnóstico expresado en `str` o `int`.
+
+        Returns:
+            `int`- Key del diagnóstico si parámetro es `str` y diagnóstico está contenido en lista de diag.
+
+            `str`- Diagnóstico si parámetro es `int` y este Key está contenido en la lista de diag.
+        """
+        if isinstance(diag, str):
+            for key, value_diagnostico in DIAGNOSTICOS.items():
+                if diag == value_diagnostico:
+                    return key
+            raise Exception(
+                f"No se encontró el diagnóstico: <{diag}> -> ({type(diag)}) en el diccionario de diagnósticos.")
+        if isinstance(diag, int):
+            for key, value_diagnostico in DIAGNOSTICOS.items():
+                if diag == key:
+                    return value_diagnostico
+            raise Exception(f"No se encontró el key: <{diag}> -> ({type(diag)}) en el diccionario de diagnósticos.")
+        raise Exception(f"No se logró traducir correctamente el diagnóstico: type(diag) -> {type(diag)}")
+
+    @staticmethod
+    def translate_tipo_va(tipo: str | int) -> int | str:
+        """
+        Convierte el tipo de VA de un tipo de dato a otro. Si está expresado como `string` y está en la lista
+        de tipos de VA, se expresa con su `key` numérico respectivo.
+        Args:
+            tipo: tipo de ventilación expresado en `str` o `int`.
+
+        Returns:
+            `int`- Key del tipo de VA si parámetro es `str` y tipo de VA está contenido en lista de tipo de VA.
+
+            `str`- Tipo de VA si parámetro es `int` y este Key está contenido en la lista de tipo de VA.
+        """
+        if isinstance(tipo, str):
+            for key, value_tipo in TIPOS_VA.items():
+                if tipo == value_tipo:
+                    return key
+            raise Exception(f"No se encontró el key: ({tipo} -> {type(tipo)}) en el diccionario de tipos de VA.")
+        if isinstance(tipo, int):
+            for key, value_tipo in TIPOS_VA.items():
+                if tipo == key:
+                    return value_tipo
+            raise Exception(f"No se encontró el tipo de VA: ({tipo} -> {type(tipo)}) en el diccionario de tipos de VA.")
+        raise Exception(f"No se logró traducir correctamente el tipo de VA: type(tipo) -> {type(tipo)}. ")
 
     @property
     def edad(self):
@@ -55,36 +135,36 @@ class Paciente:
         self._edad = edad
 
     @property
-    def diag1(self):
-        return self._diag1
+    def diag_ing1(self):
+        return self._diag_ing1
 
-    @diag1.setter
-    def diag1(self, diag1: int) -> None:
-        self._diag1 = diag1
-
-    @property
-    def diag2(self):
-        return self._diag2
-
-    @diag2.setter
-    def diag2(self, diag2: int) -> None:
-        self._diag2 = diag2
+    @diag_ing1.setter
+    def diag_ing1(self, diag: int) -> None:
+        self._diag_ing1 = diag
 
     @property
-    def diag3(self):
-        return self._diag3
+    def diag_ing2(self):
+        return self._diag_ing2
 
-    @diag3.setter
-    def diag3(self, diag3: int) -> None:
-        self._diag3 = diag3
+    @diag_ing2.setter
+    def diag_ing2(self, diag: int) -> None:
+        self._diag_ing2 = diag
 
     @property
-    def diag4(self):
-        return self._diag4
+    def diag_ing3(self):
+        return self._diag_ing3
 
-    @diag4.setter
-    def diag4(self, diag4: int) -> None:
-        self._diag4 = diag4
+    @diag_ing3.setter
+    def diag_ing3(self, diag: int) -> None:
+        self._diag_ing3 = diag
+
+    @property
+    def diag_ing4(self):
+        return self._diag_ing4
+
+    @diag_ing4.setter
+    def diag_ing4(self, diag: int) -> None:
+        self._diag_ing4 = diag
 
     @property
     def apache(self):
@@ -134,19 +214,3 @@ class Paciente:
     def porciento_tiempo(self, porciento_tiempo: float) -> None:
         self._porciento_tiempo = porciento_tiempo
 
-    def to_dict(self) -> dict[str, int | float]:
-        """Devuelve los datos del paciente como un diccionario."""
-
-        return {
-            "edad": self.edad,
-            "apache": self.apache,
-            "diag1": self.diag1,
-            "diag2": self.diag2,
-            "diag3": self.diag3,
-            "diag4": self.diag4,
-            "est_uti": self.est_uti,
-            "est_pre_uti": self.est_pre_uti,
-            "tipo_va": self.tipo_va,
-            "tiempo_va": self.tiempo_va,
-            "porciento_tiempo": self.porciento_tiempo,
-        }
