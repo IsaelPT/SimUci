@@ -40,17 +40,17 @@ class Paciente:
             porciento_tiempo: Porciento de tiempo en ventilación artificial.
         """
 
-        self._edad = edad
-        self._diag_ing1 = diag_ing1
-        self._diag_ing2 = diag_ing2
-        self._diag_ing3 = diag_ing3
-        self._diag_ing4 = diag_ing4
-        self._apache = apache
-        self._est_uti = est_uti
-        self._est_pre_uti = est_pre_uti
-        self._tipo_va = tipo_va
-        self._tiempo_va = tiempo_va
-        self._porciento_tiempo = porciento_tiempo
+        self._edad: int = edad
+        self._diag_ing1: int = diag_ing1
+        self._diag_ing2: int = diag_ing2
+        self._diag_ing3: int = diag_ing3
+        self._diag_ing4: int = diag_ing4
+        self._apache: float = apache
+        self._est_uti: int = est_uti
+        self._est_pre_uti: int = est_pre_uti
+        self._tipo_va: int = tipo_va
+        self._tiempo_va: int = tiempo_va
+        self._porciento_tiempo: float = porciento_tiempo
 
     def to_dict(self, int_str: bool = True) -> dict[str, int | float]:
         """

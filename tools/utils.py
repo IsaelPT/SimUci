@@ -21,7 +21,7 @@ class Rutas:
     class Data:
         """Donde se localizan los archivos de datos que utiliza la aplicación."""
 
-        HISTORIAL_PACIENTES = "data/historial.json"
+        HISTORIAL_PACIENTES = "data/historial_pacientes.pkl"
 
 
 class VariablesConstantes:
