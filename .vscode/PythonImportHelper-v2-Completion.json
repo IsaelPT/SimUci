@@ -1,0 +1,487 @@
+[
+    {
+        "label": "pickle",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "pickle",
+        "description": "pickle",
+        "detail": "pickle",
+        "documentation": {}
+    },
+    {
+        "label": "traceback",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "traceback",
+        "description": "traceback",
+        "detail": "traceback",
+        "documentation": {}
+    },
+    {
+        "label": "OrderedDict",
+        "importPath": "collections",
+        "description": "collections",
+        "isExtraImport": true,
+        "detail": "collections",
+        "documentation": {}
+    },
+    {
+        "label": "Paciente",
+        "importPath": "entities.paciente",
+        "description": "entities.paciente",
+        "isExtraImport": true,
+        "detail": "entities.paciente",
+        "documentation": {}
+    },
+    {
+        "label": "Paciente",
+        "importPath": "entities.paciente",
+        "description": "entities.paciente",
+        "isExtraImport": true,
+        "detail": "entities.paciente",
+        "documentation": {}
+    },
+    {
+        "label": "ExceptionHelper",
+        "importPath": "tools.excepciones",
+        "description": "tools.excepciones",
+        "isExtraImport": true,
+        "detail": "tools.excepciones",
+        "documentation": {}
+    },
+    {
+        "label": "ExceptionHelper",
+        "importPath": "tools.excepciones",
+        "description": "tools.excepciones",
+        "isExtraImport": true,
+        "detail": "tools.excepciones",
+        "documentation": {}
+    },
+    {
+        "label": "ExceptionHelper",
+        "importPath": "tools.excepciones",
+        "description": "tools.excepciones",
+        "isExtraImport": true,
+        "detail": "tools.excepciones",
+        "documentation": {}
+    },
+    {
+        "label": "Rutas",
+        "importPath": "tools.utils",
+        "description": "tools.utils",
+        "isExtraImport": true,
+        "detail": "tools.utils",
+        "documentation": {}
+    },
+    {
+        "label": "Rutas",
+        "importPath": "tools.utils",
+        "description": "tools.utils",
+        "isExtraImport": true,
+        "detail": "tools.utils",
+        "documentation": {}
+    },
+    {
+        "label": "Rutas",
+        "importPath": "tools.utils",
+        "description": "tools.utils",
+        "isExtraImport": true,
+        "detail": "tools.utils",
+        "documentation": {}
+    },
+    {
+        "label": "VariablesConstantes",
+        "importPath": "tools.utils",
+        "description": "tools.utils",
+        "isExtraImport": true,
+        "detail": "tools.utils",
+        "documentation": {}
+    },
+    {
+        "label": "utils",
+        "importPath": "tools",
+        "description": "tools",
+        "isExtraImport": true,
+        "detail": "tools",
+        "documentation": {}
+    },
+    {
+        "label": "pandas",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "pandas",
+        "description": "pandas",
+        "detail": "pandas",
+        "documentation": {}
+    },
+    {
+        "label": "time",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "time",
+        "description": "time",
+        "detail": "time",
+        "documentation": {}
+    },
+    {
+        "label": "threading",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "threading",
+        "description": "threading",
+        "detail": "threading",
+        "documentation": {}
+    },
+    {
+        "label": "Environment",
+        "importPath": "simpy",
+        "description": "simpy",
+        "isExtraImport": true,
+        "detail": "simpy",
+        "documentation": {}
+    },
+    {
+        "label": "QtCore",
+        "importPath": "PyQt5",
+        "description": "PyQt5",
+        "isExtraImport": true,
+        "detail": "PyQt5",
+        "documentation": {}
+    },
+    {
+        "label": "QObject",
+        "importPath": "PyQt5.QtCore",
+        "description": "PyQt5.QtCore",
+        "isExtraImport": true,
+        "detail": "PyQt5.QtCore",
+        "documentation": {}
+    },
+    {
+        "label": "Qt",
+        "importPath": "PyQt5.QtCore",
+        "description": "PyQt5.QtCore",
+        "isExtraImport": true,
+        "detail": "PyQt5.QtCore",
+        "documentation": {}
+    },
+    {
+        "label": "*",
+        "importPath": "uci.procesar_datos",
+        "description": "uci.procesar_datos",
+        "isExtraImport": true,
+        "detail": "uci.procesar_datos",
+        "documentation": {}
+    },
+    {
+        "label": "QIcon",
+        "importPath": "PyQt5.QtGui",
+        "description": "PyQt5.QtGui",
+        "isExtraImport": true,
+        "detail": "PyQt5.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QIcon",
+        "importPath": "PyQt5.QtGui",
+        "description": "PyQt5.QtGui",
+        "isExtraImport": true,
+        "detail": "PyQt5.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QMainWindow",
+        "importPath": "PyQt5.QtWidgets",
+        "description": "PyQt5.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PyQt5.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QWidget",
+        "importPath": "PyQt5.QtWidgets",
+        "description": "PyQt5.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PyQt5.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QTableWidgetItem",
+        "importPath": "PyQt5.QtWidgets",
+        "description": "PyQt5.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PyQt5.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QApplication",
+        "importPath": "PyQt5.QtWidgets",
+        "description": "PyQt5.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PyQt5.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "loadUi",
+        "importPath": "PyQt5.uic",
+        "description": "PyQt5.uic",
+        "isExtraImport": true,
+        "detail": "PyQt5.uic",
+        "documentation": {}
+    },
+    {
+        "label": "loadUi",
+        "importPath": "PyQt5.uic",
+        "description": "PyQt5.uic",
+        "isExtraImport": true,
+        "detail": "PyQt5.uic",
+        "documentation": {}
+    },
+    {
+        "label": "SimulationWindow",
+        "importPath": "ui_code.simulation_win",
+        "description": "ui_code.simulation_win",
+        "isExtraImport": true,
+        "detail": "ui_code.simulation_win",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Historial",
+        "importPath": "entities.historial",
+        "description": "entities.historial",
+        "isExtraImport": true,
+        "detail": "entities.historial",
+        "documentation": {}
+    },
+    {
+        "label": "sys",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sys",
+        "description": "sys",
+        "detail": "sys",
+        "documentation": {}
+    },
+    {
+        "label": "MainMenuWindow",
+        "importPath": "ui_code.mainmenu_win",
+        "description": "ui_code.mainmenu_win",
+        "isExtraImport": true,
+        "detail": "ui_code.mainmenu_win",
+        "documentation": {}
+    },
+    {
+        "label": "Historial",
+        "kind": 6,
+        "importPath": "entities.historial",
+        "description": "entities.historial",
+        "peekOfCode": "class Historial:\n    \"\"\"Un diccionario historial con los últimos `n` datos de pacientes que se han ingresado con anterioridad.\"\"\"\n    def __init__(self, limite: int = 10):\n        \"\"\"\n        Crea un diccionario ordenado con un límite definido a la hora de instanciación.\n        Args:\n            limite: límite de elementos del historial de pacientes.\n        \"\"\"\n        self.ARCHIVO_PATH = Rutas.Data.HISTORIAL_PACIENTES\n        self.limite = limite",
+        "detail": "entities.historial",
+        "documentation": {}
+    },
+    {
+        "label": "Paciente",
+        "kind": 6,
+        "importPath": "entities.paciente",
+        "description": "entities.paciente",
+        "peekOfCode": "class Paciente:\n    \"\"\"Entidad que representa un paciente.\"\"\"\n    def __init__(\n            self,\n            edad=1,\n            diag_ing1=1,\n            diag_ing2=1,\n            diag_ing3=1,\n            diag_ing4=1,\n            apache=.0,",
+        "detail": "entities.paciente",
+        "documentation": {}
+    },
+    {
+        "label": "DIAGNOSTICOS",
+        "kind": 5,
+        "importPath": "entities.paciente",
+        "description": "entities.paciente",
+        "peekOfCode": "DIAGNOSTICOS = utils.VariablesConstantes.DIAG_PREUCI\nTIPOS_VA = utils.VariablesConstantes.TIPO_VENT\nclass Paciente:\n    \"\"\"Entidad que representa un paciente.\"\"\"\n    def __init__(\n            self,\n            edad=1,\n            diag_ing1=1,\n            diag_ing2=1,\n            diag_ing3=1,",
+        "detail": "entities.paciente",
+        "documentation": {}
+    },
+    {
+        "label": "TIPOS_VA",
+        "kind": 5,
+        "importPath": "entities.paciente",
+        "description": "entities.paciente",
+        "peekOfCode": "TIPOS_VA = utils.VariablesConstantes.TIPO_VENT\nclass Paciente:\n    \"\"\"Entidad que representa un paciente.\"\"\"\n    def __init__(\n            self,\n            edad=1,\n            diag_ing1=1,\n            diag_ing2=1,\n            diag_ing3=1,\n            diag_ing4=1,",
+        "detail": "entities.paciente",
+        "documentation": {}
+    },
+    {
+        "label": "ExceptionHelper",
+        "kind": 6,
+        "importPath": "tools.excepciones",
+        "description": "tools.excepciones",
+        "peekOfCode": "class ExceptionHelper:\n    \"\"\"Permite guardar en un archivo `.log` las excepciones y errores que van ocurriendo.\"\"\"\n    __PATH = \"tools/errorslog/errors.log\"\n    def save(self, excepcion: Exception) -> None:\n        \"\"\"\n        Guarda en un archivo `.log` la excepción que se pasa por parámetros, acompañada del tiempo de ocurrencia del\n        mismo y la explicación de esta excepción.\n        Args:\n            excepcion (Exception): La excepción a guardar.\n        \"\"\"",
+        "detail": "tools.excepciones",
+        "documentation": {}
+    },
+    {
+        "label": "Rutas",
+        "kind": 6,
+        "importPath": "tools.utils",
+        "description": "tools.utils",
+        "peekOfCode": "class Rutas:\n    \"\"\"Para variables con rutas estáticas para cargar componentes necesarios.\"\"\"\n    class UiFiles:\n        \"\"\"Donde se localizan los archivos `.ui` que sirven para construir las GUI.\"\"\"\n        MAINWINDOW_UI = \"ui_templates/main_window.ui\"\n        SIMULATIONWIDGET_UI = \"ui_templates/simulation_widget.ui\"\n        GESTIONPACIENTEWIDGET_UI = \"ui_templates/gestion_pacientes.ui\"\n    class Iconos:\n        \"\"\"Donde se localizan los archivos de iconos.\"\"\"\n        WINDOWICON_HEALTH = \"ui_utils/icons/MageHealthSquareFill.png\"",
+        "detail": "tools.utils",
+        "documentation": {}
+    },
+    {
+        "label": "VariablesConstantes",
+        "kind": 6,
+        "importPath": "tools.utils",
+        "description": "tools.utils",
+        "peekOfCode": "class VariablesConstantes:\n    \"\"\"Donde se contiene variables constantes para la aplicación\"\"\"\n    DIAG_PREUCI = {\n        0: \"Vacío\", 1: \"Intoxicación exógena\", 2: \"Coma\", 3: \"Trauma craneoencefálico severo\",\n        4: \"SPO de toracotomía\", 5: \"SPO de laparotomía\", 6: \"SPO de amputación\",\n        7: 'SPO de neurología', 8: 'PCR recuperado', 9: 'Encefalopatía metabólica', 10: 'Encefalopatía hipóxica',\n        11: 'Ahorcamiento incompleto', 12: 'Insuficiencia cardiaca descompensada', 13: 'Obstétrica grave',\n        14: 'EPOC descompensada', 15: 'ARDS', 16: 'BNB-EH', 17: 'BNB-IH', 18: 'BNV', 19: 'Miocarditis',\n        20: 'Leptospirosis', 21: 'Sepsis grave', 22: 'DMO', 23: 'Shock séptico', 24: 'Shock hipovolémico',\n        25: 'Shock cardiogénico', 26: 'IMA', 27: 'Politraumatizado', 28: 'Crisis miasténica',",
+        "detail": "tools.utils",
+        "documentation": {}
+    },
+    {
+        "label": "cargar_fichero",
+        "kind": 2,
+        "importPath": "uci.procesar_datos",
+        "description": "uci.procesar_datos",
+        "peekOfCode": "def cargar_fichero(path: str, column: str) -> list:\n    \"\"\"\n    Retorna una columna organizada por fecha de ingreso\n    Args:\n        path (str): Direccion del archivo de datos\n        column (str): Nombre de la columna a devolver\n    Returns:\n        list: Una lista de los valores de la columna\n    \"\"\"\n    df = pd.read_csv(",
+        "detail": "uci.procesar_datos",
+        "documentation": {}
+    },
+    {
+        "label": "get_fecha_ingreso",
+        "kind": 2,
+        "importPath": "uci.procesar_datos",
+        "description": "uci.procesar_datos",
+        "peekOfCode": "def get_fecha_ingreso(path: str):\n    \"\"\"\n    Genrador de las fechas de ingreso\n    Args:\n        path (str): Direccion del archivo de datos\n    Yields:\n        tupla: Tupla con la fecha siguiente a la que esta y la fecha actual\n    \"\"\"\n    fecha_ingreso = cargar_fichero(path, \"fecha_ingreso\")\n    fecha = fecha_ingreso[0]",
+        "detail": "uci.procesar_datos",
+        "documentation": {}
+    },
+    {
+        "label": "get_fecha_egreso",
+        "kind": 2,
+        "importPath": "uci.procesar_datos",
+        "description": "uci.procesar_datos",
+        "peekOfCode": "def get_fecha_egreso(path: str):\n    \"\"\"\n    Generador de fecha de egreso\n    Args:\n        path (str): Direccion del archivo de datos\n    Yields:\n        datetime: La fecha de egreso\n    \"\"\"\n    fecha_ingreso = cargar_fichero(path, \"fecha_egreso\")\n    for fecha in fecha_ingreso:",
+        "detail": "uci.procesar_datos",
+        "documentation": {}
+    },
+    {
+        "label": "get_fecha_ing_uci",
+        "kind": 2,
+        "importPath": "uci.procesar_datos",
+        "description": "uci.procesar_datos",
+        "peekOfCode": "def get_fecha_ing_uci(path: str):\n    \"\"\"\n    Generador de las fechas de ingreso a la UCI\n    Args:\n        path (str): Direccion del archivo de datos\n    Yields:\n        datetime: La fecha de ingreso a la UCI\n    \"\"\"\n    fecha_ingreso = cargar_fichero(path, \"fecha_ing_uci\")\n    for fecha in fecha_ingreso:",
+        "detail": "uci.procesar_datos",
+        "documentation": {}
+    },
+    {
+        "label": "get_tiempo_vam",
+        "kind": 2,
+        "importPath": "uci.procesar_datos",
+        "description": "uci.procesar_datos",
+        "peekOfCode": "def get_tiempo_vam(path: str):\n    \"\"\"\n    Generador del tiempo en VAM\n    Args:\n        path (str): Direccion del archivo de datos\n    Yields:\n        int: Tiempo que esta en VAM\n    \"\"\"\n    tiempo_vam = cargar_fichero(path, \"tiempo_vam\")\n    for horas in tiempo_vam:",
+        "detail": "uci.procesar_datos",
+        "documentation": {}
+    },
+    {
+        "label": "get_fecha_egr_uci",
+        "kind": 2,
+        "importPath": "uci.procesar_datos",
+        "description": "uci.procesar_datos",
+        "peekOfCode": "def get_fecha_egr_uci(path: str):\n    \"\"\"\n    Genrador de fecha de egreso de la UCi\n    Args:\n        path (str): Direccion del archivo de datos\n    Yields:\n        datetime: La fecha de egreso de la UCI\n    \"\"\"\n    fecha_ingreso = cargar_fichero(path, \"fecha_egr_uci\")\n    for fecha in fecha_ingreso:",
+        "detail": "uci.procesar_datos",
+        "documentation": {}
+    },
+    {
+        "label": "get_estadia_uci",
+        "kind": 2,
+        "importPath": "uci.procesar_datos",
+        "description": "uci.procesar_datos",
+        "peekOfCode": "def get_estadia_uci(path: str):\n    \"\"\"\n    Genreador de la estadia en la UCI\n    Args:\n        path (str): Direccion del archivo de datos\n    Yields:\n        int: La cantidad de dias en la UCI\n    \"\"\"\n    estadia = cargar_fichero(path, \"estadia_uci\")\n    for est in estadia:",
+        "detail": "uci.procesar_datos",
+        "documentation": {}
+    },
+    {
+        "label": "get_sala_egreso",
+        "kind": 2,
+        "importPath": "uci.procesar_datos",
+        "description": "uci.procesar_datos",
+        "peekOfCode": "def get_sala_egreso(path: str):\n    \"\"\"\n    Generador de la sala de egreso de la UCI\n    Args:\n        path (str): Direccion del archivo de datos\n    Yields:\n        str: La sala de egreso de la UCI\n    \"\"\"\n    salas = cargar_fichero(path, \"sala_egreso\")\n    for sala in salas:",
+        "detail": "uci.procesar_datos",
+        "documentation": {}
+    },
+    {
+        "label": "get_evolucion",
+        "kind": 2,
+        "importPath": "uci.procesar_datos",
+        "description": "uci.procesar_datos",
+        "peekOfCode": "def get_evolucion(path: str):\n    \"\"\"\n    Generador de la evolucion del paciente(vive o fallece)\n    Args:\n        path (str): Direccion del archivo de datos\n    Yields:\n        str: La evolucion del paciente\n    \"\"\"\n    evoluciones = cargar_fichero(path, \"evolucion\")\n    for evolucion in evoluciones:",
+        "detail": "uci.procesar_datos",
+        "documentation": {}
+    },
+    {
+        "label": "get_diagnostico",
+        "kind": 2,
+        "importPath": "uci.procesar_datos",
+        "description": "uci.procesar_datos",
+        "peekOfCode": "def get_diagnostico(path: str):\n    \"\"\"\n    Generador del diagnostico antes de ingresar a la UCI\n    Args:\n        path (str): Direccion del archivo de datos\n    Yields:\n        str: Diagnostico del paciente antes de entrar a la UCI\n    \"\"\"\n    diagnosticos = cargar_fichero(path, \"diagnostico_preuci\")\n    for daignostico in diagnosticos:",
+        "detail": "uci.procesar_datos",
+        "documentation": {}
+    },
+    {
+        "label": "get_diagnostico_list",
+        "kind": 2,
+        "importPath": "uci.procesar_datos",
+        "description": "uci.procesar_datos",
+        "peekOfCode": "def get_diagnostico_list(path: str):\n    \"\"\"\n    Obtiene los diagnosticos de los paciente\n    Args:\n        path (str): Direccion del archivo de datos\n    Returns:\n        list: Lista de todos los diagnosticos\n    \"\"\"\n    df = pd.read_csv(path)\n    diagnostico_list = df[\"diagnostico_preuci\"].unique()",
+        "detail": "uci.procesar_datos",
+        "documentation": {}
+    },
+    {
+        "label": "get_time_simulation",
+        "kind": 2,
+        "importPath": "uci.procesar_datos",
+        "description": "uci.procesar_datos",
+        "peekOfCode": "def get_time_simulation(path: str):\n    \"\"\"\n    Obtiene la cantidad de tiempo del archivo de datos\n    Args:\n        path (str): Direccion del archivo de datos\n    Returns:\n        int: La cantidad de horas que hay en el archivo de datos\n    \"\"\"\n    ingreso = cargar_fichero(path, \"fecha_ingreso\")[0]\n    egreso = sorted(cargar_fichero(path, \"fecha_egreso\"))[-1]",
+        "detail": "uci.procesar_datos",
+        "documentation": {}
+    },
+    {
+        "label": "Uci",
+        "kind": 6,
+        "importPath": "uci.uci_simulacion",
+        "description": "uci.uci_simulacion",
+        "peekOfCode": "class Uci(threading.Thread):\n    def __init__(self, path: str, diagnostico: list, porcientos: list) -> None:\n        super().__init__()\n        class Signal(QObject):\n            signal_progBarr = QtCore.pyqtSignal(int)\n            \"\"\"Usado para actualizar con un valor la barra de progreso de simulación.\"\"\"\n            signal_terminated = QtCore.pyqtSignal(bool)\n            \"\"\"Usado para enviar una señal cuando termine la simulación satisfactoriamente.\"\"\"\n            signal_interruption = QtCore.pyqtSignal()\n            \"\"\"Usado para enviar una señal cuando se interrumpa la simulación.\"\"\"",
+        "detail": "uci.uci_simulacion",
+        "documentation": {}
+    },
+    {
+        "label": "MainMenuWindow",
+        "kind": 6,
+        "importPath": "ui_code.mainmenu_win",
+        "description": "ui_code.mainmenu_win",
+        "peekOfCode": "class MainMenuWindow(QMainWindow):\n    simulation_win: 'SimulationWindow' = None\n    def __init__(self) -> None:\n        super().__init__()\n        loadUi(Rutas.UiFiles.MAINWINDOW_UI, self)  # baseinstance: MainWindow\n        self._init_fields()\n        self._init_components()\n        self._connect_signals()\n    def _init_fields(self):\n        pass",
+        "detail": "ui_code.mainmenu_win",
+        "documentation": {}
+    },
+    {
+        "label": "SimulationWindow",
+        "kind": 6,
+        "importPath": "ui_code.simulation_win",
+        "description": "ui_code.simulation_win",
+        "peekOfCode": "class SimulationWindow(QWidget):\n    main_menu_ref: 'MainMenuWindow' = None\n    tiposVA: dict[int, str]\n    diag_preuci: dict[int, str]\n    paciente: 'Paciente' = None\n    corridas_simulacion: int\n    def __init__(self, parent: 'MainMenuWindow') -> None:\n        super().__init__()\n        self.main_menu_ref: 'MainMenuWindow' = parent  # Referencia clase padre (MainMenuWindow).\n        self.diag_preuci = {}  # Diccionario con las categorías de diagnósticos de ingreso.",
+        "detail": "ui_code.simulation_win",
+        "documentation": {}
+    },
+    {
+        "label": "Application",
+        "kind": 6,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "class Application(QApplication):\n    def __init__(self) -> None:\n        super().__init__(sys.argv)\n        self.main_win = MainMenuWindow()\n    def run(self):\n        self.main_win.show()\n        sys.exit(self.exec_())\nif __name__ == \"__main__\":\n    app = Application()\n    app.run()",
+        "detail": "app",
+        "documentation": {}
+    }
+]

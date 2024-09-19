@@ -8,7 +8,7 @@ from PyQt5.uic import loadUi
 
 from entities.historial import Historial
 from entities.paciente import Paciente
-from tools.excepciones import ExceptionSaver
+from tools.excepciones import ExceptionHelper
 from tools.utils import Rutas, VariablesConstantes
 
 if TYPE_CHECKING:
@@ -17,18 +17,18 @@ if TYPE_CHECKING:
 
 class SimulationWindow(QWidget):
     main_menu_ref: 'MainMenuWindow' = None
-    dict_tiposVA: dict[int, str]
-    dict_diag_preuci: dict[int, str]
-    paciente: Paciente = None
+    tiposVA: dict[int, str]
+    diag_preuci: dict[int, str]
+    paciente: 'Paciente' = None
     corridas_simulacion: int
 
     def __init__(self, parent: 'MainMenuWindow') -> None:
         super().__init__()
-        self.main_menu_ref = parent  # Referencia clase padre (MainMenuWindow).
-        self.dict_diag_preuci = {}  # Diccionario con las categorías de diagnósticos de ingreso.
-        self.dict_tiposVA = {}  # Tipos de ventilación artificial.
-        self.paciente = Paciente()
-        self.historial = Historial()
+        self.main_menu_ref: 'MainMenuWindow' = parent  # Referencia clase padre (MainMenuWindow).
+        self.diag_preuci = {}  # Diccionario con las categorías de diagnósticos de ingreso.
+        self.tiposVA = {}  # Tipos de ventilación artificial.
+        self.paciente: 'Paciente' = Paciente()
+        self.historial: 'Historial' = Historial()
 
         loadUi(Rutas.UiFiles.SIMULATIONWIDGET_UI, self)  # baseinstance: SimulationWindow
 
@@ -37,8 +37,8 @@ class SimulationWindow(QWidget):
         self._connect_signals()
 
     def _init_fields(self) -> None:
-        self.dict_diag_preuci = VariablesConstantes.DIAG_PREUCI
-        self.dict_tiposVA = VariablesConstantes.TIPO_VENT
+        self.diag_preuci = VariablesConstantes.DIAG_PREUCI
+        self.tiposVA = VariablesConstantes.TIPO_VENT
 
         # SpinBoxes
         self.paciente.edad = self.sb_edad.value()
@@ -60,8 +60,8 @@ class SimulationWindow(QWidget):
         self.pb_detener.setEnabled(False)
 
         # Configurando los ComboBox
-        list_diag_preuci = list(self.dict_diag_preuci.values())
-        list_tiposVA = list(self.dict_tiposVA.values())
+        list_diag_preuci = list(self.diag_preuci.values())
+        list_tiposVA = list(self.tiposVA.values())
         self.cb_d1.addItems(list_diag_preuci)
         self.cb_d2.addItems(list_diag_preuci)
         self.cb_d3.addItems(list_diag_preuci)
@@ -95,21 +95,24 @@ class SimulationWindow(QWidget):
         self.cb_d4.currentIndexChanged[str].connect(lambda diag: self._update_diag(diag, 4))
         self.cb_tipoVA.currentIndexChanged[str].connect(self._update_tipo_va)
 
+        # TableWidget
+        self.tableWidgetPacientes.cellClicked.connect(self._update_campos_paciente)
+
     def comenzar_simulacion(self) -> None:
         try:
             print("Clickeado botón COMENZAR")
             self._guardar_paciente()
-            # self._update_tabla_historial()
+            self._update_tabla_historial()
         except Exception as e:
             print(f"Ha ocurrido un error al COMENZAR la simulación: {e}\n{traceback.format_exc()}")
-            ExceptionSaver().save(e)
+            ExceptionHelper().save(e)
 
     def detener_simulacion(self) -> None:
         try:
             print("Clickeado botón DETENER")
         except Exception as e:
             print(f"Ha ocurrido un error al DETENER la simulación: {e}\n{traceback.format_exc()}")
-            ExceptionSaver().save(e)
+            ExceptionHelper().save(e)
 
     def cerrar_ventana(self) -> None:
         print("Clickeado botón CERRAR")
@@ -118,16 +121,22 @@ class SimulationWindow(QWidget):
         except Exception as e:
             print(f"{e}:\n{traceback.format_exc()}")
 
+    # TODO
     def eliminar_paciente_historial(self) -> None:
         """Elimina el paciente seleccionado de la tabla de historial de pacientes."""
 
         current_row = self.tableWidgetPacientes.currentRow()
         if current_row >= 0:
             self.tableWidgetPacientes.removeRow(current_row)
+            self.historial.eliminar(current_row)
 
+    # TODO
     def limpiar_historial(self) -> None:
-        pass
+        self.historial.historial.clear()
+        # self.historial.guardar_historial()
+        self._update_tabla_historial()
 
+    # TODO
     def deshacer_eliminacion_historial(self):
         """Deshace las últimas 5 eliminaciones realizadas en el historial de pacientes."""
         pass
@@ -138,7 +147,7 @@ class SimulationWindow(QWidget):
             print(f"Edad del paciente actualizada a: {edad}")
         except ValueError as e:
             print(e)
-            ExceptionSaver().save(e)
+            ExceptionHelper().save(e)
 
     def _update_apache(self, apache: float):
         try:
@@ -146,7 +155,7 @@ class SimulationWindow(QWidget):
             print(f"Apache del paciente actualizado a: {apache}")
         except ValueError as e:
             print(e)
-            ExceptionSaver().save(e)
+            ExceptionHelper().save(e)
 
     def _update_est_uci(self, est_uci: int):
         try:
@@ -154,7 +163,7 @@ class SimulationWindow(QWidget):
             print(f"Tiempo de estadía UTI del paciente actualizado a: {est_uci}")
         except ValueError as e:
             print(e)
-            ExceptionSaver().save(e)
+            ExceptionHelper().save(e)
 
     def _update_est_pre_uci(self, est_pre_uci: int):
         try:
@@ -162,7 +171,7 @@ class SimulationWindow(QWidget):
             print(f"Tiempo de estadía pre-UTI del paciente actualizado a: {est_pre_uci}")
         except ValueError as e:
             print(e)
-            ExceptionSaver().save(e)
+            ExceptionHelper().save(e)
 
     def _update_tiempo_va(self, tiempo_va: int):
         try:
@@ -170,7 +179,7 @@ class SimulationWindow(QWidget):
             print(f"Tiemo de ventilación artificial del paciente actualizado a: {tiempo_va}")
         except ValueError as e:
             print(e)
-            ExceptionSaver().save(e)
+            ExceptionHelper().save(e)
 
     def _update_porciento_tiempo(self, porciento: float):
         try:
@@ -178,7 +187,7 @@ class SimulationWindow(QWidget):
             print(f"Apache del paciente actualizado a: {porciento}")
         except ValueError as e:
             print(e)
-            ExceptionSaver().save(e)
+            ExceptionHelper().save(e)
 
     def _update_corridas_sim(self, corridas_sim: int):
         try:
@@ -186,7 +195,7 @@ class SimulationWindow(QWidget):
             print(f"Número de corridas de la simulación actualizadas a: {corridas_sim}")
         except ValueError as e:
             print(e)
-            ExceptionSaver().save(e)
+            ExceptionHelper().save(e)
 
     def _update_diag(self, diag: str, tipo_diag: int):
         try:
@@ -204,7 +213,7 @@ class SimulationWindow(QWidget):
             print(f"Diagnóstico {tipo_diag} del paciente actualizado a: {diag} ({int_diag})")
         except ValueError as e:
             print(e)
-            ExceptionSaver().save(e)
+            ExceptionHelper().save(e)
 
     def _update_tipo_va(self, str_tipoVA: str):
         try:
@@ -213,10 +222,10 @@ class SimulationWindow(QWidget):
             print(f"Ventilación artificial {int_tipoVA} ({str_tipoVA}) actualizado a: {str_tipoVA} ({int_tipoVA})")
         except ValueError as e:
             print(e)
-            ExceptionSaver().save(e)
+            ExceptionHelper().save(e)
 
     def _validar_paciente(self) -> bool:
-        """Valida que los datos del paciente estén correctos antes de poder utilizarlos."""
+        """Valida que los datos del paciente estén correctos antes de poder manejarlos."""
 
         print(
             f"Datos del paciente:\n"
@@ -274,8 +283,9 @@ class SimulationWindow(QWidget):
                 self.tableWidgetPacientes.insertRow(row)  # Agregar una nueva fila.
                 data_to_str = list(map(lambda d: str(d), data))  # Datos parseados a str.
                 items = [QTableWidgetItem(d) for d in data_to_str]  # Items para la tabla.
-                for _ in items:  # << Alinear los items al centro >>
-                    _.setTextAlignment(Qt.AlignCenter)
+                for _ in items:
+                    _.setTextAlignment(Qt.AlignCenter)  # Alinear los items al centro.
+                    _.setFlags(_.flags() & ~Qt.ItemIsEditable)  # Celda es editable.
                 try:
                     for columna, item in enumerate(items):
                         # Asignación → Actualizar Tabla.
@@ -285,6 +295,31 @@ class SimulationWindow(QWidget):
                 self.tableWidgetPacientes.resizeColumnsToContents()
             except Exception as e:
                 print(e)
-                ExceptionSaver().save(e)
+                ExceptionHelper().save(e)
         else:
             raise Exception("Paciente no encontrado.")
+
+    def _update_campos_paciente(self) -> None:
+        try:
+            cellIndex = self.tableWidgetPacientes.currentRow()
+            self.paciente = self.historial.get_paciente(cellIndex)
+            self._update_datos_paciente()
+        except Exception as e:
+            print(e)
+
+    def _update_datos_paciente(self) -> None:
+
+        # SpinBoxes
+        self.sb_edad.setValue(self.paciente.edad)
+        self.sb_apache.setValue(self.paciente.apache)
+        self.sb_estadiaUTI.setValue(self.paciente.est_uti)
+        self.sb_estadiaPreUTI.setValue(self.paciente.est_pre_uti)
+        self.sb_tiempoVA.setValue(self.paciente.tiempo_va)
+        self.sb_porciento_tiempo.setValue(self.paciente.porciento_tiempo)
+
+        # ComboBoxes
+        # self.cb_d1.setCurrentText(self.paciente.diag_ing1)
+        # self.cb_d2.setCurrentText(self.paciente.diag_ing1)
+        # self.cb_d3.currentText()
+        # self.cb_d4.currentText()
+        # self.cb_tipoVA.currentText()

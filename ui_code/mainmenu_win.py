@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5.uic import loadUi
 
 from ui_code.simulation_win import SimulationWindow
-from tools.excepciones import ExceptionSaver
+from tools.excepciones import ExceptionHelper
 from tools.utils import Rutas
 
 class MainMenuWindow(QMainWindow):
@@ -35,7 +35,7 @@ class MainMenuWindow(QMainWindow):
             self.simulation_win.show()
         except Exception as e:
             print(f"Error al abrir la ventana de simulación: {e}\n{traceback.format_exc()}")
-            ExceptionSaver().save(e)
+            ExceptionHelper().save(e)
 
     def cerrar_ventana_simulacion(self) -> None:
         try:
@@ -43,11 +43,11 @@ class MainMenuWindow(QMainWindow):
             self.show()
         except Exception as e:
             print(f"Error al cerrar la ventana de simulación: {e}\n{traceback.format_exc}")
-            ExceptionSaver().save(e)
+            ExceptionHelper().save(e)
 
     def cerrar_app(self) -> None:
         try:
             self.close()  # Cerrar Main Menu Window.
         except Exception as e:
             print(f"Error al cerrar la aplicación: {e}\n{traceback.format_exc()}")
-            ExceptionSaver().save(e)
+            ExceptionHelper().save(e)

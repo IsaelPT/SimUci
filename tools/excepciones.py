@@ -1,7 +1,7 @@
 import traceback
 
 
-class ExceptionSaver:
+class ExceptionHelper:
     """Permite guardar en un archivo `.log` las excepciones y errores que van ocurriendo."""
     __PATH = "tools/errorslog/errors.log"
 
