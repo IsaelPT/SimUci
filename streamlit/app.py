@@ -56,7 +56,7 @@ with ajustes_tab:
     if boton_comenzar:
         for i in stqdm(range(corridas_simulacion), desc="Progreso de la simulación en curso"):
             sleep(0.1)
-        st.success(f"La simulación ha concluido tras haber completado {corridas_simulacion} corridas de simulación.")
+        st.success(f"La simulación ha concluido tras haber completado {corridas_simulacion} iteraciones.")
 
 with resultados_tab:
     st.header("Resultados")
