@@ -1,3 +1,5 @@
+TIPO_VENT = {0: "Tubo endotraqueal", 1: "Traqueostomía", 2: "Ambas"}
+
 DIAG_PREUCI = {
     0: "Vacío",
     1: "Intoxicación exógena",
@@ -41,5 +43,3 @@ DIAG_PREUCI = {
     39: "Trasplante renal",
     40: "Guillain Barré",
 }
-
-TIPO_VENT = {0: "Tubo endotraqueal", 1: "Traqueostomía", 2: "Ambas"}

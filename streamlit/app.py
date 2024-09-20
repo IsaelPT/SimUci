@@ -3,7 +3,7 @@ from time import sleep
 from stqdm import stqdm
 
 import streamlit as st
-from utils import constantes as cons
+from utils.constants import categories as cons
 
 ajustes_tab, resultados_tab = st.tabs(("Ajustes", "Resultados"))
 
@@ -38,7 +38,7 @@ with ajustes_tab:
     st.divider()
     st.header("Simulación")
 
-    simulacion_column1, simulacion_column2 = st.columns(2, gap="small", vertical_alignment="center")
+    sim_column1, sim_column2 = st.columns(2, gap="small", vertical_alignment="center")
 
     # if 'comenzar_clicked' not in st.session_state:
     #     st.session_state.comenzar_clicked = False
@@ -48,9 +48,9 @@ with ajustes_tab:
     corridas_simulacion = st.number_input("Corridas de la Simulación", min_value=1, max_value=1000, value=50,
                                           help="La cantidad de corridas de la simulación brinda un mayor margen de precisión.")
 
-    with simulacion_column1:
+    with sim_column1:
         boton_comenzar = st.button("Comenzar Simulación", type="primary")
-    with simulacion_column2:
+    with sim_column2:
         boton_detener = st.button("Detener Simulación", type="secondary")
 
     if boton_comenzar:
