@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Paciente:
-    id: str
+    # id: str
     edad: int
     apache: int
     diag1: str
