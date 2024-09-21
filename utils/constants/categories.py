@@ -43,3 +43,12 @@ DIAG_PREUCI = {
     39: "Trasplante renal",
     40: "Guillain Barré",
 }
+
+INSUF_RESP = {
+    0: "Vacío",
+    1: "Respiratorias",
+    2: "TCE",
+    3: "Estatus posoperatorio",
+    4: "Afecciones no traumáticas del SNC",
+    5: "Causas extrapulmonares"
+}
