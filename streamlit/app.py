@@ -34,7 +34,7 @@ with ajustes_tab:
         opcion_diagn4: str = st.selectbox("Diagnostico 4", tuple(DIAG_PREUCI.values()), )
         opcion_insuf_resp: str = st.selectbox("Tipo Insuficiencia Respiratoria", tuple(INSUF_RESP.values()))
 
-    # Datos Paciente Recolectados (Son los datos de salida para ser procesados)
+    # Datos Paciente Recolectados (Son los datos de entrada para ser procesados)
     edad: int = opcion_edad
     apache: int = opcion_apache
     diagn1: int = key_categ("diag", opcion_diagn1)
