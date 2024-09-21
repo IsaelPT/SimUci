@@ -66,18 +66,10 @@ def clustering(Edad, Diag_Ing1, Diag_Ing2, Diag_Ing3, Diag_Ing4, APACHE, InsufRe
     else:
         vag = 1
 
-    df_centroid = pd.read_csv("DF_Centroides.csv")
+    df_centroid = pd.read_csv("uci\DF_Centroides.csv")
     nueva_instancia = np.array([Edad,Diag_Ing1,Diag_Ing2,Diag_Ing3,#
                                 Diag_Ing4,APACHE,InsufResp,VA,vag,
                                 EstadiaUTI,TiempoVAM,Est_PreUCI])
     distancias = np.linalg.norm(df_centroid.iloc[:, 0:12] - nueva_instancia)
     cluster_predicho = np.argmin(distancias)
     return cluster_predicho
-
-#def clustering(*args):
-#
-#    df_centroid = pd.read_csv("DF_Centroides.csv")
-#    nueva_instancia = np.array(args)
-#    distancias = np.linalg.norm(df_centroid.iloc[:, 0:12] - nueva_instancia)
-#    cluster_predicho = np.argmin(distancias)
-#    return cluster_predicho
