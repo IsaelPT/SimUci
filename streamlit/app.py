@@ -53,16 +53,16 @@ with ajustes_tab:
         if mostrar_datos:
             datos_paciente = {
                 "Edad": [opcion_edad, None],
-                "Diagnóstico 1": [opcion_diagn1, key_categ("diag", opcion_diagn1)],
-                "Diagnóstico 2": [opcion_diagn2, key_categ("diag", opcion_diagn2)],
-                "Diagnóstico 3": [opcion_diagn3, key_categ("diag", opcion_diagn3)],
-                "Diagnóstico 4": [opcion_diagn4, key_categ("diag", opcion_diagn4)],
+                "Diagnóstico 1": [opcion_diagn1, diagn1],
+                "Diagnóstico 2": [opcion_diagn2, diagn2],
+                "Diagnóstico 3": [opcion_diagn3, diagn3],
+                "Diagnóstico 4": [opcion_diagn4, diagn4],
                 "Apache": [opcion_apache, None],
                 "Tiempo Ventilación Artificial": [opcion_tiempo_vam, None],
-                "Tipo Ventilación Artificial": [opcion_tipo_vam, key_categ("va", opcion_tipo_vam)],
+                "Tipo Ventilación Artificial": [opcion_tipo_vam, tipo_vam],
                 "Estadía UTI": [opcion_estad_uti, None],
                 "Estadía Pre-UTI": [opcion_estad_preuti, None],
-                "Insuficiencia Respiratoria": [opcion_insuf_resp, key_categ("insuf", opcion_insuf_resp)],
+                "Insuficiencia Respiratoria": [opcion_insuf_resp, insuf_resp],
             }
             df = pd.DataFrame(datos_paciente, index=["Valor", "Índice"]).style.format(precision=1)
             st.dataframe(df)
