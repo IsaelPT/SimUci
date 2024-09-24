@@ -1,7 +1,8 @@
-from simulacion import Simulacion
-import distribuciones
 import pandas as pd
 import simpy
+
+import distribuciones
+from simulacion import Simulacion
 
 
 class Experiment:
@@ -44,7 +45,6 @@ def single_run(experiment):
 
 
 def multiple_replication(experiment, n_reps=100):
-
-    results = [single_run(experiment)for _ in range(n_reps)]
+    results = [single_run(experiment) for _ in range(n_reps)]
     df = pd.DataFrame(results)
     return df

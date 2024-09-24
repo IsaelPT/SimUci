@@ -1,7 +1,5 @@
 import time
 
-from stqdm import stqdm
-
 import streamlit as st
 from stqdm import stqdm
 
@@ -105,7 +103,7 @@ with ajustes_tab:
         if diag_ok and insuf_ok:
             for i in stqdm(range(corridas_sim), desc="Progreso de la simulación en curso"):
                 experiment = Experiment(edad, diagn1, diagn2, diagn3, diagn4, apache, insuf_resp,
-                                        insuf_resp,estad_uti,tiempo_vam,estad_preuti)
+                                        insuf_resp, estad_uti, tiempo_vam, estad_preuti)
                 result = multiple_replication(experiment)
                 result.to_csv(f"Paciente con id: {id}", index=False)
                 time.sleep(0.1)
