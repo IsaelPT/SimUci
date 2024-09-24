@@ -1,4 +1,5 @@
 from simulacion import Simulacion
+import distribuciones
 import pandas as pd
 import simpy
 
