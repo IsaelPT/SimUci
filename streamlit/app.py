@@ -1,9 +1,9 @@
 import time
 
-import pandas as pd
 from stqdm import stqdm
 
 import streamlit as st
+from experiment import *
 from streamlit.data_manager import key_categ
 from utils.constants.categories import *
 from utils.constants.streamlit_artifacts import *
@@ -84,6 +84,10 @@ with ajustes_tab:
     if boton_comenzar:
         for i in stqdm(range(corridas_sim), desc="Progreso de la simulación en curso"):
             time.sleep(0.1)
+            experiment = Experiment(edad, diagn1, diagn2, diagn3, diagn4, apache, insuf_resp,
+                                    insuf_resp,estad_uti,tiempo_vam,estad_preuti)
+            result = multiple_replication(experiment)
+            result.to_csv(f"Paciente con id: {id}", index=False)
         st.success(f"La simulación ha concluido tras haber completado {corridas_sim} iteraciones.")
 with resultados_tab:
     st.header("Resultados")
