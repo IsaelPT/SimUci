@@ -2,7 +2,7 @@ import subprocess
 
 
 def run_streamlit_app() -> None:
-    args = ["streamlit", "run", "streamlit/app.py"]
+    args = ["streamlit", "run", "st_app/app.py"]
     subprocess.run(args)
 
 

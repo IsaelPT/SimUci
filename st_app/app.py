@@ -1,12 +1,12 @@
 import time
 
+import pandas as pd
+import streamlit as st
 from stqdm import stqdm
 
-import streamlit as st
-from experiment import *
-from streamlit.data_manager import key_categ
+from constants import *
+from helpers import *
 from utils.constants.categories import *
-from utils.constants.streamlit_artifacts import *
 
 #### TABS
 ajustes_tab, resultados_tab = st.tabs(("Ajustes", "Resultados"))
@@ -18,16 +18,20 @@ with ajustes_tab:
 
     paciente_column1, paciente_column2, paciente_column3 = st.columns(3)
     with paciente_column1:
-        opcion_edad: int = st.number_input("Edad", min_value=10, max_value=120, value=10)
-        opcion_apache: int = st.number_input("Apache", min_value=0, max_value=1000, value=0, help=HELP_MSG_APACHE)
-        opcion_tiempo_vam: int = st.number_input("Tiempo de VA", min_value=0, max_value=1000, value=0)
-        opcion_estad_uti: int = st.number_input("Estadía UTI", min_value=0, max_value=1000, value=0,
+        opcion_edad: int = st.number_input("Edad", min_value=EDAD_MIN, max_value=EDAD_MAX, value=EDAD_DEFAULT)
+        opcion_apache: int = st.number_input("Apache", min_value=APACHE_MIN, max_value=APACHE_MAX, value=APACHE_DEFAULT,
+                                             help=HELP_MSG_APACHE)
+        opcion_tiempo_vam: int = st.number_input("Tiempo de VA", min_value=T_VAM_MIN, max_value=T_VAM_MAX,
+                                                 value=T_VAM_DEFAULT)
+        opcion_estad_uti: int = st.number_input("Estadía UTI", min_value=ESTAD_UTI_MIN, max_value=ESTAD_UTI_MAX,
+                                                value=ESTAD_UTI_DEFAULT,
                                                 help=HELP_MSG_ESTAD_UTI)
     with paciente_column2:
         opcion_diagn1: str = st.selectbox("Diagnostico 1", tuple(DIAG_PREUCI.values()), )
         opcion_diagn2: str = st.selectbox("Diagnostico 2", tuple(DIAG_PREUCI.values()), )
         opcion_tipo_vam: str = st.selectbox("Tipo de VA", tuple(TIPO_VENT.values()), )
-        opcion_estad_preuti: int = st.number_input("Estadía Pre-UTI", min_value=0, max_value=1000, value=0,
+        opcion_estad_preuti: int = st.number_input("Estadía Pre-UTI", min_value=ESTAD_PREUTI_MIN,
+                                                   max_value=ESTAD_PREUTI_MAX, value=ESTAD_PREUTI_DEFAULT,
                                                    help=HELP_MSG_ESTAD_PREUTI)
     with paciente_column3:
         opcion_diagn3: str = st.selectbox("Diagnostico 3", tuple(DIAG_PREUCI.values()), )
@@ -81,14 +85,25 @@ with ajustes_tab:
     with sim_column2:
         boton_detener = st.button("Detener Simulación", type="secondary")
 
+    diag_ok = False
+    insuf_ok = False
+
     if boton_comenzar:
-        for i in stqdm(range(corridas_sim), desc="Progreso de la simulación en curso"):
-            time.sleep(0.1)
-            experiment = Experiment(edad, diagn1, diagn2, diagn3, diagn4, apache, insuf_resp,
-                                    insuf_resp,estad_uti,tiempo_vam,estad_preuti)
-            result = multiple_replication(experiment)
-            result.to_csv(f"Paciente con id: {id}", index=False)
-        st.success(f"La simulación ha concluido tras haber completado {corridas_sim} iteraciones.")
+        # Validación de Campos y Valores
+        if not value_is_zero([diagn1, diagn2, diagn3, diagn4]):
+            diag_ok = True
+        else:
+            st.error(f"Todos los campos de diagnósticos no pueden ser 0 o Vacío.")
+        if not value_is_zero(insuf_resp):
+            insuf_ok = True
+        else:
+            st.error(f"Se debe seleccionar un tipo de insuficiencia respiratoria.")
+
+        # Comenzar Simulación si campos están correctos.
+        if diag_ok and insuf_ok:
+            for i in stqdm(range(corridas_sim), desc="Progreso de la simulación en curso"):
+                time.sleep(0.1)
+            st.success(f"La simulación ha concluido tras haber completado {corridas_sim} iteraciones.")
 with resultados_tab:
     st.header("Resultados")
 
