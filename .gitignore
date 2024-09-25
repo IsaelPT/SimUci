@@ -1,5 +1,4 @@
 .idea/
 .vscode/
-.idea/
-**/__pycache__/
-.venv/
+**/__pycache__/*
+experimentos/*
