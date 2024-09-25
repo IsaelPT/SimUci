@@ -1,6 +1,4 @@
-from soupsieve.util import lower
-
-from utils.constants.categories import TIPO_VENT, DIAG_PREUCI, INSUF_RESP
+from utils.categories import TIPO_VENT, DIAG_PREUCI, INSUF_RESP
 
 
 def key_categ(categoria: str, valor: str | int, viceversa: bool = False) -> int | str:
@@ -61,4 +59,4 @@ def __iszero(v: int | str) -> bool:
     if isinstance(v, int):
         return v == 0
     elif isinstance(v, str):
-        return lower(v) == "vacío"
+        return v.lower() == "vacío"

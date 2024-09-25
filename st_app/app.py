@@ -1,16 +1,18 @@
-import time
+import os.path
+from datetime import datetime
 
 import streamlit as st
+from pandas import DataFrame
 from stqdm import stqdm
 
 from constants import *
 from helpers import *
 from uci.experiment import *
-from utils.constants.categories import *
+from utils.categories import *
 
 #### TABS
-ajustes_tab, resultados_tab = st.tabs(("Ajustes", "Resultados"))
-with ajustes_tab:
+ajustes_simulacion, resultados_tab = st.tabs(("Ajustes Simulación", "Resultados"))
+with ajustes_simulacion:
     ############
     # Paciente #
     ############
@@ -24,8 +26,7 @@ with ajustes_tab:
         opcion_tiempo_vam: int = st.number_input("Tiempo de VA", min_value=T_VAM_MIN, max_value=T_VAM_MAX,
                                                  value=T_VAM_DEFAULT)
         opcion_estad_uti: int = st.number_input("Estadía UTI", min_value=ESTAD_UTI_MIN, max_value=ESTAD_UTI_MAX,
-                                                value=ESTAD_UTI_DEFAULT,
-                                                help=HELP_MSG_ESTAD_UTI)
+                                                value=ESTAD_UTI_DEFAULT, help=HELP_MSG_ESTAD_UTI)
     with paciente_column2:
         opcion_diagn1: str = st.selectbox("Diagnostico 1", tuple(DIAG_PREUCI.values()), )
         opcion_diagn2: str = st.selectbox("Diagnostico 2", tuple(DIAG_PREUCI.values()), )
@@ -38,7 +39,7 @@ with ajustes_tab:
         opcion_diagn4: str = st.selectbox("Diagnostico 4", tuple(DIAG_PREUCI.values()), )
         opcion_insuf_resp: str = st.selectbox("Tipo Insuficiencia Respiratoria", tuple(INSUF_RESP.values()))
 
-    # Datos Paciente Recolectados (Son los datos de entrada para ser procesados)
+    # Datos Paciente Recolectados (Son los datos de entrada para ser procesados).
     edad: int = opcion_edad
     apache: int = opcion_apache
     diagn1: int = key_categ("diag", opcion_diagn1)
@@ -47,8 +48,8 @@ with ajustes_tab:
     diagn4: int = key_categ("diag", opcion_diagn4)
     tipo_vam: int = key_categ("va", opcion_tipo_vam)
     tiempo_vam: int = opcion_tiempo_vam
-    estad_uti: int = opcion_estad_uti
-    estad_preuti: int = opcion_estad_preuti
+    estadia_uti: int = opcion_estad_uti
+    estadia_preuti: int = opcion_estad_preuti
     insuf_resp: int = key_categ("insuf", opcion_insuf_resp)
 
     contenedor = st.container()
@@ -68,7 +69,7 @@ with ajustes_tab:
                 "Estadía Pre-UTI": [opcion_estad_preuti, None],
                 "Insuficiencia Respiratoria": [opcion_insuf_resp, insuf_resp],
             }
-            df = pd.DataFrame(datos_paciente, index=["Valor", "Índice"]).style.format(precision=1)
+            df = pd.DataFrame(datos_paciente, index=["Valor", "Índice"]).style.format(precision=0)
             st.dataframe(df)
 
     ##############
@@ -76,20 +77,22 @@ with ajustes_tab:
     ##############
     st.header("Simulación")
 
-    sim_column1, sim_column2, = st.columns(2, gap="small", vertical_alignment="center")
+    boton_comenzar = st.button("Comenzar Simulación", type="primary")
 
-    corridas_sim = st.number_input("Corridas de la Simulación", min_value=1, max_value=1000, value=50,
-                                   help=HELP_MSG_CORRIDA_SIM)
-    with sim_column1:
-        boton_comenzar = st.button("Comenzar Simulación", type="primary")
-    with sim_column2:
-        boton_detener = st.button("Detener Simulación", type="secondary")
+    col_corridas, col_porciento = st.columns(2)
+    with col_corridas:
+        corridas_sim = st.number_input("Corridas de la Simulación", min_value=CORRIDAS_SIM_MIN,
+                                       max_value=CORRIDAS_SIM_MAX,
+                                       value=CORRIDAS_SIM_DEFAULT, help=HELP_MSG_CORRIDA_SIM)
+    with col_porciento:
+        porciento = st.number_input("Porciento", min_value=PORCIENTO_SIM_MIN, max_value=PORCIENTO_SIM_MAX,
+                                    value=PORCIENTO_SIM_DEFAULT, help=HELP_MSG_PORCIENTO_SIM)
 
     diag_ok = False
     insuf_ok = False
 
     if boton_comenzar:
-        # Validación de Campos y Valores
+        # Validación de Campos y Valores para realizar simulación.
         if not value_is_zero([diagn1, diagn2, diagn3, diagn4]):
             diag_ok = True
         else:
@@ -101,16 +104,18 @@ with ajustes_tab:
 
         # Comenzar Simulación si campos están correctos.
         if diag_ok and insuf_ok:
+            # Lógica de Guardar resultado.
+            fecha = datetime.now().strftime("fecha %d-%m-%Y hora %H-%M-%S")
+            ruta_base = f"experimentos\\{corridas_sim} iteraciones, {fecha}"
+            if not os.path.exists(ruta_base):
+                os.makedirs(ruta_base)
+
+            # Experimento.
             for i in stqdm(range(corridas_sim), desc="Progreso de la simulación en curso"):
                 experiment = Experiment(edad, diagn1, diagn2, diagn3, diagn4, apache, insuf_resp,
-                                        insuf_resp, estad_uti, tiempo_vam, estad_preuti)
-                result = multiple_replication(experiment)
-                result.to_csv(f"Paciente con id: {id}", index=False)
-                time.sleep(0.1)
+                                        insuf_resp, estadia_uti, tiempo_vam, estadia_preuti, porciento)
+                result: DataFrame = multiple_replication(experiment)
+                result.to_csv(f"{ruta_base}\\paciente_ID_{int(id(result))}.csv", index=False)
             st.success(f"La simulación ha concluido tras haber completado {corridas_sim} iteraciones.")
 with resultados_tab:
     st.header("Resultados")
-
-#### SIDEBAR
-with st.sidebar:
-    st.header("Opciones")

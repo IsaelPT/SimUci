@@ -1,6 +1,6 @@
 import simpy
 
-import distribuciones
+from uci import distribuciones
 
 
 class Simulacion:

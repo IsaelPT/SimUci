@@ -1,14 +1,14 @@
 import pandas as pd
 import simpy
 
-import distribuciones
-from simulacion import Simulacion
+from uci import distribuciones
+from uci.simulacion import Simulacion
 
 
 class Experiment:
-
-    def __init__(self, edad, diag_ing1, diag_ing2, diag_ing3, diag_ing4, apache,
-                 insuf_resp, va, estadia_uti, tiempo_vam, est_pre_uci, porciento=10):
+    def __init__(self, edad: int, diag_ing1: int, diag_ing2: int, diag_ing3: int, diag_ing4: int,
+                 apache: int, insuf_resp: int, va: int, estadia_uti: int, tiempo_vam: int,
+                 est_pre_uci: int, porciento: int = 10):
         self.edad = edad
         self.diag1 = diag_ing1
         self.diag2 = diag_ing2
@@ -19,8 +19,9 @@ class Experiment:
         self.va = va
         self.estadia_uti = estadia_uti
         self.tiempo_vam = tiempo_vam
-        self.tiemp_pre_uti = est_pre_uci
+        self.tiempo_pre_uti = est_pre_uci
         self.porciento = porciento
+
         self.results = {}
 
     def init_results_variables(self):
@@ -35,7 +36,7 @@ def single_run(experiment):
     cluster = distribuciones.clustering(experiment.edad, experiment.diag1, experiment.diag2,
                                         experiment.diag3, experiment.diag4, experiment.apache,
                                         experiment.insuf_resp, experiment.va, experiment.estadia_uti,
-                                        experiment.tiempo_vam, experiment.tiemp_pre_uti)
+                                        experiment.tiempo_vam, experiment.tiempo_pre_uti)
     simulacion = Simulacion(experiment, cluster)
     env.process(simulacion.uci(env))
     env.run()
