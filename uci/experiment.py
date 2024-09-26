@@ -1,51 +1,53 @@
 import pandas as pd
 import simpy
 
+from constants import VARIABLES_EXPERIMENTO
 from uci import distribuciones
 from uci.simulacion import Simulacion
 
 
 class Experiment:
-    def __init__(self, edad: int, diag_ing1: int, diag_ing2: int, diag_ing3: int, diag_ing4: int,
-                 apache: int, insuf_resp: int, va: int, estadia_uti: int, tiempo_vam: int,
-                 est_pre_uci: int, porciento: int = 10):
+    def __init__(self, edad: int, diagnostico_ingreso1: int, diagnostico_ingreso2: int, diagnostico_ingreso3: int,
+                 diagnostico_ingreso4: int, apache: int, insuficiencia_respiratoria: int, ventilacion_artificial: int,
+                 estadia_uti: int, tiempo_vam: int, tiempo_estadia_pre_uti: int, porciento: int = 10):
         self.edad = edad
-        self.diag1 = diag_ing1
-        self.diag2 = diag_ing2
-        self.diag3 = diag_ing3
-        self.diag4 = diag_ing4
+        self.diagn1 = diagnostico_ingreso1
+        self.diagn2 = diagnostico_ingreso2
+        self.diagn3 = diagnostico_ingreso3
+        self.diagn4 = diagnostico_ingreso4
         self.apache = apache
-        self.insuf_resp = insuf_resp
-        self.va = va
+        self.insuf_resp = insuficiencia_respiratoria
+        self.va = ventilacion_artificial
         self.estadia_uti = estadia_uti
         self.tiempo_vam = tiempo_vam
-        self.tiempo_pre_uti = est_pre_uci
+        self.tiempo_pre_uti = tiempo_estadia_pre_uti
         self.porciento = porciento
 
-        self.results = {}
+        self.result = {}
 
-    def init_results_variables(self):
-        self.results = {"Llegada UCI": 0, "Tiempo Pre VAM": 0, "Comienzo VAM": 0, "Tiempo VAM": 0, "Salida VAM": 0,
-                        "Tiempo Post VAM": 0, "Salida UCI": 0, "Estadia Uci": 0, "Estadia Post Uci": 0,
-                        "Egreso": 0}
+    def init_results_variables(self) -> None:
+        self.result = {valor: 0 for valor in VARIABLES_EXPERIMENTO}
+        # self.result = {"Llegada UCI": 0, "Tiempo Pre VAM": 0, "Comienzo VAM": 0, "Tiempo VAM": 0, "Salida VAM": 0,
+        #                "Tiempo Post VAM": 0, "Salida UCI": 0, "Estadia UCI": 0, "Estadia Post UCI": 0,
+        #                "Egreso": 0}
 
 
-def single_run(experiment):
+def single_run(experiment) -> dict[str, int]:
     env = simpy.Environment()
     experiment.init_results_variables()
-    cluster = distribuciones.clustering(experiment.edad, experiment.diag1, experiment.diag2,
-                                        experiment.diag3, experiment.diag4, experiment.apache,
+    cluster = distribuciones.clustering(experiment.edad, experiment.diagn1, experiment.diagn2,
+                                        experiment.diagn3, experiment.diagn4, experiment.apache,
                                         experiment.insuf_resp, experiment.va, experiment.estadia_uti,
                                         experiment.tiempo_vam, experiment.tiempo_pre_uti)
     simulacion = Simulacion(experiment, cluster)
     env.process(simulacion.uci(env))
     env.run()
 
-    results = experiment.results
-    return results
+    result = experiment.result
+    return result
 
 
-def multiple_replication(experiment, n_reps=100):
-    results = [single_run(experiment) for _ in range(n_reps)]
-    df = pd.DataFrame(results)
+def multiple_replication(experiment: Experiment, n_reps: int = 100) -> pd.DataFrame:
+    result = [single_run(experiment) for _ in range(n_reps)]
+    df = pd.DataFrame(result)
     return df

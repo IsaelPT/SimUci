@@ -2,22 +2,33 @@ import os.path
 from datetime import datetime
 
 import streamlit as st
-from pandas import DataFrame
-from stqdm import stqdm
+from scipy.stats import wilcoxon
 
 from constants import *
 from helpers import *
 from uci.experiment import *
-from utils.categories import *
 
 #### TABS
-ajustes_simulacion, resultados_tab = st.tabs(("Ajustes Simulación", "Resultados"))
-with ajustes_simulacion:
+simulacion_tab, comparacion_paciente_tab = st.tabs(("Simulación", "Comparaciones Paciente"))
+with simulacion_tab:
     ############
     # Paciente #
     ############
     st.header("Paciente")
 
+    # ID Paciente
+    # WARNING: EL ID DEL PACIENTE ESTÁ ALMACENADO DENTRO DEL SESSION_STATE!
+    col1_nuevo_paciente, col2_nuevo_paciente = st.columns([0.3, 1])
+    if "id_paciente" not in st.session_state:
+        st.session_state.id_paciente = generate_id()
+    with col1_nuevo_paciente:
+        nuevo_paciente = st.button("Nuevo paciente")
+        if nuevo_paciente:
+            st.session_state.id_paciente = generate_id()
+    with col2_nuevo_paciente:
+        st.caption(f"ID Paciente: {st.session_state.id_paciente}")
+
+    # Ingresar Datos Paciente
     paciente_column1, paciente_column2, paciente_column3 = st.columns(3)
     with paciente_column1:
         opcion_edad: int = st.number_input("Edad", min_value=EDAD_MIN, max_value=EDAD_MAX, value=EDAD_DEFAULT)
@@ -38,6 +49,8 @@ with ajustes_simulacion:
         opcion_diagn3: str = st.selectbox("Diagnostico 3", tuple(DIAG_PREUCI.values()), )
         opcion_diagn4: str = st.selectbox("Diagnostico 4", tuple(DIAG_PREUCI.values()), )
         opcion_insuf_resp: str = st.selectbox("Tipo Insuficiencia Respiratoria", tuple(INSUF_RESP.values()))
+        porciento = st.number_input("Porciento", min_value=PORCIENTO_SIM_MIN, max_value=PORCIENTO_SIM_MAX,
+                                    value=PORCIENTO_SIM_DEFAULT, help=HELP_MSG_PORCIENTO_SIM)
 
     # Datos Paciente Recolectados (Son los datos de entrada para ser procesados).
     edad: int = opcion_edad
@@ -52,9 +65,14 @@ with ajustes_simulacion:
     estadia_preuti: int = opcion_estad_preuti
     insuf_resp: int = key_categ("insuf", opcion_insuf_resp)
 
+    # Mostrar Datos Paciente
     contenedor = st.container()
     with contenedor:
-        mostrar_datos = st.checkbox("Mostrar datos del paciente", value=False)
+        col_check, col_toggle = st.columns(2)
+        with col_check:
+            mostrar_datos: bool = st.checkbox("Mostrar datos del paciente", value=False)
+        with col_toggle:
+            usar_score: bool = st.toggle("Utilizar Score pronóstico")
         if mostrar_datos:
             datos_paciente = {
                 "Edad": [opcion_edad, None],
@@ -79,43 +97,101 @@ with ajustes_simulacion:
 
     boton_comenzar = st.button("Comenzar Simulación", type="primary")
 
-    col_corridas, col_porciento = st.columns(2)
-    with col_corridas:
-        corridas_sim = st.number_input("Corridas de la Simulación", min_value=CORRIDAS_SIM_MIN,
-                                       max_value=CORRIDAS_SIM_MAX,
-                                       value=CORRIDAS_SIM_DEFAULT, help=HELP_MSG_CORRIDA_SIM)
-    with col_porciento:
-        porciento = st.number_input("Porciento", min_value=PORCIENTO_SIM_MIN, max_value=PORCIENTO_SIM_MAX,
-                                    value=PORCIENTO_SIM_DEFAULT, help=HELP_MSG_PORCIENTO_SIM)
+    corridas_sim = st.number_input("Corridas de la Simulación", min_value=CORRIDAS_SIM_MIN,
+                                   max_value=CORRIDAS_SIM_MAX, value=CORRIDAS_SIM_DEFAULT, help=HELP_MSG_CORRIDA_SIM)
 
     diag_ok = False
     insuf_ok = False
+    resultado_experimento = pd.DataFrame()
 
     if boton_comenzar:
-        # Validación de Campos y Valores para realizar simulación.
-        if not value_is_zero([diagn1, diagn2, diagn3, diagn4]):
+        # Validación de campos para realizar simulación.
+        if not value_is_zero([diagn1, diagn2, diagn3, diagn4]):  # Diagnósticos OK?
             diag_ok = True
         else:
-            st.error(f"Todos los campos de diagnósticos no pueden ser 0 o Vacío.")
-        if not value_is_zero(insuf_resp):
+            st.warning(f"Todos los campos de diagnósticos no pueden ser 0 o Vacío.")
+        if not value_is_zero(insuf_resp):  # Insuficiencia Respiratoria OK?
             insuf_ok = True
         else:
-            st.error(f"Se debe seleccionar un tipo de insuficiencia respiratoria.")
+            st.warning(f"Se debe seleccionar un tipo de insuficiencia respiratoria.")
 
-        # Comenzar Simulación si campos están correctos.
+        # Desarrollo de Simulación.
         if diag_ok and insuf_ok:
-            # Lógica de Guardar resultado.
-            fecha = datetime.now().strftime("fecha %d-%m-%Y hora %H-%M-%S")
-            ruta_base = f"experimentos\\{corridas_sim} iteraciones, {fecha}"
-            if not os.path.exists(ruta_base):
-                os.makedirs(ruta_base)
-
-            # Experimento.
-            for i in stqdm(range(corridas_sim), desc="Progreso de la simulación en curso"):
+            try:
+                # Experimento.
                 experiment = Experiment(edad, diagn1, diagn2, diagn3, diagn4, apache, insuf_resp,
                                         insuf_resp, estadia_uti, tiempo_vam, estadia_preuti, porciento)
-                result: DataFrame = multiple_replication(experiment)
-                result.to_csv(f"{ruta_base}\\paciente_ID_{int(id(result))}.csv", index=False)
-            st.success(f"La simulación ha concluido tras haber completado {corridas_sim} iteraciones.")
-with resultados_tab:
-    st.header("Resultados")
+                resultado_experimento = multiple_replication(experiment, corridas_sim)
+
+                # Guardar resultados.
+                path_base = f"experimentos\\paciente-id-{st.session_state.id_paciente}"
+                if not os.path.exists(path_base):
+                    os.makedirs(path_base)
+                fecha: str = datetime.now().strftime('%d-%m-%Y')
+                path: str = f"{path_base}\\experimento-id {generate_id(5)} fecha {fecha} corridas {corridas_sim}.csv"
+                resultado_experimento.to_csv(path, index=False)
+                st.success(f"La simulación ha concluido tras haber completado {corridas_sim} iteraciones.")
+            except Exception as e:
+                st.exception(e)
+
+    # Mostrar Resultado de experimento como DataFrame.
+    if not resultado_experimento.empty:
+        st.dataframe(df_promedio_desvestandar(resultado_experimento))
+
+with comparacion_paciente_tab:
+    st.header("Comparaciones para un Paciente")
+
+    experimento1: UploadedFile
+    experimento2: UploadedFile
+    df_experimento1: DataFrame
+    df_experimento2: DataFrame
+
+    # Subir datos con File Uploader.
+    col1_file_upl, col2_file_upl = st.columns(2)
+    with col1_file_upl:
+        experimento1 = st.file_uploader("Resultado Experimento 1")
+        if experimento1:
+            df_experimento1 = bin_to_df(experimento1)
+            if not df_experimento1.empty:
+                st.dataframe(df_experimento1, height=200)
+                st.write(f"Cantidad de Filas: {df_experimento1.shape[0]}")
+    with col2_file_upl:
+        experimento2 = st.file_uploader("Resultado Experimento 2")
+        if experimento2:
+            df_experimento2 = bin_to_df(experimento2)
+            if not df_experimento2.empty:
+                st.dataframe(df_experimento2, height=200)
+                st.write(f"Cantidad de Filas: {df_experimento2.shape[0]}")
+
+    # Selección de columna para comparación
+    seleccion_comparacion_cont = st.container()
+    with seleccion_comparacion_cont:
+        opcion_columna_comparacion = st.selectbox("Escoja una columna para comparación", VARIABLES_EXPERIMENTO)
+
+    boton_comparacion = st.button("Realizar comparación", type="primary", use_container_width=True)
+
+    # Comparación
+    if boton_comparacion:
+        if not df_experimento1.empty and not df_experimento2.empty:
+            x: DataFrame = df_experimento1[opcion_columna_comparacion]
+            y: DataFrame = df_experimento2[opcion_columna_comparacion]
+            if not x.equals(y):
+                # Verificar que ambos dataframes tengan la misma cantidad de filas para realizar Wilcoxon.
+                len_dif = abs(len(x) - len(y))
+                len_warning_msg = lambda \
+                        exp: f"Se eliminaron filas del experimento {exp} para coincidir con el experimento {2 if exp == 1 else 1} ({len_dif} filas diferentes)."
+                if x.shape[0] > y.shape[0]:  # La cantidad de filas de x, excede las de y.
+                    x = x.head(y.shape[0])
+                    st.warning(len_warning_msg(1))
+                elif y.shape[0] > x.shape[0]:  # La cantidad de filas de y, excede las de x.
+                    y = y.head(x.shape[0])
+                    st.warning(len_warning_msg(2))
+                wilcoxon_data = (x, y)
+                resultado = wilcoxon(x, y)
+                st.write(resultado)
+            else:
+                st.error(
+                    "Imposible realizar prueba de Wilcoxon cuando la diferencia entre los elementos de \"x\" y \"y\" es cero para todos los elementos.")
+        else:
+            st.error(
+                "No se puede realizar la comparación. Se detectan datos vacíos o incompletos con los experimentos.")

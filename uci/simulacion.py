@@ -27,22 +27,22 @@ class Simulacion:
 
         pre_vam = int((uci - vam) * self.experiment.porciento / 100)
         post_vam = uci - pre_vam - vam
-        self.experiment.results["Tiempo Post VAM"] = post_vam
-        self.experiment.results["Tiempo VAM"] = vam
-        self.experiment.results["Tiempo Pre VAM"] = pre_vam
-        self.experiment.results["Estadia Post Uci"] = post_uci
-        self.experiment.results["Estadia Uci"] = uci
+        self.experiment.result["Tiempo Post VAM"] = post_vam
+        self.experiment.result["Tiempo VAM"] = vam
+        self.experiment.result["Tiempo Pre VAM"] = pre_vam
+        self.experiment.result["Estadia Post Uci"] = post_uci
+        self.experiment.result["Estadia Uci"] = uci
 
-        self.experiment.results["Llegada UCI"] = env.now
+        self.experiment.result["Llegada UCI"] = env.now
 
         yield env.timeout(pre_vam)
-        self.experiment.results["Comienzo VAM"] = env.now
+        self.experiment.result["Comienzo VAM"] = env.now
 
         yield env.timeout(vam)
-        self.experiment.results["Salida VAM"] = env.now
+        self.experiment.result["Salida VAM"] = env.now
 
         yield env.timeout(post_vam)
-        self.experiment.results["Salida UCI"] = env.now
+        self.experiment.result["Salida UCI"] = env.now
 
         yield env.timeout(post_uci)
-        self.experiment.results["Egreso"] = env.now
+        self.experiment.result["Egreso"] = env.now

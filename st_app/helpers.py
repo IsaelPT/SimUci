@@ -1,4 +1,10 @@
-from utils.categories import TIPO_VENT, DIAG_PREUCI, INSUF_RESP
+import secrets
+
+import pandas as pd
+from pandas import DataFrame
+from streamlit.runtime.uploaded_file_manager import UploadedFile
+
+from constants import TIPO_VENT, DIAG_PREUCI, INSUF_RESP
 
 
 def key_categ(categoria: str, valor: str | int, viceversa: bool = False) -> int | str:
@@ -60,3 +66,53 @@ def __iszero(v: int | str) -> bool:
         return v == 0
     elif isinstance(v, str):
         return v.lower() == "vacío"
+
+
+def generate_id(n: int = 10) -> str:
+    """
+    Genera un número pseudoaleatorio de n dígitos. Utilizado para identificar pacientes.
+
+    Args:
+        n: Cantidad de dígitos mayor y diferente de 0 que tendrá el ID. Default = 10 dígitos.
+
+    Returns:
+        Cadena de n números generados aleatoriamente.
+    """
+    if n != 0:
+        return ''.join([str(secrets.randbelow(n)) for _ in range(n)])
+    else:
+        raise Exception(f"La cantidad de dígitos n={n} debe ser mayor distinta que 0.")
+
+
+def df_promedio_desvestandar(datos: DataFrame) -> DataFrame:
+    """
+    Construye un nuevo DataFrame. Contiene los datos del anterior y al final agregado el *promedio* de todos los valores y la desviación estándar.
+
+    Args:
+        datos: DataFrame base.
+
+    Returns:
+        DataFrame nuevo con nuevas filas de promedio y desviación estándar de los valores del DataFrame.
+    """
+
+    res = datos
+    promedio = datos.mean()
+    desvest = datos.std()
+    res.loc["Promedio"] = promedio
+    res.loc["Desviación Estándar"] = desvest
+
+    return res
+
+
+def bin_to_df(bin_file: UploadedFile) -> DataFrame:
+    """
+    Convierte un UploadedFile (un archivo cargado por un file_uploader) en un DataFrame.
+
+    Args:
+        bin_file: Archivo binario cargado por un file_uploader.
+
+    Returns:
+        Ese archivo (debe ser `.csv`) como un DataFrame.
+    """
+
+    return pd.read_csv(bin_file)
