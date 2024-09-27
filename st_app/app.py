@@ -18,9 +18,9 @@ with simulacion_tab:
 
     # ID Paciente
     # WARNING: EL ID DEL PACIENTE ESTÁ ALMACENADO DENTRO DEL SESSION_STATE!
-    col1_nuevo_paciente, col2_nuevo_paciente = st.columns([0.3, 1])
     if "id_paciente" not in st.session_state:
         st.session_state.id_paciente = generate_id()
+    col1_nuevo_paciente, col2_nuevo_paciente = st.columns([0.3, 1])
     with col1_nuevo_paciente:
         nuevo_paciente = st.button("Nuevo paciente")
         if nuevo_paciente:
@@ -95,14 +95,29 @@ with simulacion_tab:
     ##############
     st.header("Simulación")
 
-    boton_comenzar = st.button("Comenzar Simulación", type="primary")
-
-    corridas_sim = st.number_input("Corridas de la Simulación", min_value=CORRIDAS_SIM_MIN,
-                                   max_value=CORRIDAS_SIM_MAX, value=CORRIDAS_SIM_DEFAULT, help=HELP_MSG_CORRIDA_SIM)
-
     diag_ok = False
     insuf_ok = False
     resultado_experimento = pd.DataFrame()
+    if "df_resultado" not in st.session_state:
+        st.session_state.df_resultado = pd.DataFrame()  # session_state para visualizar datos simulación.
+
+    boton_comenzar = st.button("Comenzar Simulación", type="primary", use_container_width=True)
+    corridas_sim = st.number_input("Corridas de la Simulación", min_value=CORRIDAS_SIM_MIN,
+                                   max_value=CORRIDAS_SIM_MAX, value=CORRIDAS_SIM_DEFAULT, help=HELP_MSG_CORRIDA_SIM)
+    # Visualizar DataFrame con resultado de la simulación para este paciente.
+    if not st.session_state.df_resultado.empty:
+        toggle_fmt = st.toggle("Tabla con formato", value=True)
+        st.dataframe(format_df(st.session_state.df_resultado, format_time=True if toggle_fmt else False), height=300)
+
+        # Lógica para guardar resultados localmente.
+        csv = st.session_state.df_resultado.to_csv(index=False).encode("UTF-8")
+        boton_guardar = st.download_button(
+            label="Guardar resultados",
+            data=csv,
+            file_name=f"Experimento-Paciente-ID-{st.session_state.id_paciente}.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
 
     if boton_comenzar:
         # Validación de campos para realizar simulación.
@@ -130,13 +145,12 @@ with simulacion_tab:
                 fecha: str = datetime.now().strftime('%d-%m-%Y')
                 path: str = f"{path_base}\\experimento-id {generate_id(5)} fecha {fecha} corridas {corridas_sim}.csv"
                 resultado_experimento.to_csv(path, index=False)
-                st.success(f"La simulación ha concluido tras haber completado {corridas_sim} iteraciones.")
-            except Exception as e:
-                st.exception(e)
+                st.session_state.df_resultado = resultado_experimento
 
-    # Mostrar Resultado de experimento como DataFrame.
-    if not resultado_experimento.empty:
-        st.dataframe(df_promedio_desvestandar(resultado_experimento))
+                st.success(f"La simulación ha concluido tras haber completado {corridas_sim} iteraciones.")
+                st.rerun()
+            except Exception as e:
+                st.exception(f"No se pudo efectuar la simulación.\n{e}")
 
 with comparacion_paciente_tab:
     st.header("Comparaciones para un Paciente")
@@ -179,7 +193,8 @@ with comparacion_paciente_tab:
                 # Verificar que ambos dataframes tengan la misma cantidad de filas para realizar Wilcoxon.
                 len_dif = abs(len(x) - len(y))
                 len_warning_msg = lambda \
-                        exp: f"Se eliminaron filas del experimento {exp} para coincidir con el experimento {2 if exp == 1 else 1} ({len_dif} filas diferentes)."
+                        exp: f"Se eliminaron filas del experimento {exp} para coincidir \
+                        con el experimento {2 if exp == 1 else 1} ({len_dif} filas diferentes)."
                 if x.shape[0] > y.shape[0]:  # La cantidad de filas de x, excede las de y.
                     x = x.head(y.shape[0])
                     st.warning(len_warning_msg(1))
@@ -190,8 +205,8 @@ with comparacion_paciente_tab:
                 resultado = wilcoxon(x, y)
                 st.write(resultado)
             else:
-                st.error(
-                    "Imposible realizar prueba de Wilcoxon cuando la diferencia entre los elementos de \"x\" y \"y\" es cero para todos los elementos.")
+                st.error("Imposible realizar prueba de Wilcoxon cuando la diferencia entre los \
+                elementos de \"x\" y \"y\" es cero para todos los elementos.")
         else:
-            st.error(
-                "No se puede realizar la comparación. Se detectan datos vacíos o incompletos con los experimentos.")
+            st.error("No se puede realizar la comparación. \
+            Se detectan datos vacíos o incompletos con los experimentos.")
