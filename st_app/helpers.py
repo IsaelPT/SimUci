@@ -84,22 +84,43 @@ def generate_id(n: int = 10) -> str:
         raise Exception(f"La cantidad de dígitos n={n} debe ser mayor distinta que 0.")
 
 
-def df_promedio_desvestandar(datos: DataFrame) -> DataFrame:
+def format_df(datos: DataFrame, format_time: bool = False) -> DataFrame:
     """
-    Construye un nuevo DataFrame. Contiene los datos del anterior y al final agregado el *promedio* de todos los valores y la desviación estándar.
+    Construye un nuevo DataFrame. Agrega al comienzo del dataframe el *promedio* y *desviación estándar* de todos los valores.
 
     Args:
         datos: DataFrame base.
+        format_time: Si mostrar para cada número en la tabla el carácter "h" para expresar que los números están expresados en *horas*.
 
     Returns:
-        DataFrame nuevo con nuevas filas de promedio y desviación estándar de los valores del DataFrame.
+        DataFrame nuevo con nuevas filas de promedio y desviación estándar con los valores del DataFrame.
     """
 
-    res = datos
-    promedio = datos.mean()
-    desvest = datos.std()
-    res.loc["Promedio"] = promedio
-    res.loc["Desviación Estándar"] = desvest
+    # Construir DataFrame (salida)
+    promedio = datos.mean()  # Promedio
+    desvest = datos.std()  # Desviación Estándar
+    nuevos_datos = pd.DataFrame([promedio, desvest], index=["Promedio", "Desviación Estándar"])
+
+    label = "Información"
+    res = pd.concat([nuevos_datos, datos], axis=0).reset_index(drop=True)
+    res.insert(0, label, "")
+
+    res.loc[0, label] = "Promedio"
+    res.loc[1, label] = "Desviación Estándar"
+
+    len_datos = datos.shape[0]
+    len_nuevos_datos = nuevos_datos.shape[0]
+    for i in range(len_nuevos_datos, len_datos + len_nuevos_datos):
+        res.loc[i, label] = f"Iteración {i - len_nuevos_datos + 1}"
+
+    # Formato
+    if format_time:
+        def fmt(horas: int | float) -> str | int:
+            if isinstance(horas, (int, float)):
+                return f"{horas / 24:.1f} días ({int(horas)} h)"
+            return horas
+
+        res = res.applymap(fmt)
 
     return res
 
