@@ -117,7 +117,7 @@ def format_df(datos: DataFrame, format_time: bool = False) -> DataFrame:
     if format_time:
         def fmt(horas: int | float) -> str | int:
             if isinstance(horas, (int, float)):
-                return f"{horas / 24:.1f} días ({int(horas)} h)"
+                return f"{horas / 24:.1f} días ({horas:.1f} h)"
             return horas
 
         res = res.applymap(fmt)
