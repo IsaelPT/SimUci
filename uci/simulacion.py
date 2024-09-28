@@ -30,19 +30,13 @@ class Simulacion:
         self.experiment.result["Tiempo Post VAM"] = post_vam
         self.experiment.result["Tiempo VAM"] = vam
         self.experiment.result["Tiempo Pre VAM"] = pre_vam
-        self.experiment.result["Estadia Post Uci"] = post_uci
-        self.experiment.result["Estadia Uci"] = uci
-
-        self.experiment.result["Llegada UCI"] = env.now
+        self.experiment.result["Estadia Post UCI"] = post_uci
+        self.experiment.result["Estadia UCI"] = uci
 
         yield env.timeout(pre_vam)
-        self.experiment.result["Comienzo VAM"] = env.now
 
         yield env.timeout(vam)
-        self.experiment.result["Salida VAM"] = env.now
 
         yield env.timeout(post_vam)
-        self.experiment.result["Salida UCI"] = env.now
 
         yield env.timeout(post_uci)
-        self.experiment.result["Egreso"] = env.now

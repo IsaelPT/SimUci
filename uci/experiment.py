@@ -27,9 +27,8 @@ class Experiment:
 
     def init_results_variables(self) -> None:
         self.result = {valor: 0 for valor in VARIABLES_EXPERIMENTO}
-        # self.result = {"Llegada UCI": 0, "Tiempo Pre VAM": 0, "Comienzo VAM": 0, "Tiempo VAM": 0, "Salida VAM": 0,
-        #                "Tiempo Post VAM": 0, "Salida UCI": 0, "Estadia UCI": 0, "Estadia Post UCI": 0,
-        #                "Egreso": 0}
+        self.result = {"Tiempo Pre VAM": 0, "Tiempo VAM": 0, "Tiempo Post VAM": 0,
+                       "Estadia UCI": 0, "Estadia Post UCI": 0}
 
 
 def single_run(experiment) -> dict[str, int]:
