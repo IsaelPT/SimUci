@@ -98,3 +98,6 @@ INSUF_RESP: dict[int, str] = {
 
 VARIABLES_EXPERIMENTO: list[str] = ["Llegada UCI", "Tiempo Pre VAM", "Comienzo VAM", "Tiempo VAM", "Salida VAM",
                                     "Tiempo Post VAM", "Salida UCI", "Estadia UCI", "Estadia Post UCI", "Egreso"]
+
+RUTA_CSV_DATOS1 = "data\\datos.csv"
+RUTA_CSV_DATOS2 = "data\\Ficherodedatos(MO)17-1-2023.csv"
