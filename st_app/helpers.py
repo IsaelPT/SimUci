@@ -4,7 +4,8 @@ import pandas as pd
 from pandas import DataFrame
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-from constants import TIPO_VENT, DIAG_PREUCI, INSUF_RESP
+from constants import TIPO_VENT, DIAG_PREUCI, INSUF_RESP, RUTA_CSV_DATOS2
+from experiment import Experiment, multiple_replication
 
 
 def key_categ(categoria: str, valor: str | int, viceversa: bool = False) -> int | str:
@@ -158,3 +159,58 @@ def bin_to_df(bin_file: UploadedFile) -> DataFrame:
     """
 
     return pd.read_csv(bin_file)
+
+
+def get_real_data() -> tuple[int, int, int, int, int, int, int, int, int, int]:
+    """
+    Tuple con todos los datos necesarios para la simulación a partir de datos reales de bases de datos.
+
+    Returns:
+        tuple: edad, apache, diag1, diag2, diag3, diag4, tiempo_va, tipo_va, estad_uti, estad_preuti
+    """
+    ruta_datos = RUTA_CSV_DATOS2
+    data = pd.read_csv(ruta_datos)
+
+    # Obtención de una fila aleatoria del dataframe con datos reales.
+    random_pick = data.sample(n=1)
+
+    edad: int = int(random_pick.iloc[0, 1])
+    apache: int = int(random_pick.iloc[0, 11])
+    d1: int = int(random_pick.iloc[0, 21])
+    d2: int = int(random_pick.iloc[0, 22])
+    d3: int = int(random_pick.iloc[0, 23])
+    d4: int = int(random_pick.iloc[0, 24])
+    tiempo_va: int = int(random_pick.iloc[0, 43])
+    tipo_va: int = int(random_pick.iloc[0, 17])
+    estad_uti: int = int(random_pick.iloc[0, 37])
+    estad_preuti: int = int(random_pick.iloc[0, 39])
+
+    values = (edad, apache, d1, d2, d3, d4, tiempo_va, tipo_va, estad_uti, estad_preuti)
+    for i, v in enumerate(values):
+        if v is None:
+            raise ValueError(f"Valor en índice {i} es None.")
+
+    return values
+
+
+def start_experiment(
+        corridas_simulacion: int,
+        edad: int,
+        d1: int,
+        d2: int,
+        d3: int,
+        d4: int,
+        apache: int,
+        insuf_resp: int,
+        va: int,  # tipo
+        t_vam: int,
+        est_uti: int,
+        est_preuti: int,
+        porciento
+) -> pd.DataFrame:
+    e = Experiment(edad=edad, diagnostico_ingreso1=d1, diagnostico_ingreso2=d2, diagnostico_ingreso3=d3,
+                   diagnostico_ingreso4=d4, apache=apache, insuficiencia_respiratoria=insuf_resp,
+                   ventilacion_artificial=va, estadia_uti=est_uti, tiempo_vam=t_vam, tiempo_estadia_pre_uti=est_preuti,
+                   porciento=porciento)
+    res = multiple_replication(e, corridas_simulacion)
+    return res
