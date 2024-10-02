@@ -107,7 +107,7 @@ with simulacion_tab:
     # Visualizar DataFrame con resultado de la simulación para este paciente.
     if not st.session_state.df_resultado.empty:
         toggle_fmt = st.toggle("Tabla con formato", value=True)
-        st.dataframe(format_df(st.session_state.df_resultado, format_time=True if toggle_fmt else False), height=300)
+        st.dataframe(format_df(st.session_state.df_resultado, toggle_fmt), height=300)
 
         # Lógica para guardar resultados localmente.
         csv = st.session_state.df_resultado.to_csv(index=False).encode("UTF-8")
