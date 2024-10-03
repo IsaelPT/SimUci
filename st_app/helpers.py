@@ -4,7 +4,7 @@ import pandas as pd
 from pandas import DataFrame
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-from constants import TIPO_VENT, DIAG_PREUCI, INSUF_RESP, RUTA_CSV_DATOS2
+from constants import TIPO_VENT, DIAG_PREUCI, INSUF_RESP
 from experiment import Experiment, multiple_replication
 
 
@@ -54,19 +54,19 @@ def value_is_zero(valores: list[int | str] | int | str) -> bool:
     Returns:
         `true` si el valor o valores son 0 o "vacío", `false` caso contrario.
     """
+
+    def __iszero(v: int | str) -> bool:
+        if isinstance(v, int):
+            return v == 0
+        elif isinstance(v, str):
+            return v.lower() == "vacío"
+
     if isinstance(valores, int | str):
         return __iszero(valores)
     elif isinstance(valores, list):
         return all(__iszero(v) for v in valores)
     else:
         raise ValueError(f"El valor a verificar no es correcto: {valores}")
-
-
-def __iszero(v: int | str) -> bool:
-    if isinstance(v, int):
-        return v == 0
-    elif isinstance(v, str):
-        return v.lower() == "vacío"
 
 
 def generate_id(n: int = 10) -> str:
@@ -139,7 +139,7 @@ def format_df(datos: DataFrame, enhance_format: bool = False, data_at_beginning:
     if enhance_format:
         def fmt(horas: int | float) -> str | int:
             if isinstance(horas, (int, float)):
-                return f"{horas / 24:.1f} días ({horas:.1f} h)"
+                return f"{horas / 24:.1f} d ({horas:.1f} h)"
             return horas
 
         res = res.applymap(fmt)
@@ -161,36 +161,39 @@ def bin_to_df(bin_file: UploadedFile) -> DataFrame:
     return pd.read_csv(bin_file)
 
 
-def get_real_data() -> tuple[int, int, int, int, int, int, int, int, int, int]:
+def get_real_data(path_datos: str, fila_seleccion):
     """
-    Tuple con todos los datos necesarios para la simulación a partir de datos reales de bases de datos.
+    Obtiene una fila con datos reales de la base de datos para posteriormente ser utilizados para la simulación.
+
+    Args:
+        path_datos: Ruta de donde se obtienen los datos a extraer.
+        fila_seleccion: selección de qué fila se va a utilizar de la tabla.
 
     Returns:
-        tuple: edad, apache, diag1, diag2, diag3, diag4, tiempo_va, tipo_va, estad_uti, estad_preuti
+        edad, apache, diag1, diag2, diag3, diag4, insuf_resp, tipo_va, estadia_uti, tiempo_vam, tiempo_estad_pre_uti
     """
-    ruta_datos = RUTA_CSV_DATOS2
-    data = pd.read_csv(ruta_datos)
+    data = pd.read_csv(path_datos)
 
-    # Obtención de una fila aleatoria del dataframe con datos reales.
-    random_pick = data.sample(n=1)
+    # Selección por índice
+    pick = data.iloc[[fila_seleccion]]
 
-    edad: int = int(random_pick.iloc[0, 1])
-    apache: int = int(random_pick.iloc[0, 11])
-    d1: int = int(random_pick.iloc[0, 21])
-    d2: int = int(random_pick.iloc[0, 22])
-    d3: int = int(random_pick.iloc[0, 23])
-    d4: int = int(random_pick.iloc[0, 24])
-    tiempo_va: int = int(random_pick.iloc[0, 43])
-    tipo_va: int = int(random_pick.iloc[0, 17])
-    estad_uti: int = int(random_pick.iloc[0, 37])
-    estad_preuti: int = int(random_pick.iloc[0, 39])
+    edad: int = int(pick["Edad"].iloc[0])
+    d1: int = int(pick["Diag.Ing1"].iloc[0])
+    d2: int = int(pick["Diag.Ing2"].iloc[0])
+    d3: int = int(pick["Diag.Ing3"].iloc[0])
+    d4: int = int(pick["Diag.Ing4"].iloc[0])
+    apache: int = int(pick["APACHE"].iloc[0])
+    insuf_resp: int = int(pick["InsufResp"].iloc[0])
+    va: int = int(pick["VA"].iloc[0])  # horas
+    estadia_uti: int = to_hours(int(pick["DíasUTI"].iloc[0]))  # días -> horas
+    tiempo_vam: int = int(pick["TiempoVAM"].iloc[0])  # horas
+    tiempo_estad_pre_uti: int = to_hours(int(pick["Est. PreUCI"].iloc[0]))  # días -> horas
 
-    values = (edad, apache, d1, d2, d3, d4, tiempo_va, tipo_va, estad_uti, estad_preuti)
-    for i, v in enumerate(values):
-        if v is None:
-            raise ValueError(f"Valor en índice {i} es None.")
+    return edad, d1, d2, d3, d4, apache, insuf_resp, va, estadia_uti, tiempo_vam, tiempo_estad_pre_uti
 
-    return values
+
+def to_hours(days: int) -> int:
+    return int(days * 24)
 
 
 def start_experiment(
@@ -202,11 +205,11 @@ def start_experiment(
         d4: int,
         apache: int,
         insuf_resp: int,
-        va: int,  # tipo
+        va: int,  # tipo de ventilación artificial
         t_vam: int,
         est_uti: int,
         est_preuti: int,
-        porciento
+        porciento: int = 10
 ) -> pd.DataFrame:
     e = Experiment(edad=edad, diagnostico_ingreso1=d1, diagnostico_ingreso2=d2, diagnostico_ingreso3=d3,
                    diagnostico_ingreso4=d4, apache=apache, insuficiencia_respiratoria=insuf_resp,
