@@ -1,19 +1,22 @@
+import threading
 import time
-from simpy import Environment, SimPyException
-from uci.procesar_datos import *
-from PyQt5 import QtCore
-from PyQt5.QtCore import QObject
 
 import pandas as pd
-import threading
+from PyQt5 import QtCore
+from PyQt5.QtCore import QObject
+from simpy import Environment
+
+from uci.procesar_datos import *
 
 
 class Uci(threading.Thread):
     def __init__(self, path: str, diagnostico: list, porcientos: list) -> None:
         super().__init__()
+
         class Signal(QObject):
             signal_progBarr = QtCore.pyqtSignal(int)
             signal_terminated = QtCore.pyqtSignal(bool)
+
         self.signal = Signal()
         self.index = 0
         self.is_running = True
@@ -40,18 +43,18 @@ class Uci(threading.Thread):
         t_comienzo = time.time()
         for i in range(17881):
             self.signal.signal_progBarr.emit(i)
-            #time.sleep(0.001)
-            self.env.run(until=i+1)
-            if  self._stop_event.is_set():
+            # time.sleep(0.001)
+            self.env.run(until=i + 1)
+            if self._stop_event.is_set():
                 break
         self.signal.signal_terminated.emit(True)
         t_final = time.time()
         print(f"La simulación terminó a los {(t_final - t_comienzo):.2f} seg.")
 
-
     def stop(self):
         print("Deteniendo la simulación....")
         self._stop_event.set()
+
     def entrada_paciente(self, path: str):
         """Funcion que controla la entrada de cada paciente al hospital"""
 
@@ -98,9 +101,7 @@ class Uci(threading.Thread):
             self.hora_llegada_uci.append(self.env.now)
 
             # Se calcula los tiempos antes del van y despues de el y se espera a que se le ponga van
-            porcientos = self.porcientos(
-                self.diagnosticos_paciente, self.porcientos_paciente
-            )
+            porcientos = self.porcientos(self.diagnosticos_paciente, self.porcientos_paciente)
             diagnostico = next(gen_diagnostico)
             estadia_uci = next(gen_estadia_uci)
             tiempo_van = next(gen_tiempo_van)
