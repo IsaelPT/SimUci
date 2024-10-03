@@ -56,7 +56,10 @@ with simulacion_tab:
         if nuevo_paciente:
             st.session_state.id_paciente = generate_id()
     with col2_nuevo_paciente:
-        st.caption(f"ID Paciente: {st.session_state.id_paciente}")
+        st.session_state.id_paciente = st.text_input(label="ID Paciente", value=st.session_state.id_paciente,
+                                                     max_chars=10, placeholder="ID Paciente",
+                                                     label_visibility="collapsed")
+    # st.caption(f"ID Paciente: {st.session_state.id_paciente}")
     with col3_nuevo_paciente:
         usar_score: bool = st.toggle("Utilizar Score pronóstico")
 
@@ -64,7 +67,8 @@ with simulacion_tab:
     paciente_column1, paciente_column2, paciente_column3 = st.columns(3)
     with paciente_column1:
         opcion_edad: int = st.number_input("Edad", min_value=EDAD_MIN, max_value=EDAD_MAX, value=EDAD_DEFAULT)
-        opcion_apache: int = st.number_input("Apache", min_value=APACHE_MIN, max_value=APACHE_MAX, value=APACHE_DEFAULT,
+        opcion_apache: int = st.number_input("Apache", min_value=APACHE_MIN, max_value=APACHE_MAX,
+                                             value=APACHE_DEFAULT,
                                              help=HELP_MSG_APACHE)
         opcion_tiempo_vam: int = st.number_input("Tiempo de VA", min_value=T_VAM_MIN, max_value=T_VAM_MAX,
                                                  value=T_VAM_DEFAULT)
@@ -80,22 +84,23 @@ with simulacion_tab:
     with paciente_column3:
         opcion_diagn3: str = st.selectbox("Diagnostico 3", tuple(DIAG_PREUCI.values()), )
         opcion_diagn4: str = st.selectbox("Diagnostico 4", tuple(DIAG_PREUCI.values()), )
-        opcion_insuf_resp: str = st.selectbox("Tipo Insuficiencia Respiratoria", tuple(INSUF_RESP.values()), index=1)
+        opcion_insuf_resp: str = st.selectbox("Tipo Insuficiencia Respiratoria", tuple(INSUF_RESP.values()),
+                                              index=1)
         porciento = st.number_input("Porciento", min_value=PORCIENTO_SIM_MIN, max_value=PORCIENTO_SIM_MAX,
                                     value=PORCIENTO_SIM_DEFAULT, help=HELP_MSG_PORCIENTO_SIM)
 
-    # Datos Paciente Recolectados (Son los datos de entrada para ser procesados).
-    edad: int = opcion_edad
-    apache: int = opcion_apache
-    diagn1: int = key_categ("diag", opcion_diagn1)
-    diagn2: int = key_categ("diag", opcion_diagn2)
-    diagn3: int = key_categ("diag", opcion_diagn3)
-    diagn4: int = key_categ("diag", opcion_diagn4)
-    tipo_vam: int = key_categ("va", opcion_tipo_vam)
-    tiempo_vam: int = opcion_tiempo_vam
-    estadia_uti: int = opcion_estad_uti
-    estadia_preuti: int = opcion_estad_preuti
-    insuf_resp: int = key_categ("insuf", opcion_insuf_resp)
+        # Datos Paciente Recolectados (Son los datos de entrada para ser procesados).
+        edad: int = opcion_edad
+        apache: int = opcion_apache
+        diagn1: int = key_categ("diag", opcion_diagn1)
+        diagn2: int = key_categ("diag", opcion_diagn2)
+        diagn3: int = key_categ("diag", opcion_diagn3)
+        diagn4: int = key_categ("diag", opcion_diagn4)
+        tipo_vam: int = key_categ("va", opcion_tipo_vam)
+        tiempo_vam: int = opcion_tiempo_vam
+        estadia_uti: int = opcion_estad_uti
+        estadia_preuti: int = opcion_estad_preuti
+        insuf_resp: int = key_categ("insuf", opcion_insuf_resp)
 
     # Mostrar Datos Paciente
     mostrar_datos: bool = st.expander("Mostrar datos del paciente", expanded=False)
@@ -119,7 +124,8 @@ with simulacion_tab:
 
     boton_comenzar = st.button("Comenzar Simulación", type="primary", use_container_width=True)
     corridas_sim = st.number_input("Corridas de la Simulación", min_value=CORRIDAS_SIM_MIN,
-                                   max_value=CORRIDAS_SIM_MAX, value=CORRIDAS_SIM_DEFAULT, help=HELP_MSG_CORRIDA_SIM)
+                                   max_value=CORRIDAS_SIM_MAX, value=CORRIDAS_SIM_DEFAULT,
+                                   help=HELP_MSG_CORRIDA_SIM)
     # Visualizar DataFrame con resultado de la simulación para este paciente.
     if not st.session_state.df_resultado.empty:
         toggle_fmt = st.toggle("Tabla con formato", value=True)
@@ -179,47 +185,59 @@ with comparaciones_tab:
     with comparaciones_wilcoxon:
         st.header("Prueba de Wilcoxon")
 
-
-        # TEXTO = "La *prueba de Wilcoxon* se usa para comparar dos grupos de datos relacionados \
-        # y ver si hay diferencias significativas entre ellos. Útil cuando los datos no siguen \
-        # una distribución normal."
-        # st.markdown(TEXTO)
-
         # Considerando que los datos reales forman parte de una base de datos.
         # En la etapa actual, dicha base de datos está en formato .csv, que queda a despensas de un
         # futuro a implementar como una base de datos SQL o No SQL; incierto ahora mismo.
 
-        def init_real_data() -> pd.DataFrame:
-            # Brinda un DataFrame con datos reales de la base de datos y con un formato para mostrar.
-
-            real_data = pd.DataFrame(get_real_data(), index=VARIABLES_EXPERIMENTO, columns=["Valor"])
-            real_data.index.name = "Datos"
-            return real_data
-
-
-        r_data: pd.DataFrame = init_real_data()
+        data = pd.read_csv(RUTA_CSV_DATOS2)
         CAPTION_MSG_REAL_DATA: str = "Datos reales obtenidos de la Base de Datos"
 
         experimento: UploadedFile
-        df_experimento: DataFrame = pd.DataFrame()
+        df_experimento_sim: DataFrame = pd.DataFrame()
+        df_experimento_real: DataFrame = pd.DataFrame()
 
-        toggle_if_with_simulation_data = st.toggle("Realizar con datos de simulación", value=True)
-        if toggle_if_with_simulation_data:
+        toggle_if_simulation_with_data = st.toggle("Realizar con datos de simulación", value=True)
+        seleccion_fila = st.number_input("Selecciona una fila", min_value=1, max_value=data.shape[0] - 1, value=1)
+
+        r_data: tuple = get_real_data(RUTA_CSV_DATOS2, fila_seleccion=seleccion_fila)
+
+        st.caption("Datos seleccionados")
+        st.dataframe(data.iloc[[seleccion_fila]])
+
+        if toggle_if_simulation_with_data:
             if not st.session_state.df_resultado.empty:
-                df_experimento = st.session_state.df_resultado
+                df_experimento_sim = st.session_state.df_resultado
                 with st.container():
                     col1_wilcoxon, col2_wilcoxon = st.columns(2)
                     with col1_wilcoxon:
                         st.caption(CAPTION_MSG_REAL_DATA)
-                        st.dataframe(r_data, use_container_width=True, height=200)
+                        e = start_experiment(
+                            corridas_sim,
+                            edad=r_data[0],
+                            d1=r_data[1],
+                            d2=r_data[2],
+                            d3=r_data[3],
+                            d4=r_data[4],
+                            apache=r_data[5],
+                            insuf_resp=r_data[6],
+                            va=r_data[7],
+                            t_vam=r_data[8],
+                            est_uti=r_data[9],
+                            est_preuti=r_data[10],
+                            porciento=porciento
+                        )
+                        df_experimento_real = e.mean()
+                        st.dataframe(df_experimento_real, use_container_width=True)
+                        st.write(f"Cantidad de filas {df_experimento_real.shape[0]}")
                     with col2_wilcoxon:
                         st.caption("Media de datos resultantes de la Simulación")
-                        df_promedio = pd.DataFrame(st.session_state.df_resultado.mean(), columns=["Valor"])
-                        df_promedio.index.name = "Datos"
-                        st.dataframe(df_promedio, use_container_width=True, height=200)
+                        df_experimento_sim = pd.DataFrame(df_experimento_sim.mean(), columns=["Valor"])
+                        df_experimento_sim.index.name = "Datos"
+                        st.dataframe(df_experimento_sim, use_container_width=True)
+                        st.write(f"Cantidad de filas {df_experimento_sim.shape[0]}")
             else:
                 st.error("No se ha realizado ninguna simulación hasta el momento. \
-                Diríjase al apartado \"Simulación\".")
+            Diríjase al apartado \"Simulación\".")
         else:
             # Escoger un archivo donde estén datos de simulación de un paciente.
             col1_r_data, col2_file_upl = st.columns(2)
@@ -229,19 +247,17 @@ with comparaciones_tab:
             with col2_file_upl:
                 experimento = st.file_uploader("Datos de resultado de Simulación")
                 if experimento:
-                    df_experimento = bin_to_df(experimento)
-                    if not df_experimento.empty:
-                        st.dataframe(df_experimento, height=200)
+                    df_experimento_sim = bin_to_df(experimento)
+                    if not df_experimento_sim.empty:
+                        st.dataframe(df_experimento_sim, height=200)
 
         # Selección de columna para comparación
-        opcion_columna_comparacion = st.selectbox("Escoja una columna para la comparación", VARIABLES_EXPERIMENTO,
-                                                  key=1)
+        opcion_columna_comparacion = st.selectbox("Escoja una columna para comparar", VARIABLES_EXPERIMENTO, key=1)
         boton_comparacion = st.button("Realizar prueba", type="primary", use_container_width=True, key=2)
         if boton_comparacion:
-            if not df_experimento.empty:
-                x: DataFrame = r_data[opcion_columna_comparacion]
-                y: DataFrame = df_experimento[opcion_columna_comparacion]
-                wilcoxon_data = (x, y)
+            if not df_experimento_sim.empty:
+                x: DataFrame = df_experimento_real[opcion_columna_comparacion]
+                y: DataFrame = df_experimento_sim.loc[opcion_columna_comparacion]
                 resultado = wilcoxon(x, y)
                 st.write(resultado)
             else:
@@ -280,8 +296,7 @@ with comparaciones_tab:
                     st.warning("No se han cargado datos del experimento 2 aún.")
 
         # Selección de columna para comparación
-        opcion_columna_comparacion = st.selectbox("Escoja una columna para la comparación", VARIABLES_EXPERIMENTO,
-                                                  key=3)
+        opcion_columna_comparacion = st.selectbox("Escoja una columna para comparar", VARIABLES_EXPERIMENTO, key=3)
         boton_comparacion = st.button("Realizar prueba", type="primary", use_container_width=True, key=4)
 
         # Comparación
@@ -294,7 +309,7 @@ with comparaciones_tab:
                     len_dif = abs(len(x) - len(y))
                     len_warning_msg = lambda \
                             exp: f"Se eliminaron filas del experimento {exp} para coincidir \
-                            con el experimento {2 if exp == 1 else 1} ({len_dif} filas diferentes)."
+                        con el experimento {2 if exp == 1 else 1} ({len_dif} filas diferentes)."
                     if x.shape[0] > y.shape[0]:  # La cantidad de filas de x, excede las de y.
                         x = x.head(y.shape[0])
                         st.warning(len_warning_msg(1))
@@ -306,12 +321,12 @@ with comparaciones_tab:
                     st.write(resultado)
                 else:
                     st.error("Imposible realizar prueba de Wilcoxon cuando la diferencia entre los \
-                    elementos de \"x\" y \"y\" es cero para todos los elementos.")
+                elementos de \"x\" y \"y\" es cero para todos los elementos.")
             else:
                 st.warning("No se puede realizar la comparación. \
-                Se detectan datos vacíos o falta de datos en los experimentos.")
+            Se detectan datos vacíos o falta de datos en los experimentos.")
 
 with db_tab:
     st.markdown("Este es el conjunto de datos que se utilizan para realizar las pruebas de comparaciones.\
-                Son datos que han sido recopilados de pacientes reales en estudios anteriores realizados.")
+            Son datos que han sido recopilados de pacientes reales en estudios anteriores realizados.")
     st.dataframe(pd.read_csv(RUTA_CSV_DATOS2))
