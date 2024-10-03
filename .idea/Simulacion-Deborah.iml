@@ -3,12 +3,10 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/entities" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/st_app" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/uci" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/utils" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/entities" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/streamlit" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/entities" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.vscode" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.11" jdkType="Python SDK" />
