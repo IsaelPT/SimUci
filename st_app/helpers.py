@@ -118,7 +118,7 @@ def format_df(datos: DataFrame, enhance_format: bool = False, data_at_beginning:
     def build_labels_helper():
         res.insert(0, LABEL_INF, "")
         for index, label in enumerate(n_datos_labels):
-            print(index, ":", label)
+            # print(index, ":", label)
             if data_at_beginning:
                 res.loc[index, LABEL_INF] = label
             else:
