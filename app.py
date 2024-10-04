@@ -6,8 +6,8 @@ from pandas.io.formats.style import Styler
 from scipy.stats import wilcoxon
 
 from constants import *
+from experiment import *
 from helpers import *
-from uci.experiment import *
 
 
 #### FUNCTIONS
