@@ -189,7 +189,7 @@ with comparaciones_tab:
         # En la etapa actual, dicha base de datos está en formato .csv, que queda a despensas de un
         # futuro a implementar como una base de datos SQL o No SQL; incierto ahora mismo.
 
-        data = pd.read_csv(RUTA_CSV_DATOS2)
+        data = pd.read_csv(RUTA_FICHERODEDATOS_CSV)
         CAPTION_MSG_REAL_DATA: str = "Datos reales obtenidos de la Base de Datos"
 
         experimento: UploadedFile
@@ -199,7 +199,7 @@ with comparaciones_tab:
         toggle_if_simulation_with_data = st.toggle("Realizar con datos de simulación", value=True)
         seleccion_fila = st.number_input("Selecciona una fila", min_value=1, max_value=data.shape[0] - 1, value=1)
 
-        r_data: tuple = get_real_data(RUTA_CSV_DATOS2, fila_seleccion=seleccion_fila)
+        r_data: tuple = get_real_data(RUTA_FICHERODEDATOS_CSV, fila_seleccion=seleccion_fila)
 
         st.caption("Datos seleccionados")
         st.dataframe(data.iloc[[seleccion_fila]])
@@ -329,4 +329,4 @@ with comparaciones_tab:
 with db_tab:
     st.markdown("Este es el conjunto de datos que se utilizan para realizar las pruebas de comparaciones.\
             Son datos que han sido recopilados de pacientes reales en estudios anteriores realizados.")
-    st.dataframe(pd.read_csv(RUTA_CSV_DATOS2))
+    st.dataframe(pd.read_csv(RUTA_FICHERODEDATOS_CSV))

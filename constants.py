@@ -104,7 +104,8 @@ VARIABLES_EXPERIMENTO: list[str] = ["Tiempo Pre VAM", "Tiempo VAM", "Tiempo Post
                                     "Estadia Post UCI"]
 
 try:
-    RUTA_CSV_DATOS1 = os.path.join("data", "datos.csv")
-    RUTA_CSV_DATOS2 = os.path.join("data", "Ficherodedatos(MO)17-1-2023.csv")
+    RUTA_DATOS_CSV = os.path.join("data", "datos.csv")
+    RUTA_FICHERODEDATOS_CSV = os.path.join("data", "Ficherodedatos(MO)17-1-2023.csv")
+    RUTA_DFCENTROIDES_CSV = os.path.join("data", "DF_Centroides.csv")
 except Exception as e:
     print(f"Error al cargar el archivo la base de datos.\n>>>\nExcepcion\n>>>{e}")

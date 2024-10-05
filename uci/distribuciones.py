@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import scipy.stats as stats
 
+from constants import RUTA_DFCENTROIDES_CSV
+
 
 # Distribuciones para las variables del cluster 0
 def tiemp_VAM0():
@@ -68,7 +70,7 @@ def clustering(Edad, Diag_Ing1, Diag_Ing2, Diag_Ing3, Diag_Ing4, APACHE, InsufRe
     else:
         vag = 1
 
-    df_centroid = pd.read_csv("data\\DF_Centroides.csv")
+    df_centroid = pd.read_csv(RUTA_DFCENTROIDES_CSV)
     nueva_instancia = np.array([Edad, Diag_Ing1, Diag_Ing2, Diag_Ing3,  #
                                 Diag_Ing4, APACHE, InsufResp, VA, vag,
                                 EstadiaUTI, TiempoVAM, Est_PreUCI])
