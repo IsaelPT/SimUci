@@ -1,5 +1,7 @@
 ## Number Input
 # Edad
+import os.path
+
 EDAD_MIN = 13
 EDAD_MAX = 100
 EDAD_DEFAULT = EDAD_MIN
@@ -98,7 +100,11 @@ INSUF_RESP: dict[int, str] = {
 
 # VARIABLES_EXPERIMENTO: list[str] = ["Llegada UCI", "Tiempo Pre VAM", "Comienzo VAM", "Tiempo VAM", "Salida VAM",
 #                                     "Tiempo Post VAM", "Salida UCI", "Estadia UCI", "Estadia Post UCI", "Egreso"]
-VARIABLES_EXPERIMENTO: list[str] = ["Tiempo Pre VAM", "Tiempo VAM", "Tiempo Post VAM", "Estadia UCI", "Estadia Post UCI"]
+VARIABLES_EXPERIMENTO: list[str] = ["Tiempo Pre VAM", "Tiempo VAM", "Tiempo Post VAM", "Estadia UCI",
+                                    "Estadia Post UCI"]
 
-RUTA_CSV_DATOS1 = "data\\datos.csv"
-RUTA_CSV_DATOS2 = "data\\Ficherodedatos(MO)17-1-2023.csv"
+try:
+    RUTA_CSV_DATOS1 = os.path.join("data", "datos.csv")
+    RUTA_CSV_DATOS2 = os.path.join("data", "Ficherodedatos(MO)17-1-2023.csv")
+except Exception as e:
+    print(f"Error al cargar el archivo la base de datos.\n>>>\nExcepcion\n>>>{e}")
