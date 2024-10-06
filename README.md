@@ -77,4 +77,5 @@ Este proyecto se realiza en Python como lenguaje de programación principal. En 
 - **Git**: Sistema de control de versiones distribuido que permite gestionar el código fuente de una aplicación y su historial de cambios.
 
 ## Imágenes
-![Captura de Pantalla de la página local](imgs/screenshots/screenshot_streamlit_local_21_9_2024.png)
+![Captura de Pantalla de la página local](imgs/screenshots/screenshot_streamlit_local_5_10_2024_1.png)
+![Captura de Pantalla de la página local](imgs/screenshots/screenshot_streamlit_local_5_10_2024_2.png)
