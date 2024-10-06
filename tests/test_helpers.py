@@ -5,9 +5,7 @@ from helpers import *
 
 
 class MyTestCase(unittest.TestCase):
-    """
-    Clase para testeo de funciones helpers.
-    """
+    """Clase para testeo de funciones helpers."""
 
     def test_key_categ(self):
         self.assertEqual(key_categ("va", "Tubo endotraqueal"), 0)
