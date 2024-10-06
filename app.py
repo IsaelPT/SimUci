@@ -1,4 +1,3 @@
-import os.path
 from datetime import datetime
 
 import streamlit as st
@@ -188,7 +187,6 @@ with comparaciones_tab:
         # Considerando que los datos reales forman parte de una base de datos.
         # En la etapa actual, dicha base de datos está en formato .csv, que queda a despensas de un
         # futuro a implementar como una base de datos SQL o No SQL; incierto ahora mismo.
-
         data = pd.read_csv(RUTA_FICHERODEDATOS_CSV)
         CAPTION_MSG_REAL_DATA: str = "Datos reales obtenidos de la Base de Datos"
 
