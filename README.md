@@ -1,4 +1,42 @@
-# Aplicación para la simulación de la evolución pos-egreso para pacientes ventilados en Cuidados Intensivos
+# Requisitos e Instalación
+Los requisitos mínimos son Python v3.9 o superior.
+En la ruta raíz del proyecto existe un archivo `requirements.txt` con las dependencias básicas de Frameworks que necesita el proyecto para su funcionamiento.
+Hasta el momento:
+- Streamlit
+- Scipy
+- Simpy
+
+Y otras bibliotecas como:
+- Numpy
+- Pandas
+
+## Despliegue
+Este proyecto está desplegado hasta la fecha en Streamlit Community Cloud en la siguiente dirección.
+- https://simuci.streamlit.app/
+
+## **Aclaración muy importante**
+Para los usuarios cubanos, es IMPERATIVO el uso de VPN para el acceso a la aplicación, debido a diversas políticas que ostenta Streamlit.
+
+## Recomendaciones
+El uso de versiones recientes de Pycharm para la ejecución del proyecto vía IDE, debido a la facilidad de este para el manejo de rutas y facilidades con el intérprete: Configuración de Estructura en directorio `.idea` que brinda comodidades para que el intérprete de Python reconozca los paquetes y módulos.
+
+## Corrida de la aplicación vía Script.
+
+Para correr la aplicación de manera local se utiliza el comando
+
+```commandline
+streamlit run app.py
+```
+
+- Siendo `app.py` el módulo que gestiona la interfaz gráfica y llama funciones de los controladores de datos en el backend.
+
+*El comando debe ejecutarse desde la raíz del proyecto.*
+
+___
+
+# Información sobre el Proyecto
+
+## Aplicación para la simulación de la evolución pos-egreso para pacientes ventilados en Cuidados Intensivos
 
 ## Introducción
 La simulación de eventos de la vida real permite realizar predicciones estadísticas que son cruciales para mejorar la toma de decisiones en el ámbito de la salud. En unidades de cuidados intensivos, este enfoque proporciona al personal médico una herramienta poderosa para comprender mejor las variables que afectan el pronóstico de los pacientes, optimizando así la atención y los recursos disponibles.
