@@ -98,8 +98,6 @@ INSUF_RESP: dict[int, str] = {
     5: "Causas extrapulmonares"
 }
 
-# VARIABLES_EXPERIMENTO: list[str] = ["Llegada UCI", "Tiempo Pre VAM", "Comienzo VAM", "Tiempo VAM", "Salida VAM",
-#                                     "Tiempo Post VAM", "Salida UCI", "Estadia UCI", "Estadia Post UCI", "Egreso"]
 VARIABLES_EXPERIMENTO: list[str] = ["Tiempo Pre VAM", "Tiempo VAM", "Tiempo Post VAM", "Estadia UCI",
                                     "Estadia Post UCI"]
 
