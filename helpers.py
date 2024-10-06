@@ -185,15 +185,11 @@ def get_real_data(path_datos: str, fila_seleccion):
     apache: int = int(pick["APACHE"].iloc[0])
     insuf_resp: int = int(pick["InsufResp"].iloc[0])
     va: int = int(pick["VA"].iloc[0])  # horas
-    estadia_uti: int = to_hours(int(pick["DíasUTI"].iloc[0]))  # días -> horas
+    estadia_uti: int = int(pick["DíasUTI"].iloc[0] * 24)  # días -> horas
     tiempo_vam: int = int(pick["TiempoVAM"].iloc[0])  # horas
-    tiempo_estad_pre_uti: int = to_hours(int(pick["Est. PreUCI"].iloc[0]))  # días -> horas
+    tiempo_estad_pre_uti: int = int(pick["Est. PreUCI"].iloc[0] * 24)  # días -> horas
 
     return edad, d1, d2, d3, d4, apache, insuf_resp, va, estadia_uti, tiempo_vam, tiempo_estad_pre_uti
-
-
-def to_hours(days: int) -> int:
-    return int(days * 24)
 
 
 def start_experiment(
