@@ -43,7 +43,7 @@ ___
 ## Introducción
 La simulación de eventos de la vida real permite realizar predicciones estadísticas que son cruciales para mejorar la toma de decisiones en el ámbito de la salud. En unidades de cuidados intensivos, este enfoque proporciona al personal médico una herramienta poderosa para comprender mejor las variables que afectan el pronóstico de los pacientes, optimizando así la atención y los recursos disponibles.
 
-## Descripción situación problmémica
+## Descripción situación problémica
 La dificultad para predecir con precisión el tiempo de estancia en la Unidad de Cuidados Intensivos (UCI) de los pacientes que requieren ventilación artificial, así como su posterior pronóstico de supervivencia o alta hospitalaria, ocasiona un nivel de incertidumbre que afecta la planificación y gestión de recursos dentro de la UCI, además de complicar la toma de decisiones clínicas.
 
 ## Objetivo general
