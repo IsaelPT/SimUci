@@ -108,11 +108,11 @@ with simulacion_tab:
         if not value_is_zero([diagn1, diagn2, diagn3, diagn4]):  # Diagnósticos OK?
             diag_ok = True
         else:
-            st.warning(f"Todos los campos de diagnósticos no pueden ser 0 o Vacío.")
+            st.warning(f"Todos los diagnósticos están vacíos. Mínimo incluya un diagnóstico para la simulación.")
         if not value_is_zero(insuf_resp):  # Insuficiencia Respiratoria OK?
             insuf_ok = True
         else:
-            st.warning(f"Se debe seleccionar un tipo de insuficiencia respiratoria.")
+            st.warning(f"Seleccione un tipo de Insuficiencia Respiratoria.")
 
         # Desarrollo de Simulación.
         if diag_ok and insuf_ok:
