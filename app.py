@@ -55,10 +55,10 @@ with simulacion_tab:
                                                    max_value=ESTAD_PREUTI_MAX, value=ESTAD_PREUTI_DEFAULT,
                                                    help=HELP_MSG_ESTAD_PREUTI)
     with col3_paciente:
-        opcion_diagn1: str = st.selectbox("Diagnóstico 1", tuple(DIAG_PREUCI.values()), index=1)
-        opcion_diagn2: str = st.selectbox("Diagnóstico 2", tuple(DIAG_PREUCI.values()), index=1)
-        opcion_diagn3: str = st.selectbox("Diagnóstico 3", tuple(DIAG_PREUCI.values()), index=1)
-        opcion_diagn4: str = st.selectbox("Diagnóstico 4", tuple(DIAG_PREUCI.values()), index=1)
+        opcion_diagn1: str = st.selectbox("Diagnóstico 1", tuple(DIAG_PREUCI.values()), index=0)
+        opcion_diagn2: str = st.selectbox("Diagnóstico 2", tuple(DIAG_PREUCI.values()), index=0)
+        opcion_diagn3: str = st.selectbox("Diagnóstico 3", tuple(DIAG_PREUCI.values()), index=0)
+        opcion_diagn4: str = st.selectbox("Diagnóstico 4", tuple(DIAG_PREUCI.values()), index=0)
 
         # Datos Paciente Recolectados (Son los datos de entrada para ser procesados).
         edad: int = opcion_edad
