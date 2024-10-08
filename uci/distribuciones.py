@@ -62,18 +62,17 @@ def estad_UTI1():
 
 
 # Seleccion de cluster
-def clustering(Edad, Diag_Ing1, Diag_Ing2, Diag_Ing3, Diag_Ing4, APACHE, InsufResp, VA, EstadiaUTI, TiempoVAM,
-               Est_PreUCI):
-    vag = 0
-    if VA == 3 or VA == 2:
-        vag = 2
-    else:
-        vag = 1
+def clustering(Edad, Diag_Ing1, Diag_Ing2, Diag_Ing3, Diag_Ing4,
+               APACHE, InsufResp, va, EstadiaUTI, TiempoVAM, Est_PreUCI):
+    va_g = 1
+    if va == 2 or va == 3:
+        va_g = 2
 
     df_centroid = pd.read_csv(RUTA_DFCENTROIDES_CSV)
-    nueva_instancia = np.array([Edad, Diag_Ing1, Diag_Ing2, Diag_Ing3,  #
-                                Diag_Ing4, APACHE, InsufResp, VA, vag,
+    nueva_instancia = np.array([Edad, Diag_Ing1, Diag_Ing2, Diag_Ing3,
+                                Diag_Ing4, APACHE, InsufResp, va, va_g,
                                 EstadiaUTI, TiempoVAM, Est_PreUCI])
     distancias = np.linalg.norm(df_centroid.iloc[:, 0:12] - nueva_instancia)
     cluster_predicho = np.argmin(distancias)
+
     return cluster_predicho
