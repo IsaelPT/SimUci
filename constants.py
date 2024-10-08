@@ -41,7 +41,7 @@ HELP_MSG_APACHE: str = "Valor del APACHE."
 HELP_MSG_ESTAD_UTI: str = "Tiempo de estadía en UTI."
 HELP_MSG_ESTAD_PREUTI: str = "Tiempo de estadía pre UTI"
 HELP_MSG_CORRIDA_SIM: str = "La cantidad de corridas de la simulación brinda un mayor margen de precisión."
-HELP_MSG_PORCIENTO_SIM: str = "Proporción de tiempo dentro de estancia UCI que se espera antes de estar en Ventilación."
+HELP_MSG_PORCIENTO_SIM: str = "Proporción de tiempo dentro de estancia UCI que se espera antes de entrar en Ventilación."
 
 TIPO_VENT: dict[int, str] = {0: "Tubo endotraqueal", 1: "Traqueostomía", 2: "Ambas"}
 
