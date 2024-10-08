@@ -10,7 +10,7 @@ from experiment import Experiment, multiple_replication
 
 def key_categ(categoria: str, valor: str | int, viceversa: bool = False) -> int | str:
     """
-    Obtiene la llave (key, k) que constituye un valor si está presente en la colección de categorías definidas.
+    Obtiene la llave (key, k) que constituye un valor si está presente en la colección de categorías definidas en constants.py.
 
     Args:
         categoria: Las categorías deben ser entre "va", "diag" e "insuf".
