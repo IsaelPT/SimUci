@@ -236,8 +236,7 @@ with comparaciones_tab:
                     samples_selection = uneven_sample_fix_tuple[0]
                     min_len = uneven_sample_fix_tuple[1]
                     if min_len != -1:
-                        st.warning(f"Se eliminaron filas de las tablas de los experimentos para realizar el examen, \
-                        debido a que no todas tenían la misma cantidad. \
+                        st.warning(f"Se eliminaron filas de las tablas de los experimentos para realizar el examen. \
                         Todas las tablas pasaron a tener {min_len} filas.")
 
                     # Test de Friedman
