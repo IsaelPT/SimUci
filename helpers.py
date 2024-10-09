@@ -1,6 +1,9 @@
 import secrets
+from typing import List, Tuple
 
+import numpy as np
 import pandas as pd
+import streamlit as st
 from pandas import DataFrame
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
@@ -147,18 +150,21 @@ def format_df(datos: DataFrame, enhance_format: bool = False, data_at_beginning:
     return res
 
 
-def bin_to_df(bin_file: UploadedFile) -> DataFrame:
+def bin_to_df(files: UploadedFile | list[UploadedFile]) -> DataFrame | list[DataFrame]:
     """
     Convierte un UploadedFile (un archivo cargado por un file_uploader) en un DataFrame.
 
     Args:
-        bin_file: Archivo binario cargado por un file_uploader.
+        files: Archivo o archivos binarios cargados por un file_uploader.
 
     Returns:
-        Ese archivo (debe ser `.csv`) como un DataFrame.
+        Archivo o archivos de tipo `.csv` como un DataFrame o lista de DataFrames.
     """
 
-    return pd.read_csv(bin_file)
+    if isinstance(files, UploadedFile):
+        return pd.read_csv(files)
+    elif isinstance(files, list):
+        return [pd.read_csv(f) for f in files]
 
 
 def get_real_data(path_datos: str, fila_seleccion):
@@ -172,6 +178,7 @@ def get_real_data(path_datos: str, fila_seleccion):
     Returns:
         edad, apache, diag1, diag2, diag3, diag4, insuf_resp, tipo_va, estadia_uti, tiempo_vam, tiempo_estad_pre_uti
     """
+
     data = pd.read_csv(path_datos)
 
     # Selección por índice
@@ -192,24 +199,70 @@ def get_real_data(path_datos: str, fila_seleccion):
     return edad, d1, d2, d3, d4, apache, insuf_resp, va, estadia_uti, tiempo_vam, tiempo_estad_pre_uti
 
 
-def start_experiment(
-        corridas_simulacion: int,
-        edad: int,
-        d1: int,
-        d2: int,
-        d3: int,
-        d4: int,
-        apache: int,
-        insuf_resp: int,
-        va: int,  # tipo de ventilación artificial
-        t_vam: int,
-        est_uti: int,
-        est_preuti: int,
-        porciento: int = 10
-) -> pd.DataFrame:
+def start_experiment(corridas_simulacion: int, edad: int, d1: int, d2: int, d3: int, d4: int, apache: int,
+                     insuf_resp: int, va: int, t_vam: int, est_uti: int, est_preuti: int, porciento: int = 10
+                     ) -> pd.DataFrame:
+    """
+    Toma una serie de datos de un paciente y con ellos comienza la simulación.
+
+    Args:
+        corridas_simulacion: Cantidad de iteraciones que tendrá la simulación.
+        edad: Edad del paciente.
+        d1: Diagnóstico 1 del paciente.
+        d2: Diagnóstico 2 del paciente.
+        d3: Diagnóstico 3 del paciente.
+        d4: Diagnóstico 4 del paciente.
+        apache: Valor del APACHE.
+        insuf_resp: Tipo de Insuficiencia Respiratoria que presenta el paciente.
+        va: Tiempo de Ventilación Artificial que se espera del paciente.
+        t_vam: Tipo de Ventilación que presenta el paciente.
+        est_uti: Estadía en UTI que se espera del paciente.
+        est_preuti: Estadía Pre-UTI que presenta el paciente.
+        porciento: "Proporción de tiempo dentro de estancia UCI que se espera antes de entrar en Ventilación."
+
+    Returns:
+        Un DataFrame con el resultado de la simulación.
+    """
+
     e = Experiment(edad=edad, diagnostico_ingreso1=d1, diagnostico_ingreso2=d2, diagnostico_ingreso3=d3,
                    diagnostico_ingreso4=d4, apache=apache, insuficiencia_respiratoria=insuf_resp,
                    ventilacion_artificial=va, estadia_uti=est_uti, tiempo_vam=t_vam, tiempo_estadia_pre_uti=est_preuti,
                    porciento=porciento)
     res = multiple_replication(e, corridas_simulacion)
     return res
+
+
+def fix_uneven(dataframes: List[DataFrame]) -> Tuple[List[DataFrame], int]:
+    df_sizes = [df.shape[0] for df in dataframes]
+    if df_sizes != int(np.mean(df_sizes)):
+        min_len = min(df_sizes)
+        return [df.head(min_len) for df in dataframes], min_len
+    return dataframes, -1
+
+
+def build_df_test_result(statistics: float, p_value: float) -> DataFrame:
+    S = "Statistics"
+    P = "Valor de P"
+    data = {
+        S: [statistics],
+        P: [p_value]
+    }
+    df = pd.DataFrame(data)
+    return df
+
+
+def colm_template(columns_names: list[str], width=None, help_msg=None, disabled=True):
+    def __CONFIG_COLUMN_TEMPLATE(col_name) -> st.column_config.Column:
+        return st.column_config.Column(
+            label=col_name,
+            width=width,
+            help=help_msg,
+            disabled=disabled,
+        )
+
+    return {col_name: __CONFIG_COLUMN_TEMPLATE(col_name) for col_name in columns_names}
+    # column_config = {
+    #     "Statistics": __CONFIG_COLUMN_TEMPLATE("Statistics", ),
+    #     "Valor de P": __CONFIG_COLUMN_TEMPLATE("Valor de P")
+    # }
+    # return column_config
