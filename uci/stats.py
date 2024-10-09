@@ -1,20 +1,26 @@
-from scipy.stats import wilcoxon, friedmanchisquare
-from scipy import stats
 import numpy as np
+from scipy.stats import wilcoxon, friedmanchisquare, norm
 
 
-class Stats:
-    @staticmethod
-    def wilcoxon(x, y) -> tuple:
-        res = wilcoxon(x=x, y=y)
+class Wilcoxon:
+    def __init__(self, x, y):
+        self.sample1 = x,
+        self.sample2 = y
+
+    def wilcoxon_test(self) -> tuple:
+        res = wilcoxon(self.sample1, self.sample2)
         return res
 
-    @staticmethod
-    def friedman(*samples) -> tuple:
-        res = friedmanchisquare(samples)
+
+class Friedman:
+    def __init__(self, *samples):
+        self.samples = [*samples]
+
+    def friedman_test(self) -> tuple[float, float]:
+        res = friedmanchisquare(self.samples)
         return res
 
-    @staticmethod
-    def confidenceinterval(mean, std, n):
-        conf_int = stats.norm.interval(0.95, loc=mean, scale=std/np.sqrt(n))
-        return conf_int
+
+def confidenceinterval(mean, std, n):
+    conf_int = norm.interval(0.95, loc=mean, scale=std / np.sqrt(n))
+    return conf_int
