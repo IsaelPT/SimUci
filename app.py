@@ -1,7 +1,6 @@
 from datetime import datetime
 
-import streamlit as st
-from scipy.stats import wilcoxon
+from scipy.stats import wilcoxon, friedmanchisquare
 
 from constants import *
 from experiment import *
@@ -31,8 +30,6 @@ with simulacion_tab:
         st.session_state.id_paciente = st.text_input(label="ID Paciente", value=st.session_state.id_paciente,
                                                      max_chars=10, placeholder="ID Paciente",
                                                      label_visibility="collapsed")
-    # with col3_nuevo_paciente:
-    #     usar_score: bool = st.toggle("Utilizar Score pronóstico")
 
     # Ingresar Datos Paciente
     col1_paciente, col2_paciente, col3_paciente = st.columns(3)
@@ -117,10 +114,6 @@ with simulacion_tab:
         # Desarrollo de Simulación.
         if diag_ok and insuf_ok:
             try:
-                # experiment = Experiment(edad, diagn1, diagn2, diagn3, diagn4, apache, insuf_resp,
-                #                         insuf_resp, estadia_uti, tiempo_vam, estadia_preuti, porciento)
-                # resultado_experimento = multiple_replication(experiment, corridas_sim)
-
                 # Experimento / Simulación.
                 resultado_experimento = start_experiment(corridas_sim, edad, diagn1, diagn2, diagn3, diagn4, apache,
                                                          insuf_resp, insuf_resp, estadia_uti, tiempo_vam,
@@ -152,101 +145,112 @@ with comparaciones_tab:
     with comparacion_wilcoxon:
         st.header("Prueba de Wilcoxon")
 
-        experimento1: UploadedFile
-        experimento2: UploadedFile
-        df_experimento1: DataFrame = pd.DataFrame()
-        df_experimento2: DataFrame = pd.DataFrame()
+        file_upl1: UploadedFile
+        file_upl2: UploadedFile
+        df_experimento1 = pd.DataFrame()
+        df_experimento2 = pd.DataFrame()
 
         # Subir datos con File Uploader.
         col1_file_upl, col2_file_upl = st.columns(2)
         with col1_file_upl:
-            experimento1 = st.file_uploader("Resultado Experimento 1")
-            if experimento1:
-                df_experimento1 = bin_to_df(experimento1)
-                if not df_experimento1.empty:
-                    st.dataframe(df_experimento1, height=200)
-                    st.write(f"Cantidad de Filas: {df_experimento1.shape[0]}")
-                else:
+            file_upl1 = st.file_uploader(label="Resultado Experimento 1", type=[".csv"])
+            if file_upl1:
+                df_experimento1 = bin_to_df(file_upl1)
+                if df_experimento1.empty:
                     st.warning("No se han cargado datos del experimento 1 aún.")
-        with col2_file_upl:
-            experimento2 = st.file_uploader("Resultado Experimento 2")
-            if experimento2:
-                df_experimento2 = bin_to_df(experimento2)
-                if not df_experimento2.empty:
-                    st.dataframe(df_experimento2, height=200)
-                    st.write(f"Cantidad de Filas: {df_experimento2.shape[0]}")
                 else:
+                    st.dataframe(df_experimento1, height=200, hide_index=True)
+        with col2_file_upl:
+            file_upl2 = st.file_uploader(label="Resultado Experimento 2", type=[".csv"])
+            if file_upl2:
+                df_experimento2 = bin_to_df(file_upl2)
+                if df_experimento2.empty:
                     st.warning("No se han cargado datos del experimento 2 aún.")
+                else:
+                    st.dataframe(df_experimento2, height=200, hide_index=True)
 
         # Selección de columna para comparación
-        opcion_columna_comparacion = st.selectbox("Escoja una columna para comparar", VARIABLES_EXPERIMENTO, key=3)
-        boton_comparacion = st.button("Realizar prueba", type="primary", use_container_width=True, key=4)
+        opcion_col_comparacion = st.selectbox("Escoja una columna para comparar", VARIABLES_EXPERIMENTO, key=1)
+        boton_comparacion = st.button("Realizar prueba de Wilcoxon", type="primary", use_container_width=True, key=2)
 
         # Comparación
-        if boton_comparacion:
-            if not df_experimento1.empty and not df_experimento2.empty:
-                x: DataFrame = df_experimento1[opcion_columna_comparacion]
-                y: DataFrame = df_experimento2[opcion_columna_comparacion]
-                if not x.equals(y):
-                    # Verificar que ambos dataframes tengan la misma cantidad de filas para realizar Wilcoxon.
-                    len_dif = abs(len(x) - len(y))
-                    len_warning_msg = lambda \
-                            exp: f"Se eliminaron filas del experimento {exp} para coincidir \
-                        con el experimento {2 if exp == 1 else 1} ({len_dif} filas diferentes)."
-                    if x.shape[0] > y.shape[0]:  # La cantidad de filas de x, excede las de y.
-                        x = x.head(y.shape[0])
-                        st.warning(len_warning_msg(1))
-                    elif y.shape[0] > x.shape[0]:  # La cantidad de filas de y, excede las de x.
-                        y = y.head(x.shape[0])
-                        st.warning(len_warning_msg(2))
-                    wilcoxon_data = (x, y)
-                    resultado = wilcoxon(x, y)
-                    st.write(resultado)
+        with st.container():
+            if boton_comparacion:
+                if df_experimento1.empty or df_experimento2.empty:
+                    st.warning("No se puede realizar la comparación. \
+                    Se detectan datos vacíos o falta de datos en los experimentos.")
                 else:
-                    st.error("Imposible realizar prueba de Wilcoxon cuando la diferencia entre los \
-                elementos de \"x\" y \"y\" es cero para todos los elementos.")
-            else:
-                st.warning("No se puede realizar la comparación. \
-            Se detectan datos vacíos o falta de datos en los experimentos.")
+                    x: DataFrame = df_experimento1[opcion_col_comparacion]
+                    y: DataFrame = df_experimento2[opcion_col_comparacion]
+                    if x.equals(y):
+                        st.error("Imposible realizar prueba de Wilcoxon cuando la diferencia entre los elementos \
+                        de \"x\" y \"y\" es cero para todos los elementos. Verifique que no cargó el mismo \
+                        experimento dos veces.")
+                    else:
+                        # Corrección de que existen la misma cantidad de filas en ambas tablas.
+                        len_warning_msg = lambda \
+                                exp: f"Se eliminaron filas del experimento {exp} para coincidir \
+                                con el experimento {2 if exp == 1 else 1} ({len_dif} filas diferentes)."
+                        len_dif = abs(len(x) - len(y))
+                        if x.shape[0] > y.shape[0]:  # La cantidad de filas de x, excede las de y.
+                            x = x.head(y.shape[0])
+                            st.warning(len_warning_msg(1))
+                        elif y.shape[0] > x.shape[0]:  # La cantidad de filas de y, excede las de x.
+                            y = y.head(x.shape[0])
+                            st.warning(len_warning_msg(2))
+
+                        # Test de Wilcoxon
+                        try:
+                            wilcoxon_data = (x, y)
+                            wilcoxon_result = wilcoxon(x, y)
+
+                            # Mostrar Resultado
+                            df_mostrar = build_df_test_result(wilcoxon_result[0], wilcoxon_result[1])
+                            st.data_editor(df_mostrar,
+                                           column_config=colm_template(["Statistics", "Valor de P"]),
+                                           disabled=True, hide_index=True, use_container_width=True)
+                        except Exception as e:
+                            st.exception(e)
 
     with comparacion_friedman:
         st.header("Prueba de Friedman")
 
-        st.markdown("En desarrollo... ⚠️")
+        file_upl_experimentos: list[UploadedFile]
+        dataframes_experimentos: list[DataFrame]
 
-        #### WIP
-        # data = pd.read_csv(RUTA_FICHERODEDATOS_CSV)
+        with st.container():
+            file_upl_experimentos = st.file_uploader(label="Experimentos", type=[".csv"], accept_multiple_files=True)
+            dataframes_experimentos = bin_to_df(file_upl_experimentos)
 
-        # experimento: UploadedFile
-        # df_experimento_sim: DataFrame = pd.DataFrame()
-        # df_experimento_real: DataFrame = pd.DataFrame()
-        #
-        # # Escoger un archivo donde estén datos de simulación de un paciente.
-        # col1_file_up, col2_file_upl = st.columns(2)
-        # with col1_file_up:
-        #     experimento = st.file_uploader("Datos de resultado de Simulación")
-        #     if experimento:
-        #         df_experimento_sim = bin_to_df(experimento)
-        #         if not df_experimento_sim.empty:
-        #             st.dataframe(df_experimento_sim, height=200)
-        # with col2_file_upl:
-        #     experimento = st.file_uploader("Datos de resultado de Simulación")
-        #     if experimento:
-        #         df_experimento_sim = bin_to_df(experimento)
-        #         if not df_experimento_sim.empty:
-        #             st.dataframe(df_experimento_sim, height=200)
-        #
-        # # Selección de columna para comparación
-        # opcion_columna_comparacion = st.selectbox("Escoja una columna para comparar", VARIABLES_EXPERIMENTO, key=1)
-        # boton_comparacion = st.button("Realizar prueba", type="primary", use_container_width=True, key=2)
-        # if boton_comparacion:
-        #     if not df_experimento_sim.empty:
-        #         x: DataFrame = df_experimento_real[opcion_columna_comparacion]
-        #         y: DataFrame = df_experimento_sim.loc[opcion_columna_comparacion]
-        #         resultado = wilcoxon(x, y)
-        #         st.write(resultado)
-        #     else:
-        #         st.warning("No se han cargado datos del experimento aún.")
+        # Selección de columna para comparación
+        opcion_col_comparacion = st.selectbox("Escoja una columna para comparar", VARIABLES_EXPERIMENTO, key=3)
+        boton_comparacion = st.button("Realizar prueba de Friedman", type="primary", use_container_width=True, key=4)
+
+        with st.container():
+            if boton_comparacion:
+                if len(file_upl_experimentos) == 0:
+                    st.warning("No se han cargado datos de resultados de experimentos para realizar la prueba.")
+                else:
+                    uneven_sample_fix_tuple = fix_uneven([df[opcion_col_comparacion] for df in dataframes_experimentos])
+
+                    samples_selection = uneven_sample_fix_tuple[0]
+                    min_len = uneven_sample_fix_tuple[1]
+                    if min_len != -1:
+                        st.warning(f"Se eliminaron filas de las tablas de los experimentos para realizar el examen, \
+                        debido a que no todas tenían la misma cantidad. \
+                        Todas las tablas pasaron a tener {min_len} filas.")
+
+                    # Test de Friedman
+                    try:
+                        friedman_result = friedmanchisquare(*samples_selection)
+
+                        # Mostrar Resultado
+                        df_mostrar = build_df_test_result(friedman_result[0], friedman_result[1])
+                        st.data_editor(df_mostrar,
+                                       column_config=colm_template(["Statistics", "Valor de P"]),
+                                       hide_index=True, disabled=True, use_container_width=True)
+                    except Exception as e:
+                        st.exception(e)
 
 with validacion_tab:
     st.markdown("En desarrollo... ⚠️")
