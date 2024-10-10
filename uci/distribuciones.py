@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import scipy.stats as stats
 
-from constants import RUTA_DFCENTROIDES_CSV
+from st_utils.constants import RUTA_DFCENTROIDES_CSV
 
 
 # Distribuciones para las variables del cluster 0
