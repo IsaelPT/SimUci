@@ -104,7 +104,7 @@ def format_df_time(datos: DataFrame, enhanced_format: bool = False, data_at_begi
 
     # Construir DataFrame (salida)
     nuevos_datos = {
-        "P": datos.mean(),
+        "Porciento": datos.mean(),
         "Desviación Estándar": datos.std(),
         # "Intervalo Confianza": datos.std(),  # PROVISIONAL
     }
