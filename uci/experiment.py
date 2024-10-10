@@ -1,7 +1,7 @@
 import pandas as pd
 import simpy
 
-from constants import VARIABLES_EXPERIMENTO
+from st_utils.constants import VARIABLES_EXPERIMENTO
 from uci import distribuciones
 from uci.simulacion import Simulacion
 
