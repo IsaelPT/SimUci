@@ -1,7 +1,7 @@
 import unittest
 
-from constants import *
-from helpers import *
+from st_utils.constants import *
+from st_utils.helpers import *
 
 
 class MyTestCase(unittest.TestCase):
