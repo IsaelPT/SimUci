@@ -165,7 +165,7 @@ with validacion_tab:
     if st.session_state.table_selections >= 2:
         df_real_data: DataFrame = get_real_data(RUTA_FICHERODEDATOS_CSV, row_selection=df_selection)
         with st.container():
-            st.markdown("Datos Reales seleccionados")
+            st.markdown("Indicadores estadísticos a partir de Datos reales seleccionados")
             res = build_df_stats(df_real_data)
             st.dataframe(
                 res,
@@ -177,7 +177,7 @@ with validacion_tab:
         df_experimento_sim = st.session_state.df_resultado
         sample_size = df_experimento_sim.shape[0]
         with st.container():
-            st.markdown("Datos resultantes de la Simulación")
+            st.markdown("Indicadores estadísticos a partir de Datos de la Simulación")
             res = build_df_stats(df_experimento_sim)
             st.dataframe(
                 res,
@@ -206,7 +206,7 @@ with comparaciones_tab:
             if file_upl1:
                 df_experimento1 = bin_to_df(file_upl1)
                 if df_experimento1.empty:
-                    st.warning("No se han cargado datos del experimento 1 aún.")
+                    st.warning("Aún no se han cargado datos del experimento 1.")
                 else:
                     st.dataframe(df_experimento1, height=200, hide_index=True)
         with col2_file_upl:
@@ -214,7 +214,7 @@ with comparaciones_tab:
             if file_upl2:
                 df_experimento2 = bin_to_df(file_upl2)
                 if df_experimento2.empty:
-                    st.warning("No se han cargado datos del experimento 2 aún.")
+                    st.warning("Aún no se han cargado datos del experimento 2.")
                 else:
                     st.dataframe(df_experimento2, height=200, hide_index=True)
 
@@ -250,8 +250,8 @@ with comparaciones_tab:
 
                         try:
                             # Test de Wilcoxon
-                            wilcoxon_data = Wilcoxon(x, y)
-                            wilcoxon_data.test()
+                            wilcoxon_data = Wilcoxon()
+                            wilcoxon_data.test(x, y)
 
                             # Mostrar Resultado
                             df_mostrar = build_df_test_result(statistic=wilcoxon_data.statistic,
@@ -281,19 +281,22 @@ with comparaciones_tab:
             if boton_comparacion:
                 if len(file_upl_experimentos) == 0:
                     st.warning("No se han cargado datos de resultados de experimentos para realizar la prueba.")
+                elif not len(file_upl_experimentos) >= 3:
+                    st.warning("Debe usted cargar más de 3 muestras para realizar la prueba.")
                 else:
-                    uneven_sample_fix_tuple = fix_uneven([df[opcion_col_comparacion] for df in dataframes_experimentos])
+                    adjusted_sample_tuple = adjust_df_sizes([df[opcion_col_comparacion] \
+                                                             for df in dataframes_experimentos])
 
-                    samples_selection = uneven_sample_fix_tuple[0]
-                    min_len = uneven_sample_fix_tuple[1]
-                    if min_len != -1:
+                    samples_selection = adjusted_sample_tuple[0]
+                    min_sample_size = adjusted_sample_tuple[1]
+                    if min_sample_size != -1:
                         st.info(f"Se eliminaron filas de las tablas de los experimentos para realizar el examen. \
-                        Todas las tablas pasaron a tener {min_len} filas.")
+                        Todas las tablas pasaron a tener {min_sample_size} filas.")
 
                     try:
                         # Test de Friedman.
-                        friedman_result = Friedman(*samples_selection)
-                        friedman_result.test()
+                        friedman_result = Friedman()
+                        friedman_result.test(*samples_selection)
 
                         # Mostrar Resultado.
                         df_mostrar = build_df_test_result(statistic=friedman_result.statistic,
