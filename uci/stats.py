@@ -3,26 +3,23 @@ from scipy.stats import wilcoxon, friedmanchisquare, norm
 
 
 class Wilcoxon:
-    def __init__(self, x, y):
-        self.sample1 = x,
-        self.sample2 = y
+    def __init__(self):
         self.statistic: float = 0
         self.p_value: float = 0
 
-    def test(self) -> None:
-        res = wilcoxon(self.sample1, self.sample2)
+    def test(self, x, y) -> None:
+        res = wilcoxon(x, y)
         self.statistic = res[0]
         self.p_value = res[1]
 
 
 class Friedman:
-    def __init__(self, *samples):
-        self.samples = [*samples]
+    def __init__(self):
         self.statistic: float = 0
         self.p_value: float = 0
 
-    def test(self) -> None:
-        res = friedmanchisquare(self.samples)
+    def test(self, *samples) -> None:
+        res = friedmanchisquare(*samples)
         self.statistic = res[0]
         self.p_value = res[1]
 
