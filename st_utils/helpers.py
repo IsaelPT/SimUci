@@ -152,6 +152,18 @@ def format_df_time(datos: DataFrame, enhanced_format: bool = False, data_at_begi
 
 
 def build_df_stats(df: DataFrame) -> DataFrame:
+    """
+    Construye un DataFrame que contiene los datos de la Media, Desviación Estándar e Intervalos de Confianza de los
+    datos een un DataFrame como parámetro.
+
+    Args:
+        df: DataFrame de entrada.
+
+    Returns:
+        DataFrame transformado con formato para vista de datos y valores estadísticos.
+
+    """
+
     media: DataFrame = df.mean().to_frame().T
     desvest: DataFrame = df.std().to_frame().T
     confint = StatsUtils.confidenceinterval(media, desvest, df.shape[0])
@@ -165,6 +177,17 @@ def build_df_stats(df: DataFrame) -> DataFrame:
 
 
 def format_df_stats(df: DataFrame) -> DataFrame:
+    """
+    Agrega una columna al extremo izquierdo del DataFrame por parámetros con el nombre de columna "Información".
+    Brinda de soporte visual para comprender los datos de las tablas.
+
+    Args:
+        df: DataFrame a aplicar dicho formato.
+
+    Returns:
+        DataFrame con una nueva columna a la izquierda ("Información") con datos estadísticos de utilidad.
+    """
+
     LABEL_INF = "Información"
     df.insert(0, LABEL_INF, "")
     df.loc[0, LABEL_INF] = "Promedio"
@@ -220,7 +243,6 @@ def get_real_data(path_datos: str, row_selection) -> DataFrame:
             rows.append(new_row)
 
         return pd.DataFrame(rows)
-        # return edad, d1, d2, d3, d4, apache, insuf_resp, va, estadia_uti, tiempo_vam, tiempo_estad_pre_uti
 
 
 def start_experiment(corridas_simulacion: int, edad: int, d1: int, d2: int, d3: int, d4: int, apache: int,
@@ -256,7 +278,20 @@ def start_experiment(corridas_simulacion: int, edad: int, d1: int, d2: int, d3: 
     return res
 
 
-def fix_uneven(dataframes: List[DataFrame]) -> Tuple[List[DataFrame], int]:
+def adjust_df_sizes(dataframes: List[DataFrame]) -> Tuple[List[DataFrame], int]:
+    """
+    Construye un tuple con una lista de DataFrames las cuales tienen su cantidad de filas iguales al dataframe con menos
+    filas en la lista de dataframes de parámetros, y un entero con el valor del size del dataframe con menor size.
+
+    Args:
+        dataframes: Lista de DataFrames.
+
+    Returns:
+        Tuple con Lista con los DataFrames "recortados" o no, y entero con el valor del size del dataframe más pequeño.
+        El entero es -1 si no hubo necesidad de "recortar" los dataframes.
+
+    """
+
     df_sizes = [df.shape[0] for df in dataframes]
     if df_sizes != int(np.mean(df_sizes)):
         min_len = min(df_sizes)
