@@ -1,14 +1,14 @@
 from datetime import datetime
 
-from scipy.stats import wilcoxon, friedmanchisquare
+from st_utils.constants import *
+from st_utils.helpers import *
+from uci.experiment import *
+from uci.stats import *
 
-from constants import *
-from experiment import *
-from helpers import *
+# from scipy.stats import wilcoxon, friedmanchisquare
 
 #### TABS
-simulacion_tab, db_tab, comparaciones_tab, validacion_tab = st.tabs(
-    ("Simulación", "Datos reales", "Comparaciones", "Validación"))
+simulacion_tab, validacion_tab, comparaciones_tab = st.tabs(("Simulación", "Datos reales", "Comparaciones"))
 
 with simulacion_tab:
     ############
@@ -20,7 +20,6 @@ with simulacion_tab:
     # IMPORTANT: EL ID DEL PACIENTE ESTÁ ALMACENADO DENTRO DEL SESSION_STATE!
     if "id_paciente" not in st.session_state:
         st.session_state.id_paciente = generate_id()
-    # col1_nuevo_paciente, col2_nuevo_paciente, col3_nuevo_paciente = st.columns([1, 1, 1])
     col1_nuevo_paciente, col2_nuevo_paciente = st.columns([1, 1])
     with col1_nuevo_paciente:
         nuevo_paciente = st.button("Nuevo paciente")
@@ -38,18 +37,19 @@ with simulacion_tab:
         opcion_apache: int = st.number_input("Apache", min_value=APACHE_MIN, max_value=APACHE_MAX,
                                              value=APACHE_DEFAULT,
                                              help=HELP_MSG_APACHE)
-        opcion_tiempo_vam: int = st.number_input("Tiempo de VA", min_value=T_VAM_MIN, max_value=T_VAM_MAX,
+        opcion_tiempo_vam: int = st.number_input("Tiempo de Ventilación Artificial", min_value=T_VAM_MIN,
+                                                 max_value=T_VAM_MAX,
                                                  value=T_VAM_DEFAULT)
-        opcion_estad_uti: int = st.number_input("Estadía UTI", min_value=ESTAD_UTI_MIN, max_value=ESTAD_UTI_MAX,
+        opcion_estad_uti: int = st.number_input("Estadía UCI", min_value=ESTAD_UTI_MIN, max_value=ESTAD_UTI_MAX,
                                                 value=ESTAD_UTI_DEFAULT, help=HELP_MSG_ESTAD_UTI)
     with col2_paciente:
         opcion_insuf_resp: str = st.selectbox("Tipo Insuficiencia Respiratoria", tuple(INSUF_RESP.values()),
                                               index=1)
-        opcion_tipo_vam: str = st.selectbox("Tipo de VA", tuple(TIPO_VENT.values()), )
-        opcion_estad_preuti: int = st.number_input("Estadía Pre-UTI", min_value=ESTAD_PREUTI_MIN,
+        opcion_tipo_vam: str = st.selectbox("Tipo de Ventilación Artificial", tuple(TIPO_VENT.values()), )
+        opcion_estad_preuti: int = st.number_input("Estadía Pre-UCI", min_value=ESTAD_PREUTI_MIN,
                                                    max_value=ESTAD_PREUTI_MAX, value=ESTAD_PREUTI_DEFAULT,
                                                    help=HELP_MSG_ESTAD_PREUTI)
-        porciento = st.number_input("Porciento", min_value=PORCIENTO_SIM_MIN, max_value=PORCIENTO_SIM_MAX,
+        porciento = st.number_input("Porciento Tiempo UCI", min_value=PORCIENTO_SIM_MIN, max_value=PORCIENTO_SIM_MAX,
                                     value=PORCIENTO_SIM_DEFAULT, help=HELP_MSG_PORCIENTO_SIM)
     with col3_paciente:
         opcion_diagn1: str = st.selectbox("Diagnóstico 1", tuple(DIAG_PREUCI.values()), index=0)
@@ -81,14 +81,22 @@ with simulacion_tab:
     if "df_resultado" not in st.session_state:
         st.session_state.df_resultado = pd.DataFrame()  # session_state para visualizar datos simulación.
 
-    boton_comenzar = st.button("Comenzar Simulación", type="primary", use_container_width=True)
-    corridas_sim = st.number_input("Corridas de la Simulación", min_value=CORRIDAS_SIM_MIN,
-                                   max_value=CORRIDAS_SIM_MAX, value=CORRIDAS_SIM_DEFAULT,
-                                   help=HELP_MSG_CORRIDA_SIM)
+    sim_buttons_container = st.container()
+    with sim_buttons_container:
+        corridas_sim = st.number_input("Corridas de la Simulación", min_value=CORRIDAS_SIM_MIN,
+                                       max_value=CORRIDAS_SIM_MAX, value=CORRIDAS_SIM_DEFAULT,
+                                       help=HELP_MSG_CORRIDA_SIM)
+        boton_comenzar = st.button("Comenzar Simulación", type="primary", use_container_width=True)
+
     # Visualizar DataFrame con resultado de la simulación para este paciente.
     if not st.session_state.df_resultado.empty:
         toggle_fmt = st.toggle("Tabla con formato", value=True)
-        st.dataframe(format_df(st.session_state.df_resultado, toggle_fmt), height=300)
+        st.dataframe(
+            format_df_time(st.session_state.df_resultado, toggle_fmt),
+            hide_index=True,
+            use_container_width=True,
+            height=300
+        )
 
         # Lógica para guardar resultados localmente.
         csv = st.session_state.df_resultado.to_csv(index=False).encode("UTF-8")
@@ -99,6 +107,8 @@ with simulacion_tab:
             mime="text/csv",
             use_container_width=True
         )
+
+        st.success(f"La simulación ha concluido tras haber completado {corridas_sim} iteraciones.")
 
     if boton_comenzar:
         # Validación de campos para realizar simulación.
@@ -111,7 +121,7 @@ with simulacion_tab:
         else:
             st.warning(f"Seleccione un tipo de Insuficiencia Respiratoria.")
 
-        # Desarrollo de Simulación.
+        # Desarrollo de la Simulación.
         if diag_ok and insuf_ok:
             try:
                 # Experimento / Simulación.
@@ -128,15 +138,50 @@ with simulacion_tab:
                 resultado_experimento.to_csv(path, index=False)
                 st.session_state.df_resultado = resultado_experimento
 
-                st.success(f"La simulación ha concluido tras haber completado {corridas_sim} iteraciones.")
                 st.rerun()
             except Exception as e:
-                st.exception(f"No se pudo efectuar la simulación.\n{e}")
+                st.exception(f"No se pudo efectuar la simulación. Error asociado:\n{e}")
 
-with db_tab:
+with validacion_tab:
     st.markdown("Este es el conjunto de datos que se utilizan para realizar las pruebas de comparaciones.\
             Son datos que han sido recopilados de pacientes reales en estudios anteriores realizados.")
-    st.dataframe(pd.read_csv(RUTA_FICHERODEDATOS_CSV))
+
+    df_data = pd.read_csv(RUTA_FICHERODEDATOS_CSV)
+
+    selection: list[int] = st.dataframe(
+        df_data,
+        key="data",
+        on_select="rerun",
+        selection_mode=["multi-row"],
+        hide_index=True,
+        height=300
+    )["selection"]["rows"]  # dict -> {"selection": {"rows": [0, 1, 2, ...], "columns": []}}
+
+    # DataFrame Datos Reales
+    if len(selection) >= 2:
+        df_real_data: DataFrame = get_real_data(RUTA_FICHERODEDATOS_CSV, row_selection=selection)
+        with st.container():
+            st.markdown("Datos Reales seleccionados")
+            res = build_df_stats(df_real_data)
+            st.dataframe(
+                res,
+                hide_index=True,
+                use_container_width=True,
+            )
+    # DataFrame Simulacion
+    if not st.session_state.df_resultado.empty:  # Hacemos referencias a los resultados de la Simulación
+        df_experimento_sim = st.session_state.df_resultado
+        sample_size = df_experimento_sim.shape[0]
+        with st.container():
+            st.markdown("Datos resultantes de la Simulación")
+            res = build_df_stats(df_experimento_sim)
+            st.dataframe(
+                res,
+                hide_index=True,
+                use_container_width=True,
+            )
+    else:
+        st.error("No se ha realizado ninguna simulación hasta el momento. Diríjase al apartado \"Simulación\".")
 
 with comparaciones_tab:
     comparacion_wilcoxon = st.expander("Comparación vía Wilcoxon", expanded=True)
@@ -150,7 +195,7 @@ with comparaciones_tab:
         df_experimento1 = pd.DataFrame()
         df_experimento2 = pd.DataFrame()
 
-        # Subir datos con File Uploader.
+        # File Uploader.
         col1_file_upl, col2_file_upl = st.columns(2)
         with col1_file_upl:
             file_upl1 = st.file_uploader(label="Resultado Experimento 1", type=[".csv"])
@@ -169,11 +214,11 @@ with comparaciones_tab:
                 else:
                     st.dataframe(df_experimento2, height=200, hide_index=True)
 
-        # Selección de columna para comparación
+        # Columna a comparar.
         opcion_col_comparacion = st.selectbox("Escoja una columna para comparar", VARIABLES_EXPERIMENTO, key=1)
         boton_comparacion = st.button("Realizar prueba de Wilcoxon", type="primary", use_container_width=True, key=2)
 
-        # Comparación
+        # Comparación.
         with st.container():
             if boton_comparacion:
                 if df_experimento1.empty or df_experimento2.empty:
@@ -188,27 +233,28 @@ with comparaciones_tab:
                         experimento dos veces.")
                     else:
                         # Corrección de que existen la misma cantidad de filas en ambas tablas.
-                        len_warning_msg = lambda \
+                        len_info_msg = lambda \
                                 exp: f"Se eliminaron filas del experimento {exp} para coincidir \
                                 con el experimento {2 if exp == 1 else 1} ({len_dif} filas diferentes)."
                         len_dif = abs(len(x) - len(y))
                         if x.shape[0] > y.shape[0]:  # La cantidad de filas de x, excede las de y.
                             x = x.head(y.shape[0])
-                            st.warning(len_warning_msg(1))
+                            st.info(len_info_msg(1))
                         elif y.shape[0] > x.shape[0]:  # La cantidad de filas de y, excede las de x.
                             y = y.head(x.shape[0])
-                            st.warning(len_warning_msg(2))
+                            st.info(len_info_msg(2))
 
-                        # Test de Wilcoxon
                         try:
-                            wilcoxon_data = (x, y)
-                            wilcoxon_result = wilcoxon(x, y)
+                            # Test de Wilcoxon
+                            wilcoxon_data = Wilcoxon(x, y)
+                            wilcoxon_data.test()
 
                             # Mostrar Resultado
-                            df_mostrar = build_df_test_result(wilcoxon_result[0], wilcoxon_result[1])
-                            st.data_editor(df_mostrar,
-                                           column_config=colm_template(["Statistics", "Valor de P"]),
-                                           disabled=True, hide_index=True, use_container_width=True)
+                            df_mostrar = build_df_test_result(statistic=wilcoxon_data.statistic,
+                                                              p_value=wilcoxon_data.p_value)
+                            st.dataframe(df_mostrar,
+                                         # column_config=colm_template(["Statistics", "Valor de P"]),
+                                         hide_index=True, use_container_width=True)
                         except Exception as e:
                             st.exception(e)
 
@@ -218,11 +264,12 @@ with comparaciones_tab:
         file_upl_experimentos: list[UploadedFile]
         dataframes_experimentos: list[DataFrame]
 
+        # File Uploader.
         with st.container():
             file_upl_experimentos = st.file_uploader(label="Experimentos", type=[".csv"], accept_multiple_files=True)
             dataframes_experimentos = bin_to_df(file_upl_experimentos)
 
-        # Selección de columna para comparación
+        # Columna a comparar.
         opcion_col_comparacion = st.selectbox("Escoja una columna para comparar", VARIABLES_EXPERIMENTO, key=3)
         boton_comparacion = st.button("Realizar prueba de Friedman", type="primary", use_container_width=True, key=4)
 
@@ -236,62 +283,17 @@ with comparaciones_tab:
                     samples_selection = uneven_sample_fix_tuple[0]
                     min_len = uneven_sample_fix_tuple[1]
                     if min_len != -1:
-                        st.warning(f"Se eliminaron filas de las tablas de los experimentos para realizar el examen. \
+                        st.info(f"Se eliminaron filas de las tablas de los experimentos para realizar el examen. \
                         Todas las tablas pasaron a tener {min_len} filas.")
 
-                    # Test de Friedman
                     try:
-                        friedman_result = friedmanchisquare(*samples_selection)
+                        # Test de Friedman.
+                        friedman_result = Friedman(*samples_selection)
+                        friedman_result.test()
 
-                        # Mostrar Resultado
-                        df_mostrar = build_df_test_result(friedman_result[0], friedman_result[1])
-                        st.data_editor(df_mostrar,
-                                       column_config=colm_template(["Statistics", "Valor de P"]),
-                                       hide_index=True, disabled=True, use_container_width=True)
+                        # Mostrar Resultado.
+                        df_mostrar = build_df_test_result(statistic=friedman_result.statistic,
+                                                          p_value=friedman_result.p_value)
+                        st.dataframe(df_mostrar, hide_index=True, use_container_width=True)
                     except Exception as e:
                         st.exception(e)
-
-with validacion_tab:
-    st.markdown("En desarrollo... ⚠️")
-
-    #### WIP
-    # data = pd.read_csv(RUTA_FICHERODEDATOS_CSV)
-    #
-    # seleccion_fila = st.number_input("Selecciona una fila", min_value=1, max_value=data.shape[0] - 1, value=1)
-    #
-    # st.caption("Datos seleccionados")
-    # st.dataframe(data.iloc[[seleccion_fila]])
-    #
-    # r_data: tuple = get_real_data(RUTA_FICHERODEDATOS_CSV, fila_seleccion=seleccion_fila)
-    #
-    # if not st.session_state.df_resultado.empty:
-    #     df_experimento_sim = st.session_state.df_resultado
-    #     with st.container():
-    #         st.dataframe(r_data, use_container_width=True, height=200)
-    #         col1_wilcoxon, col2_wilcoxon = st.columns(2)
-    #         with col1_wilcoxon:
-    #             st.caption("Datos reales obtenidos de la Base de Datos")
-    #             e = start_experiment(
-    #                 corridas_sim,
-    #                 edad=r_data[0],
-    #                 d1=r_data[1],
-    #                 d2=r_data[2],
-    #                 d3=r_data[3],
-    #                 d4=r_data[4],
-    #                 apache=r_data[5],
-    #                 insuf_resp=r_data[6],
-    #                 va=r_data[7],
-    #                 t_vam=r_data[8],
-    #                 est_uti=r_data[9],
-    #                 est_preuti=r_data[10],
-    #                 porciento=porciento
-    #             )
-    #             df_experimento_real = e.mean()
-    #             st.dataframe(df_experimento_real, use_container_width=True)
-    #         with col2_wilcoxon:
-    #             st.caption("Media de datos resultantes de la Simulación")
-    #             df_experimento_sim = pd.DataFrame(df_experimento_sim.mean(), columns=["Valor"])
-    #             df_experimento_sim.index.name = "Datos"
-    #             st.dataframe(df_experimento_sim, use_container_width=True)
-    # else:
-    #     st.error("No se ha realizado ninguna simulación hasta el momento. Diríjase al apartado \"Simulación\".")
