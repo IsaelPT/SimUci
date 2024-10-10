@@ -7,8 +7,9 @@ import streamlit as st
 from pandas import DataFrame
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-from constants import TIPO_VENT, DIAG_PREUCI, INSUF_RESP
-from experiment import Experiment, multiple_replication
+from st_utils.constants import TIPO_VENT, DIAG_PREUCI, INSUF_RESP, VARIABLES_EXPERIMENTO
+from uci.experiment import Experiment, multiple_replication
+from uci.stats import StatsUtils
 
 
 def key_categ(categoria: str, valor: str | int, viceversa: bool = False) -> int | str:
@@ -72,30 +73,30 @@ def value_is_zero(valores: list[int | str] | int | str) -> bool:
         raise ValueError(f"El valor a verificar no es correcto: {valores}")
 
 
-def generate_id(n: int = 10) -> str:
+def generate_id(digits: int = 10) -> str:
     """
     Genera un número pseudoaleatorio de n dígitos. Utilizado para identificar pacientes.
 
     Args:
-        n: Cantidad de dígitos mayor y diferente de 0 que tendrá el ID. Default = 10 dígitos.
+        digits: Cantidad de dígitos mayor y diferente de 0 que tendrá el ID. Default = 10 dígitos.
 
     Returns:
         Cadena de n números generados aleatoriamente.
     """
-    if n != 0:
-        return ''.join([str(secrets.randbelow(n)) for _ in range(n)])
-    else:
-        raise Exception(f"La cantidad de dígitos n={n} debe ser mayor distinta que 0.")
+
+    if not 0 < digits <= 10:
+        raise Exception(f"La cantidad de dígitos n={digits} debe estar en el rango de 0 < d <= 10.")
+    return ''.join([str(secrets.randbelow(digits)) for _ in range(digits)])
 
 
-def format_df(datos: DataFrame, enhance_format: bool = False, data_at_beginning: bool = False) -> DataFrame:
+def format_df_time(datos: DataFrame, enhanced_format: bool = False, data_at_beginning: bool = False) -> DataFrame:
     """
     Construye un nuevo DataFrame. Agrega al comienzo del dataframe el *promedio* y *desviación estándar* de todos los valores.
 
     Args:
         data_at_beginning: Muestra los datos nuevos al principio del dataframe. En caso contrario, los muestra al final.
         datos: DataFrame base.
-        enhance_format: Usar solo si es para mostrar datos. Para cada número en la tabla el carácter "h" para expresar que los números están expresados en *horas*.
+        enhanced_format: Usar solo si es para mostrar datos. Para cada número en la tabla el carácter "h" para expresar que los números están expresados en *horas*.
 
     Returns:
         DataFrame nuevo con nuevas filas de promedio y desviación estándar con los valores del DataFrame.
@@ -103,9 +104,9 @@ def format_df(datos: DataFrame, enhance_format: bool = False, data_at_beginning:
 
     # Construir DataFrame (salida)
     nuevos_datos = {
-        "Promedio": datos.mean(),
+        "P": datos.mean(),
         "Desviación Estándar": datos.std(),
-        "Intervalo Confianza": datos.std(),  # PROVISIONAL
+        # "Intervalo Confianza": datos.std(),  # PROVISIONAL
     }
     n_datos_values = list(nuevos_datos.values())
     n_datos_labels = list(nuevos_datos.keys())
@@ -139,7 +140,7 @@ def format_df(datos: DataFrame, enhance_format: bool = False, data_at_beginning:
             res.loc[i, LABEL_INF] = f"Iteración {i + 1}"
 
     # Formato
-    if enhance_format:
+    if enhanced_format:
         def fmt(horas: int | float) -> str | int:
             if isinstance(horas, (int, float)):
                 return f"{horas / 24:.1f} d ({horas:.1f} h)"
@@ -148,6 +149,29 @@ def format_df(datos: DataFrame, enhance_format: bool = False, data_at_beginning:
         res = res.applymap(fmt)
 
     return res
+
+
+def build_df_stats(df: DataFrame) -> DataFrame:
+    media: DataFrame = df.mean().to_frame().T
+    desvest: DataFrame = df.std().to_frame().T
+    confint = StatsUtils.confidenceinterval(media, desvest, df.shape[0])
+    li = pd.DataFrame(confint[0])
+    ls = pd.DataFrame(confint[1])
+    li.columns = media.columns.to_list()
+    ls.columns = media.columns.to_list()
+    df_final = pd.concat([media, desvest, li, ls], axis=0, ignore_index=True)
+    df_final = format_df_stats(df_final)
+    return df_final
+
+
+def format_df_stats(df: DataFrame) -> DataFrame:
+    LABEL_INF = "Información"
+    df.insert(0, LABEL_INF, "")
+    df.loc[0, LABEL_INF] = "Promedio"
+    df.loc[1, LABEL_INF] = "Desviación Estándar"
+    df.loc[2, LABEL_INF] = "Intervalo de Confianza (LI)"
+    df.loc[3, LABEL_INF] = "Intervalo de Confianza (LS)"
+    return df
 
 
 def bin_to_df(files: UploadedFile | list[UploadedFile]) -> DataFrame | list[DataFrame]:
@@ -167,36 +191,36 @@ def bin_to_df(files: UploadedFile | list[UploadedFile]) -> DataFrame | list[Data
         return [pd.read_csv(f) for f in files]
 
 
-def get_real_data(path_datos: str, fila_seleccion):
+@st.cache_data
+def get_real_data(path_datos: str, row_selection) -> DataFrame:
     """
     Obtiene una fila con datos reales de la base de datos para posteriormente ser utilizados para la simulación.
 
     Args:
         path_datos: Ruta de donde se obtienen los datos a extraer.
-        fila_seleccion: selección de qué fila se va a utilizar de la tabla.
+        row_selection: selección de qué fila se va a utilizar de la tabla.
 
     Returns:
         edad, apache, diag1, diag2, diag3, diag4, insuf_resp, tipo_va, estadia_uti, tiempo_vam, tiempo_estad_pre_uti
     """
 
-    data = pd.read_csv(path_datos)
+    if len(row_selection) != 0:
+        data = pd.read_csv(path_datos)
 
-    # Selección por índice
-    pick = data.iloc[[fila_seleccion]]
+        rows = []
 
-    edad: int = int(pick["Edad"].iloc[0])
-    d1: int = int(pick["Diag.Ing1"].iloc[0])
-    d2: int = int(pick["Diag.Ing2"].iloc[0])
-    d3: int = int(pick["Diag.Ing3"].iloc[0])
-    d4: int = int(pick["Diag.Ing4"].iloc[0])
-    apache: int = int(pick["APACHE"].iloc[0])
-    insuf_resp: int = int(pick["InsufResp"].iloc[0])
-    va: int = int(pick["VA"].iloc[0])  # horas
-    estadia_uti: int = int(pick["DíasUTI"].iloc[0] * 24)  # días -> horas
-    tiempo_vam: int = int(pick["TiempoVAM"].iloc[0])  # horas
-    tiempo_estad_pre_uti: int = int(pick["Est. PreUCI"].iloc[0] * 24)  # días -> horas
+        for index in row_selection:
+            new_row = {
+                VARIABLES_EXPERIMENTO[0]: int(data["Est. PreUCI"].iloc[index] * 24),  # días -> horas
+                VARIABLES_EXPERIMENTO[1]: int(data["TiempoVAM"].iloc[index]),  # horas
+                VARIABLES_EXPERIMENTO[2]: int(data["Est. PostUCI"].iloc[index]),  # horas
+                VARIABLES_EXPERIMENTO[3]: int(data["EstadiaUTI"].iloc[index]),  # horas
+                VARIABLES_EXPERIMENTO[4]: int(data["Est. PostUCI"].iloc[index] * 24),  # días -> horas
+            }
+            rows.append(new_row)
 
-    return edad, d1, d2, d3, d4, apache, insuf_resp, va, estadia_uti, tiempo_vam, tiempo_estad_pre_uti
+        return pd.DataFrame(rows)
+        # return edad, d1, d2, d3, d4, apache, insuf_resp, va, estadia_uti, tiempo_vam, tiempo_estad_pre_uti
 
 
 def start_experiment(corridas_simulacion: int, edad: int, d1: int, d2: int, d3: int, d4: int, apache: int,
@@ -240,29 +264,23 @@ def fix_uneven(dataframes: List[DataFrame]) -> Tuple[List[DataFrame], int]:
     return dataframes, -1
 
 
-def build_df_test_result(statistics: float, p_value: float) -> DataFrame:
-    S = "Statistics"
+def build_df_test_result(statistic: float, p_value: float) -> DataFrame:
+    """
+    Construye un DataFrame con un formato específico que es destinado a la visualización de los resultados de los test estadísticos.
+
+    Args:
+        statistic: Valor de Statistics. Resultado de Exámen.
+        p_value: Valor de P. Resultado de Exámen.
+
+    Returns:
+        DataFrame con datos statistics y p_value que se pasan por parámetros.
+    """
+
+    S = "Statistic"
     P = "Valor de P"
     data = {
-        S: [statistics],
+        S: [statistic],
         P: [p_value]
     }
     df = pd.DataFrame(data)
     return df
-
-
-def colm_template(columns_names: list[str], width=None, help_msg=None, disabled=True):
-    def __CONFIG_COLUMN_TEMPLATE(col_name) -> st.column_config.Column:
-        return st.column_config.Column(
-            label=col_name,
-            width=width,
-            help=help_msg,
-            disabled=disabled,
-        )
-
-    return {col_name: __CONFIG_COLUMN_TEMPLATE(col_name) for col_name in columns_names}
-    # column_config = {
-    #     "Statistics": __CONFIG_COLUMN_TEMPLATE("Statistics", ),
-    #     "Valor de P": __CONFIG_COLUMN_TEMPLATE("Valor de P")
-    # }
-    # return column_config
