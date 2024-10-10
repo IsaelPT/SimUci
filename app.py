@@ -34,17 +34,14 @@ with simulacion_tab:
     col1_paciente, col2_paciente, col3_paciente = st.columns(3)
     with col1_paciente:
         opcion_edad: int = st.number_input("Edad", min_value=EDAD_MIN, max_value=EDAD_MAX, value=EDAD_DEFAULT)
-        opcion_apache: int = st.number_input("Apache", min_value=APACHE_MIN, max_value=APACHE_MAX,
-                                             value=APACHE_DEFAULT,
+        opcion_apache: int = st.number_input("Apache", min_value=APACHE_MIN, max_value=APACHE_MAX, value=APACHE_DEFAULT,
                                              help=HELP_MSG_APACHE)
         opcion_tiempo_vam: int = st.number_input("Tiempo de Ventilación Artificial", min_value=T_VAM_MIN,
-                                                 max_value=T_VAM_MAX,
-                                                 value=T_VAM_DEFAULT)
+                                                 max_value=T_VAM_MAX, value=T_VAM_DEFAULT)
         opcion_estad_uti: int = st.number_input("Estadía UCI", min_value=ESTAD_UTI_MIN, max_value=ESTAD_UTI_MAX,
                                                 value=ESTAD_UTI_DEFAULT, help=HELP_MSG_ESTAD_UTI)
     with col2_paciente:
-        opcion_insuf_resp: str = st.selectbox("Tipo Insuficiencia Respiratoria", tuple(INSUF_RESP.values()),
-                                              index=1)
+        opcion_insuf_resp: str = st.selectbox("Tipo Insuficiencia Respiratoria", tuple(INSUF_RESP.values()), index=1)
         opcion_tipo_vam: str = st.selectbox("Tipo de Ventilación Artificial", tuple(TIPO_VENT.values()), )
         opcion_estad_preuti: int = st.number_input("Estadía Pre-UCI", min_value=ESTAD_PREUTI_MIN,
                                                    max_value=ESTAD_PREUTI_MAX, value=ESTAD_PREUTI_DEFAULT,
@@ -88,11 +85,11 @@ with simulacion_tab:
                                        help=HELP_MSG_CORRIDA_SIM)
         boton_comenzar = st.button("Comenzar Simulación", type="primary", use_container_width=True)
 
-    # Visualizar DataFrame con resultado de la simulación para este paciente.
+    # Mostrar DataFrame con resultado de la simulación para este paciente.
     if not st.session_state.df_resultado.empty:
         toggle_fmt = st.toggle("Tabla con formato", value=True)
         st.dataframe(
-            format_df_time(st.session_state.df_resultado, toggle_fmt),
+            format_df_time(st.session_state.df_resultado, toggle_fmt, data_at_beginning=True),
             hide_index=True,
             use_container_width=True,
             height=300
@@ -143,12 +140,16 @@ with simulacion_tab:
                 st.exception(f"No se pudo efectuar la simulación. Error asociado:\n{e}")
 
 with validacion_tab:
-    st.markdown("Este es el conjunto de datos que se utilizan para realizar las pruebas de comparaciones.\
-            Son datos que han sido recopilados de pacientes reales en estudios anteriores realizados.")
-
     df_data = pd.read_csv(RUTA_FICHERODEDATOS_CSV)
 
-    selection: list[int] = st.dataframe(
+    if "table_selections" not in st.session_state:
+        st.session_state.table_selections = 0
+
+    st.markdown("Este es el conjunto de datos que se utilizan para realizar las pruebas de comparaciones.\
+            Son datos que han sido recopilados de pacientes reales en estudios anteriores realizados.")
+    st.write()
+
+    df_selection: list[int] = st.dataframe(
         df_data,
         key="data",
         on_select="rerun",
@@ -156,10 +157,13 @@ with validacion_tab:
         hide_index=True,
         height=300
     )["selection"]["rows"]  # dict -> {"selection": {"rows": [0, 1, 2, ...], "columns": []}}
+    st.session_state.table_selections = len(df_selection)
+    if st.session_state.table_selections <= 1:
+        st.info("Seleccione dos o más filas en la tabla de datos para calcular indicadores estadísticos.")
 
     # DataFrame Datos Reales
-    if len(selection) >= 2:
-        df_real_data: DataFrame = get_real_data(RUTA_FICHERODEDATOS_CSV, row_selection=selection)
+    if st.session_state.table_selections >= 2:
+        df_real_data: DataFrame = get_real_data(RUTA_FICHERODEDATOS_CSV, row_selection=df_selection)
         with st.container():
             st.markdown("Datos Reales seleccionados")
             res = build_df_stats(df_real_data)
