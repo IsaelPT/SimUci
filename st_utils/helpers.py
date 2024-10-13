@@ -160,7 +160,7 @@ def build_df_stats(df: DataFrame, sample_size: int | None = None,
         else:
             if not sample_size or sample_size <= 0:
                 raise ValueError(f"Para realizar el intervalo de confianza debe usarse un tamaño de muestra válido."
-                                 f"\ Found: {sample_size}")
+                                 f"Found: {sample_size}")
             else:
                 confint = StatsUtils.confidenceinterval(mean, std, sample_size)
                 li = pd.DataFrame(confint[0])
