@@ -27,9 +27,9 @@ ESTAD_PREUTI_MAX = 34
 ESTAD_PREUTI_DEFAULT = ESTAD_PREUTI_MIN
 
 # Corridas Simulación
-CORRIDAS_SIM_MIN = 25
+CORRIDAS_SIM_MIN = 30
 CORRIDAS_SIM_MAX = 1000
-CORRIDAS_SIM_DEFAULT = CORRIDAS_SIM_MIN
+CORRIDAS_SIM_DEFAULT = 30
 
 # Porciento
 PORCIENTO_SIM_MIN = 0
@@ -98,8 +98,7 @@ INSUF_RESP: dict[int, str] = {
     5: "Causas extrapulmonares"
 }
 
-VARIABLES_EXPERIMENTO: list[str] = ["Tiempo Pre VAM", "Tiempo VAM", "Tiempo Post VAM", "Estadia UCI",
-                                    "Estadia Post UCI"]
+VARIABLES_EXPERIMENTO = ["Tiempo Pre VAM", "Tiempo VAM", "Tiempo Post VAM", "Estadia UCI", "Estadia Post UCI"]
 
 try:
     RUTA_DATOS_CSV = os.path.join("data", "datos.csv")
