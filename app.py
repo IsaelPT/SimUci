@@ -239,6 +239,8 @@ with datos_reales_tab:
         "Conjunto de datos que se utilizan para realizar las pruebas de comparaciones.\
             Estos son datos recopilados de pacientes reales en estudios anteriormente realizados."
     )
+    html_text = f'<p style="color:{PRIMARY_COLOR};">Puede seleccionar una fila para realizar una simulación al paciente seleccionado.</p>'
+    st.markdown(html_text, unsafe_allow_html=True)
 
     df_selection: int = st.dataframe(
         df_data,
@@ -279,24 +281,26 @@ with datos_reales_tab:
     )
 
     if simular_tabla:
-        lst_e: list[tuple[float]] = simulate_real_data(
-            RUTA_FICHERODEDATOS_CSV, df_selection == None
-        )
+        with st.spinner("Simulando todos los datos en la tabla..."):
+            lst_e: list[tuple[float]] = simulate_real_data(
+                RUTA_FICHERODEDATOS_CSV, df_selection == None
+            )
 
-        # DataFrame con conjunto de todos los resultados de simulaciones a todos los pacientes de la tabla.
-        df_sim_datos_reales = build_df_stats(
-            lst_e,
-            CORRIDAS_SIM_DEFAULT,
-            include_mean=True,
-            include_std=False,
-            include_confint=False,
-            include_info_label=False,
-        )
-        df_sim_datos_reales.index.name = "Paciente"
+            # DataFrame con conjunto de todos los resultados de simulaciones a todos los pacientes de la tabla.
+            df_sim_datos_reales = build_df_stats(
+                lst_e,
+                CORRIDAS_SIM_DEFAULT,
+                include_mean=True,
+                include_std=False,
+                include_confint=False,
+                include_info_label=False,
+            )
+            df_sim_datos_reales.index.name = "Paciente"
 
-        if "df_sim_datos_reales" not in st.session_state:
-            st.session_state.df_sim_datos_reales = df_sim_datos_reales
+            if "df_sim_datos_reales" not in st.session_state:
+                st.session_state.df_sim_datos_reales = df_sim_datos_reales
 
+    if not st.session_state.df_sim_datos_reales.empty:
         st.dataframe(
             format_df_time(st.session_state.df_sim_datos_reales),
             hide_index=False,
