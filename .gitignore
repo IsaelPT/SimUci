@@ -1,3 +1,4 @@
 .vscode/
+.devcontainer/*
 **/__pycache__/*
 experimentos/*

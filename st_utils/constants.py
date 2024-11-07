@@ -27,21 +27,25 @@ ESTAD_PREUTI_MAX = 34
 ESTAD_PREUTI_DEFAULT = ESTAD_PREUTI_MIN
 
 # Corridas Simulación
-CORRIDAS_SIM_MIN = 30
+CORRIDAS_SIM_MIN = 50
 CORRIDAS_SIM_MAX = 1000
-CORRIDAS_SIM_DEFAULT = 30
+CORRIDAS_SIM_DEFAULT = CORRIDAS_SIM_MIN
 
 # Porciento
 PORCIENTO_SIM_MIN = 0
-PORCIENTO_SIM_MAX = 100
-PORCIENTO_SIM_DEFAULT = 10
+PORCIENTO_SIM_MAX = 10
+PORCIENTO_SIM_DEFAULT = PORCIENTO_SIM_MIN
 
 # Mensajes de Ayuda en varios Widgets de la aplicación Streamlit
 HELP_MSG_APACHE: str = "Valor del APACHE."
 HELP_MSG_ESTAD_UTI: str = "Tiempo de estadía en UTI."
 HELP_MSG_ESTAD_PREUTI: str = "Tiempo de estadía pre UTI"
-HELP_MSG_CORRIDA_SIM: str = "La cantidad de corridas de la simulación brinda un mayor margen de precisión."
-HELP_MSG_PORCIENTO_SIM: str = "Proporción de tiempo dentro de estancia UCI que se espera antes de entrar en Ventilación."
+HELP_MSG_CORRIDA_SIM: str = (
+    "La cantidad de corridas de la simulación brinda un mayor margen de precisión."
+)
+HELP_MSG_PORCIENTO_SIM: str = (
+    "Proporción de tiempo dentro de estancia UCI que se espera antes de entrar en Ventilación."
+)
 
 TIPO_VENT: dict[int, str] = {0: "Tubo endotraqueal", 1: "Traqueostomía", 2: "Ambas"}
 
@@ -95,10 +99,16 @@ INSUF_RESP: dict[int, str] = {
     2: "TCE",
     3: "Estatus posoperatorio",
     4: "Afecciones no traumáticas del SNC",
-    5: "Causas extrapulmonares"
+    5: "Causas extrapulmonares",
 }
 
-VARIABLES_EXPERIMENTO = ["Tiempo Pre VAM", "Tiempo VAM", "Tiempo Post VAM", "Estadia UCI", "Estadia Post UCI"]
+VARIABLES_EXPERIMENTO = [
+    "Tiempo Pre VAM",
+    "Tiempo VAM",
+    "Tiempo Post VAM",
+    "Estadia UCI",
+    "Estadia Post UCI",
+]
 
 try:
     RUTA_DATOS_CSV = os.path.join("data", "datos.csv")
@@ -106,3 +116,15 @@ try:
     RUTA_DFCENTROIDES_CSV = os.path.join("data", "DF_Centroides.csv")
 except Exception as e:
     print(f"Error al cargar el archivo la base de datos.\n>>>\nExcepcion\n>>>{e}")
+
+try:
+    import toml
+
+    current_dir = os.path.dirname(__file__)
+    config_path = os.path.join(current_dir, "..", ".streamlit", "config.toml")
+    with open(config_path, "r") as f:
+        config = toml.load(f)
+        PRIMARY_COLOR = config["theme"]["primaryColor"]
+        SECUNDARY_BACKGROUND_COLOR = config["theme"]["secondaryBackgroundColor"]
+except FileNotFoundError as fnf:
+    print(f"No se encontró el de config.\n{fnf}")
