@@ -1,12 +1,14 @@
 import secrets
+import random
 from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
+import streamlit as st
 from pandas import DataFrame
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-from st_utils.constants import TIPO_VENT, DIAG_PREUCI, INSUF_RESP
+from st_utils.constants import CORRIDAS_SIM_DEFAULT, TIPO_VENT, DIAG_PREUCI, INSUF_RESP
 from uci.experiment import Experiment, multiple_replication
 from uci.stats import StatsUtils
 
@@ -42,9 +44,13 @@ def key_categ(categoria: str, valor: str | int, viceversa: bool = False) -> int 
                 return v
 
     if not viceversa:
-        raise Exception(f"El valor (value) que se proporcionó no se encuentra en el conjunto de categorías {categoria}")
+        raise Exception(
+            f"El valor (value) que se proporcionó no se encuentra en el conjunto de categorías {categoria}"
+        )
     else:
-        raise Exception(f"La llave (key) que se proporcionó no se encuentra en el conjunto de categórias {categoria}")
+        raise Exception(
+            f"La llave (key) que se proporcionó no se encuentra en el conjunto de categórias {categoria}"
+        )
 
 
 def value_is_zero(valores: list[int | str] | int | str) -> bool:
@@ -84,8 +90,10 @@ def generate_id(digits: int = 10) -> str:
     """
 
     if not 0 < digits <= 10:
-        raise Exception(f"La cantidad de dígitos n={digits} debe estar en el rango de 0 < d <= 10.")
-    return ''.join([str(secrets.randbelow(digits)) for _ in range(digits)])
+        raise Exception(
+            f"La cantidad de dígitos n={digits} debe estar en el rango de 0 < d <= 10."
+        )
+    return "".join([str(secrets.randbelow(digits)) for _ in range(digits)])
 
 
 def format_df_time(df: DataFrame) -> DataFrame:
@@ -93,7 +101,7 @@ def format_df_time(df: DataFrame) -> DataFrame:
     Toma todas las columnas y convierte los valores numéricos en texto con formato, mostrando los días y las horas.
 
     Args:
-        df: DataFrame a trasformar..
+        df: DataFrame a trasformar.
 
     Returns:
         DataFrame donde cada celda que contenga números tendrá el formato (# d (# h)).
@@ -106,75 +114,142 @@ def format_df_time(df: DataFrame) -> DataFrame:
 
     def fmt(col: pd.Series):
         mascara: pd.Series = pd.to_numeric(col, errors="coerce").notna()
-        formatted: pd.Series = col.astype(object)
+        format: pd.Series = col.astype(object)  # Para filtrar los valores NaN.
         valores_numericos = col[mascara].astype(float)
-        formatted[mascara] = [f"{d:.1f} d ({h:.1f}) h" for d, h in zip(valores_numericos / 24, valores_numericos)]
-        return formatted
+        format[mascara] = [
+            (
+                f"{d:.1f} d ({h:.1f}) h"  # Días en Horas.
+                if not 0 < h < 1.0
+                else f"{d:.1f} d ({h * 60:.0f} min)"  # Días en Minutos.
+            )
+            for d, h in zip(valores_numericos / 24, valores_numericos)
+        ]
+        return format
 
     return df.apply(fmt)
 
 
-def format_df_stats(df: DataFrame) -> DataFrame:
+def format_df_stats(
+    df: DataFrame,
+    label: str = "Información",
+) -> DataFrame:
     """
     Agrega una columna al extremo izquierdo del DataFrame por parámetros con el nombre de columna "Información".
     Brinda de soporte visual para comprender los datos de las tablas.
+    Columna:
+    >>> [
+        "Promedio",
+        "Desviación Estándar",
+        "Límite Inferior",
+        "Límite Superior"
+    ]
 
     Args:
         df: DataFrame a aplicar dicho formato.
+        label: Nombre de la columna a agregar. Default = "Información".
 
     Returns:
         DataFrame con una nueva columna a la izquierda ("Información") con datos estadísticos de utilidad.
     """
+    df.insert(0, label, "")
 
-    LABEL_INF = "Información"
-    df.insert(0, LABEL_INF, "")
-    df.loc[0, LABEL_INF] = "Promedio"
-    df.loc[1, LABEL_INF] = "Desviación Estándar"
-    df.loc[2, LABEL_INF] = "Límite Inferior"
-    df.loc[3, LABEL_INF] = "Límite Superior"
+    df.loc[0, label] = "Promedio"
+    df.loc[1, label] = "Desviación Estándar"
+    df.loc[2, label] = "Límite Inferior"
+    df.loc[3, label] = "Límite Superior"
+    # for i in range(df.shape[0]):
+    #     df.loc[i, label] = f"Paciente {i}"
+
     return df
 
 
-def build_df_stats(df: DataFrame, sample_size: int | None = None,
-                   include_info_label=False, include_mean=True, include_std=True, include_confint=True) -> DataFrame:
+def build_df_stats(
+    data: DataFrame | list[DataFrame],
+    sample_size: int | None = None,
+    include_mean=True,
+    include_std=False,
+    include_confint=False,
+    include_info_label=True,
+    info_label: str = "Información",
+) -> DataFrame:
+    """Construye un dataframe que contiene los datos producto de los estudios estadísticos realizados al o a los pacientes.
+
+    Args:
+        data (DataFrame | list[DataFrame]): DataFrame o lista de DataFrames con los datos a estudiar.
+        sample_size (int | None, optional): Tamaño de muestra. También entendido como cantidad de simulaciones que se tomas en consideración; cantidad de iteraciones. Defaults to None.
+        include_info_label (bool, optional): Mostrar en la tabla una columna informativa sobre los campos. Defaults to False.
+        include_mean (bool, optional): Mostrar el dato de la media en la tabla. Defaults to True.
+        include_std (bool, optional): Mostrar el dato de la desviación estándar. Defaults to True.
+        include_confint (bool, optional): Mostrar el dato del intervalor de confianza (límite inf, límite sup). Defaults to True.
+
+    Raises:
+        ValueError: Cuando se debe incluir al menos 1 valor estadístico a mostrar.
+        ValueError: Cuando al realizar el cálculo de intervalo de confianza no se tengan la media y la desviación estándar.
+        ValueError: Cuando al realizar el cálculo de intervalo de confianza se provea un tamaño de muestra incorrecto (x > 0)
+
+    Returns:
+        DataFrame: DataFrame incluyendo todos los datos recogidos y calculados.
+    """
     if not any([include_mean, include_std, include_confint]):
         raise ValueError("Se debe al menos incluir 1 valor estadísticos.")
 
-    stats_values = []
+    single_patient = True if isinstance(data, DataFrame) else False
 
-    # Media
-    if include_mean:
-        mean: DataFrame = df.mean().to_frame().T
-        stats_values.append(mean)
+    def build_helper(df: DataFrame) -> DataFrame:
+        stats_values = []
 
-    # Desviación Estándar
-    if include_std:
-        std: DataFrame = df.std().to_frame().T
-        stats_values.append(std)
+        # Media
+        if include_mean:
+            mean: DataFrame = df.mean().to_frame().T
+            stats_values.append(mean)
 
-    # Intervalo de Confianza
-    if include_confint:
-        if not include_mean and include_std:
-            raise ValueError(f"Para realizar el intervalo de confianza son necesarios: "
-                             f"mean y std: Falta {'mean' if not include_mean else 'std'}")
-        else:
-            if not sample_size or sample_size <= 0:
-                raise ValueError(f"Para realizar el intervalo de confianza debe usarse un tamaño de muestra válido."
-                                 f"Found: {sample_size}")
+        # Desviación Estándar
+        if include_std:
+            std: DataFrame = df.std().to_frame().T
+            stats_values.append(std)
+
+        # Intervalo de Confianza
+        if include_confint:
+            if not include_mean and include_std:
+                raise ValueError(
+                    f"Para realizar el intervalo de confianza son necesarios: "
+                    f"mean y std: Falta {'mean' if not include_mean else 'std'}"
+                )
             else:
-                confint = StatsUtils.confidenceinterval(mean, std, sample_size)
-                li = pd.DataFrame(confint[0])
-                ls = pd.DataFrame(confint[1])
-                li.columns = mean.columns.to_list()
-                ls.columns = mean.columns.to_list()
-                stats_values.extend([li, ls])
+                if not sample_size or sample_size <= 0:
+                    raise ValueError(
+                        f"Para realizar el intervalo de confianza debe usarse un tamaño de muestra válido."
+                        f"Found: {sample_size}"
+                    )
+                else:
+                    confint = StatsUtils.confidenceinterval(mean, std, sample_size)
+                    li = pd.DataFrame(confint[0])
+                    ls = pd.DataFrame(confint[1])
+                    li.columns = mean.columns.to_list()
+                    ls.columns = mean.columns.to_list()
+                    stats_values.extend([li, ls])
 
-    df_final = pd.concat(stats_values, axis=0, ignore_index=True)
+        df_final = pd.concat(stats_values, axis=0, ignore_index=True)
+
+        return df_final
+
+    # Nota: cuando se provee una lista, se hace un promedio de los resultados para cada paciente. Por lo tanto, se debe
+    # realizar un promedio de las listas de resultados de cada paciente.
+    df_output = (
+        build_helper(data)
+        if single_patient
+        else pd.DataFrame(
+            [build_helper(df).iloc[0] for df in data], index=[f"Paciente {i}" for i in range(len(data))]
+        )
+    )
 
     if include_info_label:
-        return format_df_stats(df_final)
+        return format_df_stats(
+            df=df_output,
+            label=info_label,
+        )
 
-    return df_final
+    return df_output
 
 
 def bin_to_df(files: UploadedFile | list[UploadedFile]) -> DataFrame | list[DataFrame]:
@@ -194,34 +269,51 @@ def bin_to_df(files: UploadedFile | list[UploadedFile]) -> DataFrame | list[Data
         return [pd.read_csv(f) for f in files]
 
 
-def extract_real_data(path_datos: str, index: int,
-                      return_type: str = "df") -> DataFrame | tuple[float]:
-    if index:
-        data = pd.read_csv(path_datos)
+def extract_real_data(
+    ruta_archivo_csv: str, index: int | None, return_type: str = "df"
+) -> DataFrame | tuple[float]:
+    data = pd.read_csv(ruta_archivo_csv)
 
-        row = {
-            "edad": int(data["Edad"].iloc[index]),
-            "d1": int(data["Diag.Ing1"].iloc[index]),
-            "d2": int(data["Diag.Ing2"].iloc[index]),
-            "d3": int(data["Diag.Ing3"].iloc[index]),
-            "d4": int(data["Diag.Ing4"].iloc[index]),
-            "apache": int(data["APACHE"].iloc[index]),
-            "insuf": int(data["InsufResp"].iloc[index]),
-            "va": int(data["VA"].iloc[index]),
-            "estuci": int(data["Est. UCI"].iloc[index] * 24),  # días -> horas
-            "tiempo_vam": int(data["TiempoVAM"].iloc[index]),  # horas
-            "estpreuci": int(data["Est. PreUCI"].iloc[index] * 24),  # días -> horas
+    def build_row(data_index: int):
+        return {
+            "edad": int(data["Edad"].iloc[data_index]),
+            "d1": int(data["Diag.Ing1"].iloc[data_index]),
+            "d2": int(data["Diag.Ing2"].iloc[data_index]),
+            "d3": int(data["Diag.Ing3"].iloc[data_index]),
+            "d4": int(data["Diag.Ing4"].iloc[data_index]),
+            "apache": int(data["APACHE"].iloc[data_index]),
+            "insuf": int(data["InsufResp"].iloc[data_index]),
+            "va": int(data["VA"].iloc[data_index]),
+            "estuci": int(data["Est. UCI"].iloc[data_index] * 24),  # días -> horas
+            "tiempo_vam": int(data["TiempoVAM"].iloc[data_index]),  # horas
+            "estpreuci": int(
+                data["Est. PreUCI"].iloc[data_index] * 24
+            ),  # días -> horas
         }
 
-        # Return Type
-        if return_type == "tuple":
-            return tuple(row.values())
-        return pd.DataFrame(data=[row])  # Default Return Type
+    extracted_data = build_row(index)
+
+    if return_type == "tuple":
+        return tuple(extracted_data.values())  # Alternative Return Type (Tuple)
+    if return_type == "df":
+        return pd.DataFrame(data=[extracted_data])  # Default Return Type (DataFrame)
 
 
-def start_experiment(corridas_simulacion: int, edad: int, d1: int, d2: int, d3: int, d4: int, apache: int,
-                     insuf_resp: int, va: int, t_vam: int, est_uci: int, est_preuti: int, porciento: int = 10
-                     ) -> pd.DataFrame:
+def start_experiment(
+    corridas_simulacion: int,
+    edad: int,
+    d1: int,
+    d2: int,
+    d3: int,
+    d4: int,
+    apache: int,
+    insuf_resp: int,
+    va: int,
+    t_vam: int,
+    est_uci: int,
+    est_preuti: int,
+    porciento: int = 10,
+) -> pd.DataFrame:
     """
     Toma una serie de datos de un paciente y con ellos comienza la simulación.
 
@@ -238,7 +330,7 @@ def start_experiment(corridas_simulacion: int, edad: int, d1: int, d2: int, d3: 
         t_vam: Tipo de Ventilación que presenta el paciente.
         est_uci: Estadía en UTI que se espera del paciente.
         est_preuti: Estadía Pre-UTI que presenta el paciente.
-        porciento: "Proporción de tiempo dentro de estancia UCI que se espera antes de entrar en Ventilación."
+        porciento: "Proporción de tiempo dentro de estancia UCI que se espera antes de entrar en Ventilación." Por defecto, su valor es 10%.
 
     Returns:
         Un DataFrame con el resultado de la simulación.
@@ -247,10 +339,20 @@ def start_experiment(corridas_simulacion: int, edad: int, d1: int, d2: int, d3: 
 
     """
 
-    e = Experiment(edad=edad, diagnostico_ingreso1=d1, diagnostico_ingreso2=d2, diagnostico_ingreso3=d3,
-                   diagnostico_ingreso4=d4, apache=apache, insuficiencia_respiratoria=insuf_resp,
-                   ventilacion_artificial=va, estadia_uti=est_uci, tiempo_vam=t_vam, tiempo_estadia_pre_uti=est_preuti,
-                   porciento=porciento)
+    e = Experiment(
+        edad=edad,
+        diagnostico_ingreso1=d1,
+        diagnostico_ingreso2=d2,
+        diagnostico_ingreso3=d3,
+        diagnostico_ingreso4=d4,
+        apache=apache,
+        insuficiencia_respiratoria=insuf_resp,
+        ventilacion_artificial=va,
+        estadia_uti=est_uci,
+        tiempo_vam=t_vam,
+        tiempo_estadia_pre_uti=est_preuti,
+        porciento=porciento,
+    )
     res = multiple_replication(e, corridas_simulacion)
     return res
 
@@ -290,9 +392,63 @@ def build_df_test_result(statistic: float, p_value: float) -> DataFrame:
 
     S = "Statistic"
     P = "Valor de P"
-    data = {
-        S: [statistic],
-        P: [p_value]
-    }
+    data = {S: [statistic], P: [p_value]}
     df = pd.DataFrame(data)
     return df
+
+
+def simulate_real_data(
+    ruta_fichero_csv: str, df_selection: int | None
+) -> tuple[float] | list[tuple[float]]:
+    """A partir de una porción de los datos reales, realiza una simulación para un paciente seleccionado o para todos los pacientes.
+
+    Args:
+        ruta_fichero_csv (str): Ruta del archivo de datos reales.
+        df_selection (int | None): Indice del paciente seleccionado. Si es None, realiza una simulación para todos los pacientes.
+
+    Returns:
+        tuple[float] | list[tuple[float]]: Tuple con los resultados de la simulación para un paciente o lista de tuples con los resultados de la simulación para todos los pacientes.
+    """
+
+    def experiment_helper(t: tuple[float]) -> DataFrame:
+        """Construye un DataFrame con los resultados de la simulación.
+
+        Args:
+            t (tuple[float]): Tuple con los datos de un paciente.
+
+        Returns:
+            DataFrame: DataFrame con los resultados de la simulación.
+        """
+
+        e = start_experiment(
+            corridas_simulacion=CORRIDAS_SIM_DEFAULT,
+            edad=int(t[0]),
+            d1=t[1],
+            d2=t[2],
+            d3=t[3],
+            d4=t[4],
+            apache=t[5],
+            insuf_resp=t[6],
+            va=t[7],
+            est_uci=t[8],
+            t_vam=t[9],
+            est_preuti=t[10],
+            porciento=random.randint(0, 10),
+        )
+
+        return e
+
+    if df_selection:
+        t: tuple[float] = extract_real_data(
+            ruta_fichero_csv, index=df_selection, return_type="tuple"
+        )
+        return experiment_helper(t)  # tuple[float]
+    else:
+        datalen = pd.read_csv(ruta_fichero_csv).shape[0]
+        return [
+            experiment_helper(t)
+            for t in [
+                extract_real_data(ruta_fichero_csv, index=i, return_type="tuple")
+                for i in range(datalen)
+            ]
+        ]  # list[tuple[float]]
