@@ -274,13 +274,16 @@ with datos_reales_tab:
             use_container_width=True,
         )
 
-    simular_tabla = st.button(
+    if "df_sim_datos_reales" not in st.session_state:
+        st.session_state.df_sim_datos_reales = pd.DataFrame()
+
+    # Simular todos los datos en la tabla.
+    if st.button(
         "Simular todos los datos en la tabla",
         type="primary",
         use_container_width=True,
-    )
-
-    if simular_tabla:
+        key="simular_tabla",
+    ):
         with st.spinner("Simulando todos los datos en la tabla..."):
             lst_e: list[tuple[float]] = simulate_real_data(
                 RUTA_FICHERODEDATOS_CSV, df_selection == None
@@ -296,10 +299,9 @@ with datos_reales_tab:
                 include_info_label=False,
             )
             df_sim_datos_reales.index.name = "Paciente"
+            st.session_state.df_sim_datos_reales = df_sim_datos_reales
 
-            if "df_sim_datos_reales" not in st.session_state:
-                st.session_state.df_sim_datos_reales = df_sim_datos_reales
-
+    # Mostrar simulación con datos reales.
     if not st.session_state.df_sim_datos_reales.empty:
         st.dataframe(
             format_df_time(st.session_state.df_sim_datos_reales),
@@ -311,7 +313,8 @@ with datos_reales_tab:
         csv_sim_datos_reales = st.session_state.df_sim_datos_reales.to_csv(
             index=False
         ).encode("UTF-8")
-        boton_guardar = st.download_button(
+
+        st.download_button(
             label="Guardar resultados",
             data=csv_sim_datos_reales,
             file_name=f"Experimentos con Datos Reales.csv",
