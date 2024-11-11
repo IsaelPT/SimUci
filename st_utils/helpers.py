@@ -239,7 +239,8 @@ def build_df_stats(
         build_helper(data)
         if single_patient
         else pd.DataFrame(
-            [build_helper(df).iloc[0] for df in data], index=[f"Paciente {i}" for i in range(len(data))]
+            [build_helper(df).iloc[0] for df in data],
+            index=[f"Paciente {i}" for i in range(len(data))],
         )
     )
 
@@ -276,19 +277,21 @@ def extract_real_data(
 
     def build_row(data_index: int):
         return {
-            "edad": int(data["Edad"].iloc[data_index]),
-            "d1": int(data["Diag.Ing1"].iloc[data_index]),
-            "d2": int(data["Diag.Ing2"].iloc[data_index]),
-            "d3": int(data["Diag.Ing3"].iloc[data_index]),
-            "d4": int(data["Diag.Ing4"].iloc[data_index]),
-            "apache": int(data["APACHE"].iloc[data_index]),
-            "insuf": int(data["InsufResp"].iloc[data_index]),
-            "va": int(data["VA"].iloc[data_index]),
-            "estuci": int(data["Est. UCI"].iloc[data_index] * 24),  # días -> horas
-            "tiempo_vam": int(data["TiempoVAM"].iloc[data_index]),  # horas
-            "estpreuci": int(
-                data["Est. PreUCI"].iloc[data_index] * 24
-            ),  # días -> horas
+            """
+            estuci: dias -> horas
+            espreuci: dias -> horas
+            """
+            "edad": int(data["Edad"].iloc[data_index].iloc[0]),
+            "d1": int(data["Diag.Ing1"].iloc[data_index].iloc[0]),
+            "d2": int(data["Diag.Ing2"].iloc[data_index].iloc[0]),
+            "d3": int(data["Diag.Ing3"].iloc[data_index].iloc[0]),
+            "d4": int(data["Diag.Ing4"].iloc[data_index].iloc[0]),
+            "apache": int(data["APACHE"].iloc[data_index].iloc[0]),
+            "insuf": int(data["InsufResp"].iloc[data_index].iloc[0]),
+            "va": int(data["VA"].iloc[data_index].iloc[0]),
+            "estuci": int(data["Est. UCI"].iloc[data_index].iloc[0] * 24),
+            "tiempo_vam": int(data["TiempoVAM"].iloc[data_index].iloc[0]),
+            "estpreuci": int(data["Est. PreUCI"].iloc[data_index].iloc[0] * 24),
         }
 
     extracted_data = build_row(index)
