@@ -98,7 +98,7 @@ Y otras bibliotecas como:
 
 Este proyecto está desplegado hasta la fecha en Streamlit Community Cloud en la siguiente dirección.
 
-- https://simuci.streamlit.app/
+- https://simuci-v0.streamlit.app/
 
 ## **Aclaración muy importante**
 
