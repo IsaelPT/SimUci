@@ -249,12 +249,20 @@ with datos_reales_tab:
         selection_mode=["single-row"],
         hide_index=False,
         height=300,
-    )["selection"][
-        "rows"
-    ]  # dict -> {"selection": {"rows": [0, 1, 2, ...], "columns": []}}
+    )["selection"]["rows"]
+
+    # df_selection devuelve un dict de la forma:
+    # {
+    #     "selection": {
+    #         "rows": [0, 1, 2, ...],
+    #         "columns": [0, 1, 2, ...]
+    #     }
+    # }
+
+    df_selection = df_selection[0] if df_selection else None
 
     # DataFrame Datos Reales
-    if df_selection:
+    if df_selection is not None or df_selection == 0:
         st.markdown("Indicadores estadísticos del paciente seleccionado")
 
         e: tuple[float] = simulate_real_data(RUTA_FICHERODEDATOS_CSV, df_selection)
