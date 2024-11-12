@@ -294,7 +294,7 @@ with datos_reales_tab:
     ):
         with st.spinner("Simulando todos los datos en la tabla..."):
             lst_e: list[tuple[float]] = simulate_real_data(
-                RUTA_FICHERODEDATOS_CSV, df_selection == None
+                RUTA_FICHERODEDATOS_CSV, df_selection=None
             )
 
             # DataFrame con conjunto de todos los resultados de simulaciones a todos los pacientes de la tabla.
