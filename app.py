@@ -121,10 +121,10 @@ with simulacion_tab:
     diag_ok = False
     insuf_ok = False
     resultado_experimento = pd.DataFrame()
+
+    # session_state para visualizar datos simulación.
     if "df_resultado" not in st.session_state:
-        st.session_state.df_resultado = (
-            pd.DataFrame()
-        )  # session_state para visualizar datos simulación.
+        st.session_state.df_resultado = pd.DataFrame()
 
     sim_buttons_container = st.container()
     with sim_buttons_container:
@@ -259,15 +259,17 @@ with datos_reales_tab:
     #     }
     # }
 
+    # Si se seleccionó alguna fila, se asigna a esta variable. De no seleccionarse nada es None.
     df_selection = df_selection[0] if df_selection else None
 
-    # DataFrame Datos Reales
-    if df_selection is not None or df_selection == 0:
+    # DataFrame con experimento con datos reales
+    if df_selection == 0 or df_selection is not None:
         st.markdown("Indicadores estadísticos del paciente seleccionado")
 
-        e: tuple[float] = simulate_real_data(RUTA_FICHERODEDATOS_CSV, df_selection)
+        e: tuple[float] = simulate_real_data(
+            ruta_fichero_csv=RUTA_FICHERODEDATOS_CSV, df_selection=df_selection
+        )
 
-        # DataFrame con experimento con datos reales
         df_sim_datos_reales = build_df_stats(
             e,
             CORRIDAS_SIM_DEFAULT,
@@ -294,10 +296,10 @@ with datos_reales_tab:
     ):
         with st.spinner("Simulando todos los datos en la tabla..."):
             lst_e: list[tuple[float]] = simulate_real_data(
-                RUTA_FICHERODEDATOS_CSV, df_selection=None
+                RUTA_FICHERODEDATOS_CSV, df_selection=-1
             )
 
-            # DataFrame con conjunto de todos los resultados de simulaciones a todos los pacientes de la tabla.
+            # DataFrame con todos los resultados de simulaciones a todos los pacientes en la tabla.
             df_sim_datos_reales = build_df_stats(
                 lst_e,
                 CORRIDAS_SIM_DEFAULT,

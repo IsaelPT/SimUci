@@ -279,20 +279,25 @@ def extract_real_data(
         # estuci: días -> horas
         # tiempo_vam: horas
         # estpreuci: días -> horas
-        output = {
-            "edad": int(data["Edad"].iloc[data_index]),
-            "d1": int(data["Diag.Ing1"].iloc[data_index]),
-            "d2": int(data["Diag.Ing2"].iloc[data_index]),
-            "d3": int(data["Diag.Ing3"].iloc[data_index]),
-            "d4": int(data["Diag.Ing4"].iloc[data_index]),
-            "apache": int(data["APACHE"].iloc[data_index]),
-            "insuf": int(data["InsufResp"].iloc[data_index]),
-            "va": int(data["VA"].iloc[data_index]),
-            "estuci": int(data["Est. UCI"].iloc[data_index] * 24),
-            "tiempo_vam": int(data["TiempoVAM"].iloc[data_index]),
-            "estpreuci": int(data["Est. PreUCI"].iloc[data_index] * 24),
-        }
-        return output
+        print(f"TYPE: {type(data_index)} --- DATA: {data_index}\n")
+        if isinstance(data_index, int):
+            output = {
+                "edad": int(data["Edad"].iloc[data_index]),
+                "d1": int(data["Diag.Ing1"].iloc[data_index]),
+                "d2": int(data["Diag.Ing2"].iloc[data_index]),
+                "d3": int(data["Diag.Ing3"].iloc[data_index]),
+                "d4": int(data["Diag.Ing4"].iloc[data_index]),
+                "apache": int(data["APACHE"].iloc[data_index]),
+                "insuf": int(data["InsufResp"].iloc[data_index]),
+                "va": int(data["VA"].iloc[data_index]),
+                "estuci": int(data["Est. UCI"].iloc[data_index] * 24),
+                "tiempo_vam": int(data["TiempoVAM"].iloc[data_index]),
+                "estpreuci": int(data["Est. PreUCI"].iloc[data_index] * 24),
+            }
+            print(output.values())
+            return output
+        else:
+            raise ValueError("El parámetro data_index debe ser un entero positivo.")
 
     extracted_data = build_row(index)
 
@@ -403,13 +408,13 @@ def build_df_test_result(statistic: float, p_value: float) -> DataFrame:
 
 
 def simulate_real_data(
-    ruta_fichero_csv: str, df_selection: int | None
+    ruta_fichero_csv: str, df_selection: int
 ) -> tuple[float] | list[tuple[float]]:
     """A partir de una porción de los datos reales, realiza una simulación para un paciente seleccionado o para todos los pacientes.
 
     Args:
         ruta_fichero_csv (str): Ruta del archivo de datos reales.
-        df_selection (int | None): Indice del paciente seleccionado. Si es None, realiza una simulación para todos los pacientes.
+        df_selection (int): Indice del paciente seleccionado. Si es None, realiza una simulación para todos los pacientes.
 
     Returns:
         tuple[float] | list[tuple[float]]: Tuple con los resultados de la simulación para un paciente o lista de tuples con los resultados de la simulación para todos los pacientes.
@@ -443,13 +448,13 @@ def simulate_real_data(
 
         return e
 
-    if df_selection is not None:
+    if df_selection != -1:
         t: tuple[float] = extract_real_data(
             ruta_fichero_csv, index=df_selection, return_type="tuple"
         )
         # Se retorna un tuple[float]
         return experiment_helper(t)
-    else:
+    elif df_selection == -1:
         datalen = pd.read_csv(ruta_fichero_csv).shape[0]
         # Se retorna un list[tuple[float]]
         return [
@@ -459,3 +464,5 @@ def simulate_real_data(
                 for i in range(datalen)
             ]
         ]
+    else:
+        raise ValueError("El parámetro df_selection debe ser -1 o un entero positivo.")
