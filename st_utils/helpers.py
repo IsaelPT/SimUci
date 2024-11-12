@@ -271,35 +271,37 @@ def bin_to_df(files: UploadedFile | list[UploadedFile]) -> DataFrame | list[Data
 
 
 def extract_real_data(
-    ruta_archivo_csv: str, index: int | None, return_type: str = "df"
+    ruta_archivo_csv: str, index: int, return_type: str = "df"
 ) -> DataFrame | tuple[float]:
     data = pd.read_csv(ruta_archivo_csv)
 
     def build_row(data_index: int):
-        return {
-            """
-            estuci: dias -> horas
-            espreuci: dias -> horas
-            """
-            "edad": int(data["Edad"].iloc[data_index].iloc[0]),
-            "d1": int(data["Diag.Ing1"].iloc[data_index].iloc[0]),
-            "d2": int(data["Diag.Ing2"].iloc[data_index].iloc[0]),
-            "d3": int(data["Diag.Ing3"].iloc[data_index].iloc[0]),
-            "d4": int(data["Diag.Ing4"].iloc[data_index].iloc[0]),
-            "apache": int(data["APACHE"].iloc[data_index].iloc[0]),
-            "insuf": int(data["InsufResp"].iloc[data_index].iloc[0]),
-            "va": int(data["VA"].iloc[data_index].iloc[0]),
-            "estuci": int(data["Est. UCI"].iloc[data_index].iloc[0] * 24),
-            "tiempo_vam": int(data["TiempoVAM"].iloc[data_index].iloc[0]),
-            "estpreuci": int(data["Est. PreUCI"].iloc[data_index].iloc[0] * 24),
+        # estuci: días -> horas
+        # tiempo_vam: horas
+        # estpreuci: días -> horas
+        output = {
+            "edad": int(data["Edad"].iloc[data_index]),
+            "d1": int(data["Diag.Ing1"].iloc[data_index]),
+            "d2": int(data["Diag.Ing2"].iloc[data_index]),
+            "d3": int(data["Diag.Ing3"].iloc[data_index]),
+            "d4": int(data["Diag.Ing4"].iloc[data_index]),
+            "apache": int(data["APACHE"].iloc[data_index]),
+            "insuf": int(data["InsufResp"].iloc[data_index]),
+            "va": int(data["VA"].iloc[data_index]),
+            "estuci": int(data["Est. UCI"].iloc[data_index] * 24),
+            "tiempo_vam": int(data["TiempoVAM"].iloc[data_index]),
+            "estpreuci": int(data["Est. PreUCI"].iloc[data_index] * 24),
         }
+        return output
 
     extracted_data = build_row(index)
 
-    if return_type == "tuple":
-        return tuple(extracted_data.values())  # Alternative Return Type (Tuple)
     if return_type == "df":
-        return pd.DataFrame(data=[extracted_data])  # Default Return Type (DataFrame)
+        return pd.DataFrame([extracted_data])  # Alternative Return Type (Tuple)
+    elif return_type == "tuple":
+        return tuple(extracted_data.values())  # Default Return Type (DataFrame)
+    else:
+        raise ValueError("El parámetro return_type debe ser 'df' o 'tuple'.")
 
 
 def start_experiment(
@@ -441,17 +443,19 @@ def simulate_real_data(
 
         return e
 
-    if df_selection:
+    if df_selection is not None:
         t: tuple[float] = extract_real_data(
             ruta_fichero_csv, index=df_selection, return_type="tuple"
         )
-        return experiment_helper(t)  # tuple[float]
+        # Se retorna un tuple[float]
+        return experiment_helper(t)
     else:
         datalen = pd.read_csv(ruta_fichero_csv).shape[0]
+        # Se retorna un list[tuple[float]]
         return [
             experiment_helper(t)
             for t in [
                 extract_real_data(ruta_fichero_csv, index=i, return_type="tuple")
                 for i in range(datalen)
             ]
-        ]  # list[tuple[float]]
+        ]
