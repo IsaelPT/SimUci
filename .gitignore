@@ -1,4 +1,6 @@
 .vscode/
+.idea/*
+.venv/*
 .devcontainer/*
 **/__pycache__/*
 experimentos/*
