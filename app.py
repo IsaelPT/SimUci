@@ -7,7 +7,9 @@ from st_utils.helpers import *
 from uci.experiment import *
 from uci.stats import *
 
-#### TABS
+########
+# TABS #
+########
 simulacion_tab, datos_reales_tab, comparaciones_tab = st.tabs(
     ("Simulación", "Datos reales", "Comparaciones")
 )
@@ -19,7 +21,7 @@ with simulacion_tab:
     st.header("Paciente")
 
     # ID Paciente
-    # IMPORTANT: EL ID DEL PACIENTE ESTÁ ALMACENADO DENTRO DEL SESSION_STATE!
+    # NOTE: EL ID DEL PACIENTE ESTÁ ALMACENADO DENTRO DEL SESSION_STATE!
     if "id_paciente" not in st.session_state:
         st.session_state.id_paciente = generate_id()
     col1_nuevo_paciente, col2_nuevo_paciente = st.columns([1, 1])
@@ -136,7 +138,9 @@ with simulacion_tab:
             help=HELP_MSG_CORRIDA_SIM,
         )
         boton_comenzar = st.button(
-            "Comenzar Simulación", type="primary", use_container_width=True
+            "Comenzar Simulación",
+            type="primary",
+            use_container_width=True
         )
 
     # Mostrar DataFrame con resultado de la simulación para ese paciente.
@@ -154,6 +158,7 @@ with simulacion_tab:
             include_confint=True,
             include_info_label=True,
         )
+
         if toggle_format:
             df_simulacion = format_df_time(df_simulacion)
 
@@ -174,19 +179,15 @@ with simulacion_tab:
             key="guardar_simulacion",
         )
 
-        st.success(
-            f"La simulación ha concluido tras haber completado {corridas_sim} iteraciones."
-        )
+        st.success(f"La simulación ha concluido tras haber completado {corridas_sim} iteraciones.")
 
     if boton_comenzar:
         # Validación de campos para realizar simulación.
-        if not value_is_zero([diagn1, diagn2, diagn3, diagn4]):  # Diagnósticos OK?
+        if not value_is_zero([diagn1, diagn2, diagn3, diagn4]):  # campos de Diagnósticos OK?
             diag_ok = True
         else:
-            st.warning(
-                f"Todos los diagnósticos están vacíos. Mínimo incluya un diagnóstico para la simulación."
-            )
-        if not value_is_zero(insuf_resp):  # Insuficiencia Respiratoria OK?
+            st.warning(f"Todos los diagnósticos están vacíos. Se debe incluir mínimo un diagnóstico para realizar la simulación.")
+        if not value_is_zero(insuf_resp):  # campo de dInsuficiencia Respiratoria OK?
             insuf_ok = True
         else:
             st.warning(f"Seleccione un tipo de Insuficiencia Respiratoria.")
@@ -216,9 +217,8 @@ with simulacion_tab:
                 if not os.path.exists(path_base):
                     os.makedirs(path_base)
                 fecha: str = datetime.now().strftime("%d-%m-%Y")
-                path: str = (
-                    f"{path_base}\\experimento-id {generate_id(5)} fecha {fecha} corridas {corridas_sim}.csv"
-                )
+
+                path: str = (f"{path_base}\\experimento-id {generate_id(5)} fecha {fecha} corridas {corridas_sim}.csv")
                 resultado_experimento.to_csv(path, index=False)
                 st.session_state.df_resultado = resultado_experimento
 
@@ -239,7 +239,9 @@ with datos_reales_tab:
         "Conjunto de datos que se utilizan para realizar las pruebas de comparaciones.\
             Estos son datos recopilados de pacientes reales en estudios anteriormente realizados."
     )
+
     html_text = f'<p style="color:{PRIMARY_COLOR};">Puede seleccionar una fila para realizar una simulación al paciente seleccionado.</p>'
+
     st.markdown(html_text, unsafe_allow_html=True)
 
     df_selection: int = st.dataframe(
@@ -278,6 +280,7 @@ with datos_reales_tab:
             include_confint=True,
             include_info_label=True,
         )
+
         st.dataframe(
             format_df_time(df_sim_datos_reales),
             hide_index=True,
@@ -296,7 +299,8 @@ with datos_reales_tab:
     ):
         with st.spinner("Simulando todos los datos en la tabla..."):
             lst_e: list[tuple[float]] = simulate_real_data(
-                RUTA_FICHERODEDATOS_CSV, df_selection=-1
+                RUTA_FICHERODEDATOS_CSV,
+                df_selection = -1
             )
 
             # DataFrame con todos los resultados de simulaciones a todos los pacientes en la tabla.
@@ -320,9 +324,7 @@ with datos_reales_tab:
         )
 
         # Lógica para guardar resultados localmente.
-        csv_sim_datos_reales = st.session_state.df_sim_datos_reales.to_csv(
-            index=False
-        ).encode("UTF-8")
+        csv_sim_datos_reales = st.session_state.df_sim_datos_reales.to_csv(index=False).encode("UTF-8")
 
         st.download_button(
             label="Guardar resultados",
@@ -368,7 +370,9 @@ with comparaciones_tab:
 
         # Columna a comparar.
         opcion_col_comparacion = st.selectbox(
-            "Escoja una columna para comparar", VARIABLES_EXPERIMENTO, key=1
+            "Escoja una columna para comparar",
+            VARIABLES_EXPERIMENTO,
+            key=1
         )
         boton_comparacion = st.button(
             "Realizar prueba de Wilcoxon",
@@ -381,34 +385,24 @@ with comparaciones_tab:
         with st.container():
             if boton_comparacion:
                 if df_experimento1.empty or df_experimento2.empty:
-                    st.warning(
-                        "No se puede realizar la comparación. \
-                    Se detectan datos vacíos o falta de datos en los experimentos."
-                    )
+                    st.warning("No se puede realizar la comparación. Se detectan datos vacíos o falta de datos en los experimentos.")
                 else:
                     x: DataFrame = df_experimento1[opcion_col_comparacion]
                     y: DataFrame = df_experimento2[opcion_col_comparacion]
                     if x.equals(y):
-                        st.error(
-                            'Imposible realizar prueba de Wilcoxon cuando la diferencia entre los elementos \
-                        de "x" y "y" es cero para todos los elementos. Verifique que no cargó el mismo \
-                        experimento dos veces.'
-                        )
+                        st.error('Imposible realizar prueba de Wilcoxon cuando la diferencia entre los elementos de "x" y "y" es cero para todos los elementos. Verifique que no cargó el mismo experimento dos veces.')
                     else:
+                        len_dif = abs(len(x) - len(y))
                         # Corrección de que existen la misma cantidad de filas en ambas tablas.
                         len_info_msg = (
-                            lambda exp: f"Se eliminaron filas del experimento {exp} para coincidir \
-                                con el experimento {2 if exp == 1 else 1} ({len_dif} filas diferentes)."
+                            lambda exp: f"Se eliminaron filas del experimento {exp} para coincidir con el experimento {2 if exp == 1 else 1} ({len_dif} filas diferentes)."
                         )
-                        len_dif = abs(len(x) - len(y))
-                        if (
-                            x.shape[0] > y.shape[0]
-                        ):  # La cantidad de filas de x, excede las de y.
+                        # La cantidad de filas de x, excede las de y.
+                        if (x.shape[0] > y.shape[0]):
                             x = x.head(y.shape[0])
                             st.info(len_info_msg(1))
-                        elif (
-                            y.shape[0] > x.shape[0]
-                        ):  # La cantidad de filas de y, excede las de x.
+                        # La cantidad de filas de y, excede las de x.
+                        else:
                             y = y.head(x.shape[0])
                             st.info(len_info_msg(2))
 
@@ -423,7 +417,9 @@ with comparaciones_tab:
                                 p_value=wilcoxon_data.p_value,
                             )
                             st.dataframe(
-                                df_mostrar, hide_index=True, use_container_width=True
+                                df_mostrar,
+                                hide_index=True,
+                                use_container_width=True
                             )
                         except Exception as e:
                             st.exception(e)
@@ -437,31 +433,31 @@ with comparaciones_tab:
         # File Uploader.
         with st.container():
             file_upl_experimentos = st.file_uploader(
-                label="Experimentos", type=[".csv"], accept_multiple_files=True
+                label="Experimentos",
+                type=[".csv"],
+                accept_multiple_files=True
             )
             dataframes_experimentos = bin_to_df(file_upl_experimentos)
 
         # Columna a comparar.
         opcion_col_comparacion = st.selectbox(
-            "Escoja una columna para comparar", VARIABLES_EXPERIMENTO, key=3
+            "Escoja una columna para comparar",
+            VARIABLES_EXPERIMENTO,
+            key=3
         )
         boton_comparacion = st.button(
             "Realizar prueba de Friedman",
             type="primary",
             use_container_width=True,
-            key=4,
+            key=4
         )
 
         with st.container():
             if boton_comparacion:
                 if len(file_upl_experimentos) == 0:
-                    st.warning(
-                        "No se han cargado datos de resultados de experimentos para realizar la prueba."
-                    )
+                    st.warning("No se han cargado datos de resultados de experimentos para realizar la prueba.")
                 elif not len(file_upl_experimentos) >= 3:
-                    st.warning(
-                        "Debe usted cargar más de 3 muestras para realizar la prueba."
-                    )
+                    st.warning("Debe usted cargar más de 3 muestras para realizar la prueba.")
                 else:
                     adjusted_sample_tuple = adjust_df_sizes(
                         [df[opcion_col_comparacion] for df in dataframes_experimentos]
@@ -471,8 +467,7 @@ with comparaciones_tab:
                     min_sample_size = adjusted_sample_tuple[1]
                     if min_sample_size != -1:
                         st.info(
-                            f"Se eliminaron filas de las tablas de los experimentos para realizar el examen. \
-                        Todas las tablas pasaron a tener {min_sample_size} filas."
+                            f"Se eliminaron filas de las tablas de los experimentos para realizar el examen. Todas las tablas pasaron a tener {min_sample_size} filas."
                         )
 
                     try:
@@ -486,7 +481,9 @@ with comparaciones_tab:
                             p_value=friedman_result.p_value,
                         )
                         st.dataframe(
-                            df_mostrar, hide_index=True, use_container_width=True
+                            df_mostrar,
+                            hide_index=True,
+                            use_container_width=True
                         )
                     except Exception as e:
                         st.exception(e)
