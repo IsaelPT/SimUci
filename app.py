@@ -392,8 +392,8 @@ with comparaciones_tab:
                     if x.equals(y):
                         st.error('Imposible realizar prueba de Wilcoxon cuando la diferencia entre los elementos de "x" y "y" es cero para todos los elementos. Verifique que no cargó el mismo experimento dos veces.')
                     else:
-                        len_dif = abs(len(x) - len(y))
                         # Corrección de que existen la misma cantidad de filas en ambas tablas.
+                        len_dif = abs(len(x) - len(y))
                         len_info_msg = (
                             lambda exp: f"Se eliminaron filas del experimento {exp} para coincidir con el experimento {2 if exp == 1 else 1} ({len_dif} filas diferentes)."
                         )
@@ -402,7 +402,7 @@ with comparaciones_tab:
                             x = x.head(y.shape[0])
                             st.info(len_info_msg(1))
                         # La cantidad de filas de y, excede las de x.
-                        else:
+                        elif (y.shape[0] > x.shape[0]):
                             y = y.head(x.shape[0])
                             st.info(len_info_msg(2))
 
@@ -421,6 +421,8 @@ with comparaciones_tab:
                                 hide_index=True,
                                 use_container_width=True
                             )
+                            st.markdown(INFO_STATISTIC)
+                            st.markdown(INFO_P_VALUE)
                         except Exception as e:
                             st.exception(e)
 
@@ -455,9 +457,9 @@ with comparaciones_tab:
         with st.container():
             if boton_comparacion:
                 if len(file_upl_experimentos) == 0:
-                    st.warning("No se han cargado datos de resultados de experimentos para realizar la prueba.")
+                    st.warning("No se han cargado datos de resultados de experimentos para realizar esta prueba.")
                 elif not len(file_upl_experimentos) >= 3:
-                    st.warning("Debe usted cargar más de 3 muestras para realizar la prueba.")
+                    st.warning("Debe cargar más de 3 muestras para realizar esta prueba.")
                 else:
                     adjusted_sample_tuple = adjust_df_sizes(
                         [df[opcion_col_comparacion] for df in dataframes_experimentos]
@@ -467,7 +469,7 @@ with comparaciones_tab:
                     min_sample_size = adjusted_sample_tuple[1]
                     if min_sample_size != -1:
                         st.info(
-                            f"Se eliminaron filas de las tablas de los experimentos para realizar el examen. Todas las tablas pasaron a tener {min_sample_size} filas."
+                            f"Para realizar correctamente el examen se eliminaron filas de las tablas de los experimentos, ya que es un requisito que exista el mismo tamaño de muestra. Todas las tablas pasaron a tener {min_sample_size} filas."
                         )
 
                     try:
@@ -485,5 +487,7 @@ with comparaciones_tab:
                             hide_index=True,
                             use_container_width=True
                         )
+                        st.markdown(INFO_STATISTIC)
+                        st.markdown(INFO_P_VALUE)
                     except Exception as e:
                         st.exception(e)

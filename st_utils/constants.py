@@ -47,6 +47,13 @@ HELP_MSG_PORCIENTO_SIM: str = (
     "Proporción de tiempo dentro de estancia UCI que se espera antes de entrar en Ventilación."
 )
 
+INFO_STATISTIC: str = (
+    "***Statistic***: Este número indica cuánto difieren los datos entre sí, basándose en el orden de las diferencias; un valor más pequeño sugiere que hay más diferencias entre los grupos que estás comparando." 
+)
+INFO_P_VALUE: str = (
+    "***Valor de P***: Este número dice qué tan probable es que las diferencias que ves se deban al azar; si es menor a 0.05, es probable que las diferencias sean reales y no casuales."
+)
+
 TIPO_VENT: dict[int, str] = {0: "Tubo endotraqueal", 1: "Traqueostomía", 2: "Ambas"}
 
 DIAG_PREUCI: dict[int, str] = {
