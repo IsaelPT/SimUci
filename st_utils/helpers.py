@@ -279,7 +279,7 @@ def extract_real_data(
         # estuci: días -> horas
         # tiempo_vam: horas
         # estpreuci: días -> horas
-        print(f"TYPE: {type(data_index)} --- DATA: {data_index}\n")
+        # print(f"TYPE: {type(data_index)} --- DATA: {data_index}\n")
         if isinstance(data_index, int):
             output = {
                 "edad": int(data["Edad"].iloc[data_index]),
@@ -381,11 +381,21 @@ def adjust_df_sizes(dataframes: List[DataFrame]) -> Tuple[List[DataFrame], int]:
 
     """
 
+    def all_equal(lst) -> bool | None:
+        """Devuelve True si todos los valores de la lista son iguales."""
+        if not lst:
+            return None
+        return len(set(lst)) == 1
+
     df_sizes = [df.shape[0] for df in dataframes]
-    if df_sizes != int(np.mean(df_sizes)):
+
+    try:
+        if all_equal(df_sizes):
+            return dataframes, -1
         min_len = min(df_sizes)
         return [df.head(min_len) for df in dataframes], min_len
-    return dataframes, -1
+    except Exception() as e:
+        print(e)
 
 
 def build_df_test_result(statistic: float, p_value: float) -> DataFrame:
