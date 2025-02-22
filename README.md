@@ -96,22 +96,15 @@ Y otras bibliotecas como:
 
 ## Despliegue
 
-Este proyecto está desplegado hasta la fecha en Streamlit Community Cloud en la siguiente dirección.
+Este proyecto está desplegado hasta la fecha en Streamlit Community Cloud. Se puede acceder a través de la siguiente dirección:
 
 - https://simuci-v0.streamlit.app/
 
-## **Aclaración muy importante**
+## **Importante**
 
-Para los usuarios cubanos, es IMPERATIVO el uso de VPN para el acceso a la aplicación, debido a diversas políticas que
-ostenta Streamlit:
+Para los usuarios cubanos, es necesario el uso de VPN para el acceso a la plataforma, debido a las políticas que exige Streamlit:
 > Error: Forbidden.
 > Your client does not have permission to get URL / from this server.
-
-## Recomendaciones
-
-El uso de versiones recientes de Pycharm para la ejecución del proyecto vía IDE, debido a la facilidad de este para el
-manejo de rutas y facilidades con el intérprete: Configuración de Estructura en directorio `.idea` que brinda
-comodidades para que el intérprete de Python reconozca los paquetes y módulos.
 
 ## Corrida de la aplicación vía Script.
 
