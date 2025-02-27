@@ -24,6 +24,9 @@ with simulacion_tab:
     # NOTE: EL ID DEL PACIENTE ESTÁ ALMACENADO DENTRO DEL SESSION_STATE!
     if "id_paciente" not in st.session_state:
         st.session_state.id_paciente = generate_id()
+    if "semilla_simulacion" not in st.session_state:
+        st.session_state.semilla_simulacion = 0
+
     col1_nuevo_paciente, col2_nuevo_paciente = st.columns([1, 1])
     with col1_nuevo_paciente:
         nuevo_paciente = st.button("Nuevo paciente")
@@ -137,7 +140,7 @@ with simulacion_tab:
             value=CORRIDAS_SIM_DEFAULT,
             help=HELP_MSG_CORRIDA_SIM,
         )
-        boton_comenzar = st.button(
+        boton_comenzar_simulacion = st.button(
             "Comenzar Simulación",
             type="primary",
             use_container_width=True
@@ -148,7 +151,8 @@ with simulacion_tab:
         toggle_format = st.toggle(
             "Tiempo en días",
             value=True,
-            help="Formato de tiempo. Si no se selecciona, se mostrará en horas.",
+            help="Formato de tiempo. Al activar muestra las horas en su aproximación a lo que sería en días.",
+            key="formato-tiempo-simulacion"
         )
         df_simulacion = build_df_stats(
             data=st.session_state.df_resultado,
@@ -181,7 +185,7 @@ with simulacion_tab:
 
         st.success(f"La simulación ha concluido tras haber completado {corridas_sim} iteraciones.")
 
-    if boton_comenzar:
+    if boton_comenzar_simulacion:
         # Validación de campos para realizar simulación.
         if not value_is_zero([diagn1, diagn2, diagn3, diagn4]):  # campos de Diagnósticos OK?
             diag_ok = True
@@ -223,25 +227,31 @@ with simulacion_tab:
                 st.session_state.df_resultado = resultado_experimento
 
                 st.rerun()
-            except Exception as e:
-                st.exception(f"No se pudo efectuar la simulación. Error asociado:\n{e}")
+            except Exception as experimento:
+                st.exception(f"No se pudo efectuar la simulación. Error asociado:\n{experimento}")
 
+###############################
+# SIMULACION CON DATOS REALES #
+###############################
 with datos_reales_tab:
     ##############
     # Validación #
     ##############
     st.header("Validación con Datos Reales")
 
+    # fijar_semilla_toggle = st.toggle(
+    #     "Fijar semilla",
+    #     value=False,
+    #     help="Al fijar una semilla, se usará una sola semilla para las simulaciones. Los resultados se vuelve reproducibles."
+    # )
+
+    # if fijar_semilla_toggle:
+    #     fix_seed(1)
+
     df_data = pd.read_csv(RUTA_FICHERODEDATOS_CSV)
     df_data.index.name = "Paciente"
 
-    st.markdown(
-        "Conjunto de datos que se utilizan para realizar las pruebas de comparaciones.\
-            Estos son datos recopilados de pacientes reales en estudios anteriormente realizados."
-    )
-
     html_text = f'<p style="color:{PRIMARY_COLOR};">Puede seleccionar una fila para realizar una simulación al paciente seleccionado.</p>'
-
     st.markdown(html_text, unsafe_allow_html=True)
 
     df_selection: int = st.dataframe(
@@ -262,18 +272,29 @@ with datos_reales_tab:
     # }
 
     # Si se seleccionó alguna fila, se asigna a esta variable. De no seleccionarse nada es None.
-    df_selection = df_selection[0] if df_selection else None
+    selection = df_selection[0] if df_selection else None
 
-    # DataFrame con experimento con datos reales
-    if df_selection == 0 or df_selection is not None:
-        st.markdown("Indicadores estadísticos del paciente seleccionado")
+    if "df_sim_datos_reales" not in st.session_state:
+        st.session_state.df_sim_datos_reales = pd.DataFrame()
 
-        e: tuple[float] = simulate_real_data(
-            ruta_fichero_csv=RUTA_FICHERODEDATOS_CSV, df_selection=df_selection
+    # DataFrame se encuentra con resultado de experimento con datos reales
+    if selection == 0 or selection is not None:
+        st.markdown("Resultados de simulación con paciente seleccionado")
+
+        toggle_format = st.toggle(
+            "Tiempo en días",
+            value=False,
+            help="Formato de tiempo. Al activar muestra las horas en su aproximación a lo que sería en días.",
+            key="formato-tiempo-datosreales"
+        )
+
+        experimento: tuple[float] = simulate_real_data(
+            ruta_fichero_csv=RUTA_FICHERODEDATOS_CSV,
+            df_selection=selection
         )
 
         df_sim_datos_reales = build_df_stats(
-            e,
+            experimento,
             CORRIDAS_SIM_DEFAULT,
             include_mean=True,
             include_std=True,
@@ -281,14 +302,14 @@ with datos_reales_tab:
             include_info_label=True,
         )
 
+        if toggle_format:
+            df_sim_datos_reales = format_df_time(df_sim_datos_reales)
+
         st.dataframe(
-            format_df_time(df_sim_datos_reales),
+            df_sim_datos_reales,
             hide_index=True,
             use_container_width=True,
         )
-
-    if "df_sim_datos_reales" not in st.session_state:
-        st.session_state.df_sim_datos_reales = pd.DataFrame()
 
     # Simular todos los datos en la tabla.
     if st.button(
@@ -297,7 +318,7 @@ with datos_reales_tab:
         use_container_width=True,
         key="simular_tabla",
     ):
-        with st.spinner("Simulando todos los datos en la tabla..."):
+        with st.spinner("Simulando todos los datos en la tabla. Por favor, espere, esto puede tardar varios minutos."):
             lst_e: list[tuple[float]] = simulate_real_data(
                 RUTA_FICHERODEDATOS_CSV,
                 df_selection = -1
@@ -335,50 +356,58 @@ with datos_reales_tab:
             key="guardar_sim_datos_reales",
         )
 
-        st.success(f"Se ha realizado la simulación para cada paciente correctamente.")
+        st.success(f"Se ha realizado la simulación para cada paciente.")
 
+#################
+# COMPARACIONES #
+#################
 with comparaciones_tab:
-    comparacion_wilcoxon = st.expander("Comparación vía Wilcoxon", expanded=True)
-    comparacion_friedman = st.expander("Comparación vía Friedman", expanded=True)
+    wilcoxon_tab, friedman_tab = st.tabs(("Wilcoxon", "Friedman"))
 
-    with comparacion_wilcoxon:
-        st.header("Prueba de Wilcoxon")
+    with wilcoxon_tab:
+        st.markdown("### Wilcoxon")
 
         file_upl1: UploadedFile
         file_upl2: UploadedFile
         df_experimento1 = pd.DataFrame()
         df_experimento2 = pd.DataFrame()
 
-        # File Uploader.
-        col1_file_upl, col2_file_upl = st.columns(2)
-        with col1_file_upl:
-            file_upl1 = st.file_uploader(label="Resultado Experimento 1", type=[".csv"])
-            if file_upl1:
-                df_experimento1 = bin_to_df(file_upl1)
-                if df_experimento1.empty:
-                    st.warning("Aún no se han cargado datos del experimento 1.")
-                else:
-                    st.dataframe(df_experimento1, height=200, hide_index=True)
-        with col2_file_upl:
-            file_upl2 = st.file_uploader(label="Resultado Experimento 2", type=[".csv"])
-            if file_upl2:
-                df_experimento2 = bin_to_df(file_upl2)
-                if df_experimento2.empty:
-                    st.warning("Aún no se han cargado datos del experimento 2.")
-                else:
-                    st.dataframe(df_experimento2, height=200, hide_index=True)
+        with st.container():
+            col1, col2 = st.columns(2)
+            with col1:
+                file_upl1 = st.file_uploader(
+                    label="Experimento 1",
+                    type=[".csv"],
+                    accept_multiple_files=False
+                )
+            with col2:
+                file_upl2 = st.file_uploader(
+                    label="Experimento 2",
+                    type=[".csv"],
+                    accept_multiple_files=False
+                )
+
+            with st.expander("Previsualización", expanded=False):
+                if file_upl1:
+                    df_experimento1 = bin_to_df(file_upl1)
+                    if not df_experimento1.empty:
+                        st.dataframe(df_experimento1, height=200, use_container_width=True, hide_index=True)
+                if file_upl2:
+                    df_experimento2 = bin_to_df(file_upl2)
+                    if not df_experimento2.empty:
+                        st.dataframe(df_experimento2, height=200, use_container_width=True, hide_index=True)
 
         # Columna a comparar.
         opcion_col_comparacion = st.selectbox(
-            "Escoja una columna para comparar",
+            "Seleccione una columna para comparar",
             VARIABLES_EXPERIMENTO,
-            key=1
+            key="col-comparacion-wilcoxon"
         )
         boton_comparacion = st.button(
             "Realizar prueba de Wilcoxon",
             type="primary",
             use_container_width=True,
-            key=2,
+            key="boton-comparacion-wilcoxon",
         )
 
         # Comparación Wilcoxon.
@@ -423,11 +452,10 @@ with comparaciones_tab:
                             )
                             st.markdown(INFO_STATISTIC)
                             st.markdown(INFO_P_VALUE)
-                        except Exception as e:
-                            st.exception(e)
-
-    with comparacion_friedman:
-        st.header("Prueba de Friedman")
+                        except Exception as experimento:
+                            st.exception(experimento)
+    with friedman_tab:
+        st.markdown("### Friedman")
 
         file_upl_experimentos: list[UploadedFile]
         dataframes_experimentos: list[DataFrame]
@@ -443,7 +471,7 @@ with comparaciones_tab:
 
         # Columna a comparar.
         opcion_col_comparacion = st.selectbox(
-            "Escoja una columna para comparar",
+            "Seleccione una columna para comparar",
             VARIABLES_EXPERIMENTO,
             key=3
         )
@@ -489,5 +517,5 @@ with comparaciones_tab:
                         )
                         st.markdown(INFO_STATISTIC)
                         st.markdown(INFO_P_VALUE)
-                    except Exception as e:
-                        st.exception(e)
+                    except Exception as experimento:
+                        st.exception(experimento)

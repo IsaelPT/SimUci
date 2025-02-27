@@ -418,7 +418,8 @@ def build_df_test_result(statistic: float, p_value: float) -> DataFrame:
 
 
 def simulate_real_data(
-    ruta_fichero_csv: str, df_selection: int
+    ruta_fichero_csv: str,
+    df_selection: int
 ) -> tuple[float] | list[tuple[float]]:
     """A partir de una porción de los datos reales, realiza una simulación para un paciente seleccionado o para todos los pacientes.
 
@@ -462,10 +463,12 @@ def simulate_real_data(
         t: tuple[float] = extract_real_data(
             ruta_fichero_csv, index=df_selection, return_type="tuple"
         )
+
         # Se retorna un tuple[float]
         return experiment_helper(t)
     elif df_selection == -1:
         datalen = pd.read_csv(ruta_fichero_csv).shape[0]
+
         # Se retorna un list[tuple[float]]
         return [
             experiment_helper(t)
@@ -476,3 +479,27 @@ def simulate_real_data(
         ]
     else:
         raise ValueError("El parámetro df_selection debe ser -1 o un entero positivo.")
+
+def fix_seed(seed: int = None):
+    """Fija la semilla de numpy. Esto es útil para las simulaciones que utilizan una semilla aleatoria basada en el sistema. Al fijar la semilla se pueden obtener resultados con comportamientos específicos. Si la semilla es None, restaura el valor de la semilla aleatoria.
+
+    Args:
+        seed (int): Valor máximo 2^32 - 1 (numpy)
+        seed (None): Si es None, la semilla vuelve a ser aleatoria
+
+    Raises:
+        ValueError: Si se excede el valor máximo de semilla (uint32: 2^32 - 1)
+        ValueError: Si la semilla es negativa
+    """
+
+    try:
+        if seed is not None:
+            if seed > np.iinfo(np.int32).max:
+                raise ValueError("Se excedió el tamaño de semilla permisible (2^32 - 1)")
+            if seed < 0:
+                raise ValueError("Semilla debe ser un número entero positivo (uint32)")
+            np.random.seed(seed)
+        else:
+            np.random.seed(None)
+    except Exception as e:
+        print(e)

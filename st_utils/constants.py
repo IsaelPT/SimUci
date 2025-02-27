@@ -4,12 +4,12 @@ import os.path
 # Edad
 EDAD_MIN = 14
 EDAD_MAX = 100
-EDAD_DEFAULT = EDAD_MIN
+EDAD_DEFAULT = 22
 
 # Apache
 APACHE_MIN = 0  # Excepcionalmente.
 APACHE_MAX = 36
-APACHE_DEFAULT = APACHE_MIN
+APACHE_DEFAULT = 5
 
 # Tiempo VAM
 T_VAM_MIN = 24
@@ -46,7 +46,6 @@ HELP_MSG_CORRIDA_SIM: str = (
 HELP_MSG_PORCIENTO_SIM: str = (
     "Proporción de tiempo dentro de estancia UCI que se espera antes de entrar en Ventilación."
 )
-
 INFO_STATISTIC: str = (
     "***Statistic***: Este número indica cuánto difieren los datos entre sí, basándose en el orden de las diferencias; un valor más pequeño sugiere que hay más diferencias entre los grupos que estás comparando." 
 )
@@ -54,7 +53,11 @@ INFO_P_VALUE: str = (
     "***Valor de P***: Este número dice qué tan probable es que las diferencias que ves se deban al azar; si es menor a 0.05, es probable que las diferencias sean reales y no casuales."
 )
 
-TIPO_VENT: dict[int, str] = {0: "Tubo endotraqueal", 1: "Traqueostomía", 2: "Ambas"}
+TIPO_VENT: dict[int, str] = {
+    0: "Tubo endotraqueal",
+    1: "Traqueostomía",
+    2: "Ambas"
+}
 
 DIAG_PREUCI: dict[int, str] = {
     0: "Vacío",
@@ -121,8 +124,8 @@ try:
     RUTA_DATOS_CSV = os.path.join("data", "datos.csv")
     RUTA_FICHERODEDATOS_CSV = os.path.join("data", "Ficherodedatos(MO)17-1-2023.csv")
     RUTA_DFCENTROIDES_CSV = os.path.join("data", "DF_Centroides.csv")
-except Exception as e:
-    print(f"Error al cargar el archivo la base de datos.\n>>>\nExcepcion\n>>>{e}")
+except Exception as experimento:
+    print(f"Error al cargar el archivo la base de datos.\n>>>\nExcepcion\n>>>{experimento}")
 
 try:
     import toml

@@ -9,7 +9,6 @@ class Simulacion:
         self.cluster = cluster
 
     def uci(self, env: simpy.Environment):
-
         if self.cluster == 0:
             post_uci = int(distribuciones.tiemp_postUCI0())
             uci = int(distribuciones.estad_UTI0())
@@ -34,9 +33,6 @@ class Simulacion:
         self.experiment.result["Estadia UCI"] = uci
 
         yield env.timeout(pre_vam)
-
         yield env.timeout(vam)
-
         yield env.timeout(post_vam)
-
         yield env.timeout(post_uci)
