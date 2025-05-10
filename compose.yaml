@@ -9,13 +9,9 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend:/app
-    working_dir: /app
-    command: npm install && npm run dev
-    depends_on:
-      - login
-
-      - sim
+      - ./frontend:/usr/src/app
+    working_dir: /usr/src/app
+    command: serve -s dist -l 3000
 
   # ------------------------
   # Servicio: Simulación
