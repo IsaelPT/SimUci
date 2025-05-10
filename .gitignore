@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Build outputs
+dist/
+build/
+*.pyc
+__pycache__/
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Testing
+coverage/
+.coverage
+.pytest_cache/
+
+# Misc
+*.bak
+*.swp
+.tmp/
+.temp/
