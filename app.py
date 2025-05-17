@@ -324,7 +324,7 @@ with datos_reales_tab:
         key="simular_tabla",
     ):
         with st.spinner(
-            "Simulando todos los datos en la tabla. Por favor, espere, esto puede tardar varios minutos."
+            "Simulando todos los datos en la tabla. Esto puede tardar varios minutos..."
         ):
             lst_e: list[tuple[float]] = simulate_real_data(
                 RUTA_FICHERODEDATOS_CSV, df_selection=-1
