@@ -4,22 +4,21 @@ from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
-import streamlit as st
 from pandas import DataFrame
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-from st_utils.constants import CORRIDAS_SIM_DEFAULT, TIPO_VENT, DIAG_PREUCI, INSUF_RESP
+from utils.constants import CORRIDAS_SIM_DEFAULT, TIPO_VENT, DIAG_PREUCI, INSUF_RESP
 from uci.experiment import Experiment, multiple_replication
 from uci.stats import StatsUtils
 
 from joblib import load
 
 
-def predict(df:DataFrame):
-    model = load('new_workflow.joblib')
+def predict(df: DataFrame):
+    model = load("new_workflow.joblib")
     preds = model.predict(df)
     preds_proba = model.predict_proba(df)
-    return preds, round(preds_proba[:,1], 2)
+    return preds, round(preds_proba[:, 1], 2)
 
 
 def key_categ(categoria: str, valor: str | int, viceversa: bool = False) -> int | str:
@@ -35,15 +34,15 @@ def key_categ(categoria: str, valor: str | int, viceversa: bool = False) -> int 
         Llave que representa en las colecciones de categorías el valor que se pasa por parámetros.
     """
 
-    match categoria:
-        case "va":
-            categorias = TIPO_VENT
-        case "diag":
-            categorias = DIAG_PREUCI
-        case "insuf":
-            categorias = INSUF_RESP
-        case _:
-            raise Exception(f"La categoría que se selecciona no existe {categoria}.")
+    if categoria == "va":
+        categorias = TIPO_VENT
+    elif categoria == "diag":
+        categorias = DIAG_PREUCI
+    elif categoria == "insuf":
+        categorias = INSUF_RESP
+    else:
+        raise Exception(f"La categoría que se selecciona no existe {categoria}.")
+
     for k, v in categorias.items():
         if not viceversa:
             if v == valor:
@@ -427,8 +426,7 @@ def build_df_test_result(statistic: float, p_value: float) -> DataFrame:
 
 
 def simulate_real_data(
-    ruta_fichero_csv: str,
-    df_selection: int
+    ruta_fichero_csv: str, df_selection: int
 ) -> tuple[float] | list[tuple[float]]:
     """A partir de una porción de los datos reales, realiza una simulación para un paciente seleccionado o para todos los pacientes.
 
@@ -489,6 +487,7 @@ def simulate_real_data(
     else:
         raise ValueError("El parámetro df_selection debe ser -1 o un entero positivo.")
 
+
 def fix_seed(seed: int = None):
     """Fija la semilla de numpy. Esto es útil para las simulaciones que utilizan una semilla aleatoria basada en el sistema. Al fijar la semilla se pueden obtener resultados con comportamientos específicos. Si la semilla es None, restaura el valor de la semilla aleatoria.
 
@@ -504,7 +503,9 @@ def fix_seed(seed: int = None):
     try:
         if seed is not None:
             if seed > np.iinfo(np.int32).max:
-                raise ValueError("Se excedió el tamaño de semilla permisible (2^32 - 1)")
+                raise ValueError(
+                    "Se excedió el tamaño de semilla permisible (2^32 - 1)"
+                )
             if seed < 0:
                 raise ValueError("Semilla debe ser un número entero positivo (uint32)")
             np.random.seed(seed)
