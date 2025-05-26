@@ -1,15 +1,27 @@
 import pandas as pd
 import simpy
 
-from st_utils.constants import VARIABLES_EXPERIMENTO
+from utils.constants import VARIABLES_EXPERIMENTO
 from uci import distribuciones
 from uci.simulacion import Simulacion
 
 
 class Experiment:
-    def __init__(self, edad: int, diagnostico_ingreso1: int, diagnostico_ingreso2: int, diagnostico_ingreso3: int,
-                 diagnostico_ingreso4: int, apache: int, insuficiencia_respiratoria: int, ventilacion_artificial: int,
-                 estadia_uti: int, tiempo_vam: int, tiempo_estadia_pre_uti: int, porciento: int = 10):
+    def __init__(
+        self,
+        edad: int,
+        diagnostico_ingreso1: int,
+        diagnostico_ingreso2: int,
+        diagnostico_ingreso3: int,
+        diagnostico_ingreso4: int,
+        apache: int,
+        insuficiencia_respiratoria: int,
+        ventilacion_artificial: int,
+        estadia_uti: int,
+        tiempo_vam: int,
+        tiempo_estadia_pre_uti: int,
+        porciento: int = 10,
+    ):
         self.edad = edad
         self.diagn1 = diagnostico_ingreso1
         self.diagn2 = diagnostico_ingreso2
@@ -34,10 +46,19 @@ class Experiment:
 def single_run(experiment) -> dict[str, int]:
     env = simpy.Environment()
     experiment.init_results_variables()
-    cluster = distribuciones.clustering(experiment.edad, experiment.diagn1, experiment.diagn2,
-                                        experiment.diagn3, experiment.diagn4, experiment.apache,
-                                        experiment.insuf_resp, experiment.va, experiment.estadia_uti,
-                                        experiment.tiempo_vam, experiment.tiempo_pre_uti)
+    cluster = distribuciones.clustering(
+        experiment.edad,
+        experiment.diagn1,
+        experiment.diagn2,
+        experiment.diagn3,
+        experiment.diagn4,
+        experiment.apache,
+        experiment.insuf_resp,
+        experiment.va,
+        experiment.estadia_uti,
+        experiment.tiempo_vam,
+        experiment.tiempo_pre_uti,
+    )
     simulacion = Simulacion(experiment, cluster)
     env.process(simulacion.uci(env))
     env.run()

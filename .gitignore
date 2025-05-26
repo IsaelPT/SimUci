@@ -1,6 +1,39 @@
+# IDEs and editor folders
 .vscode/
-.idea/*
-.venv/*
-.devcontainer/*
+.idea/
+
+# Python virtual environments
+.venv/
+
+# Dev containers
+.devcontainer/
+
+# Python cache and compiled files
 **/__pycache__/*
-experimentos/*
+*.py[cod]
+*.pyo
+*.pyd
+
+# Jupyter Notebooks checkpoints
+*.ipynb_checkpoints/
+
+# Joblib/model files
+*.joblib
+
+# Local Experiments and Outputs
+experiments/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Streamlit config
+.streamlit/*.toml
+
+# Ignore by default, but allow tracked files
+!README.md
+!requirements.txt
+!app.py

@@ -1,11 +1,60 @@
 from datetime import datetime
-
+import os
+import pandas as pd
+from pandas import DataFrame
 import streamlit as st
+from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-from utils.constants import *
-from utils.helpers import *
-from uci.experiment import *
-from uci.stats import *
+from utils.helpers import (
+    generate_id,
+    key_categ,
+    value_is_zero,
+    start_experiment,
+    build_df_stats,
+    format_df_time,
+    simulate_real_data,
+    bin_to_df,
+    adjust_df_sizes,
+    build_df_test_result,
+)
+from utils.constants import (
+    EDAD_MIN,
+    EDAD_MAX,
+    EDAD_DEFAULT,
+    APACHE_MIN,
+    APACHE_MAX,
+    APACHE_DEFAULT,
+    HELP_MSG_APACHE,
+    T_VAM_MIN,
+    T_VAM_MAX,
+    T_VAM_DEFAULT,
+    ESTAD_UTI_MIN,
+    ESTAD_UTI_MAX,
+    ESTAD_UTI_DEFAULT,
+    HELP_MSG_ESTAD_UTI,
+    INSUF_RESP,
+    TIPO_VENT,
+    ESTAD_PREUTI_MIN,
+    ESTAD_PREUTI_MAX,
+    ESTAD_PREUTI_DEFAULT,
+    HELP_MSG_ESTAD_PREUTI,
+    PORCIENTO_SIM_MIN,
+    PORCIENTO_SIM_MAX,
+    PORCIENTO_SIM_DEFAULT,
+    HELP_MSG_PORCIENTO_SIM,
+    DIAG_PREUCI,
+    RUTA_FICHERODEDATOS_CSV,
+    PRIMARY_COLOR,
+    VARIABLES_EXPERIMENTO,
+    CORRIDAS_SIM_MIN,
+    CORRIDAS_SIM_MAX,
+    CORRIDAS_SIM_DEFAULT,
+    HELP_MSG_CORRIDA_SIM,
+    INFO_STATISTIC,
+    INFO_P_VALUE,
+)
+from uci.stats import Wilcoxon, Friedman
+
 
 ########
 # TABS #
@@ -193,12 +242,12 @@ with simulacion_tab:
             diag_ok = True
         else:
             st.warning(
-                f"Todos los diagnósticos están vacíos. Se debe incluir mínimo un diagnóstico para realizar la simulación."
+                "Todos los diagnósticos están vacíos. Se debe incluir mínimo un diagnóstico para realizar la simulación."
             )
         if not value_is_zero(insuf_resp):  # campo de dInsuficiencia Respiratoria OK?
             insuf_ok = True
         else:
-            st.warning(f"Seleccione un tipo de Insuficiencia Respiratoria.")
+            st.warning("Seleccione un tipo de Insuficiencia Respiratoria.")
 
         # Desarrollo de la Simulación.
         if diag_ok and insuf_ok:
@@ -358,13 +407,13 @@ with datos_reales_tab:
         st.download_button(
             label="Guardar resultados",
             data=csv_sim_datos_reales,
-            file_name=f"Experimentos con Datos Reales.csv",
+            file_name="Experimentos con Datos Reales.csv",
             mime="text/csv",
             use_container_width=True,
             key="guardar_sim_datos_reales",
         )
 
-        st.success(f"Se ha realizado la simulación para cada paciente.")
+        st.success("Se ha realizado la simulación para cada paciente.")
 
 #################
 # COMPARACIONES #
@@ -441,9 +490,10 @@ with comparaciones_tab:
                     else:
                         # Corrección de que existen la misma cantidad de filas en ambas tablas.
                         len_dif = abs(len(x) - len(y))
-                        len_info_msg = (
-                            lambda exp: f"Se eliminaron filas del experimento {exp} para coincidir con el experimento {2 if exp == 1 else 1} ({len_dif} filas diferentes)."
-                        )
+
+                        def len_info_msg(exp):
+                            return f"Se eliminaron filas del experimento {exp} para coincidir con el experimento {2 if exp == 1 else 1} ({len_dif} filas diferentes)."
+
                         # La cantidad de filas de x, excede las de y.
                         if x.shape[0] > y.shape[0]:
                             x = x.head(y.shape[0])

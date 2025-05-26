@@ -43,21 +43,11 @@ HELP_MSG_ESTAD_PREUTI: str = "Tiempo de estadía pre UTI"
 HELP_MSG_CORRIDA_SIM: str = (
     "La cantidad de corridas de la simulación brinda un mayor margen de precisión."
 )
-HELP_MSG_PORCIENTO_SIM: str = (
-    "Proporción de tiempo dentro de estancia UCI que se espera antes de entrar en Ventilación."
-)
-INFO_STATISTIC: str = (
-    "***Statistic***: Este número indica cuánto difieren los datos entre sí, basándose en el orden de las diferencias; un valor más pequeño sugiere que hay más diferencias entre los grupos que estás comparando." 
-)
-INFO_P_VALUE: str = (
-    "***Valor de P***: Este número dice qué tan probable es que las diferencias que ves se deban al azar; si es menor a 0.05, es probable que las diferencias sean reales y no casuales."
-)
+HELP_MSG_PORCIENTO_SIM: str = "Proporción de tiempo dentro de estancia UCI que se espera antes de entrar en Ventilación."
+INFO_STATISTIC: str = "***Statistic***: Este número indica cuánto difieren los datos entre sí, basándose en el orden de las diferencias; un valor más pequeño sugiere que hay más diferencias entre los grupos que estás comparando."
+INFO_P_VALUE: str = "***Valor de P***: Este número dice qué tan probable es que las diferencias que ves se deban al azar; si es menor a 0.05, es probable que las diferencias sean reales y no casuales."
 
-TIPO_VENT: dict[int, str] = {
-    0: "Tubo endotraqueal",
-    1: "Traqueostomía",
-    2: "Ambas"
-}
+TIPO_VENT: dict[int, str] = {0: "Tubo endotraqueal", 1: "Traqueostomía", 2: "Ambas"}
 
 DIAG_PREUCI: dict[int, str] = {
     0: "Vacío",
@@ -125,7 +115,9 @@ try:
     RUTA_FICHERODEDATOS_CSV = os.path.join("data", "Ficherodedatos(MO)17-1-2023.csv")
     RUTA_DFCENTROIDES_CSV = os.path.join("data", "DF_Centroides.csv")
 except Exception as experimento:
-    print(f"Error al cargar el archivo la base de datos.\n>>>\nExcepcion\n>>>{experimento}")
+    print(
+        f"Error al cargar el archivo la base de datos.\n>>>\nExcepcion\n>>>{experimento}"
+    )
 
 try:
     import toml
