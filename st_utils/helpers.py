@@ -12,6 +12,15 @@ from st_utils.constants import CORRIDAS_SIM_DEFAULT, TIPO_VENT, DIAG_PREUCI, INS
 from uci.experiment import Experiment, multiple_replication
 from uci.stats import StatsUtils
 
+from joblib import load
+
+
+def predict(df:DataFrame):
+    model = load('new_workflow.joblib')
+    preds = model.predict(df)
+    preds_proba = model.predict_proba(df)
+    return preds, round(preds_proba[:,1], 2)
+
 
 def key_categ(categoria: str, valor: str | int, viceversa: bool = False) -> int | str:
     """
