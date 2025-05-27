@@ -25,6 +25,7 @@ from utils.constants import (
     APACHE_MAX,
     APACHE_DEFAULT,
     HELP_MSG_APACHE,
+    HELP_MSG_TIEMPO_VAM,
     T_VAM_MIN,
     T_VAM_MAX,
     T_VAM_DEFAULT,
@@ -91,31 +92,49 @@ with simulacion_tab:
         )
 
     # Ingresar Datos Paciente
-    col1_paciente, col2_paciente, col3_paciente = st.columns(3)
+    col1_paciente, col2_paciente = st.columns(2)
     with col1_paciente:
-        opcion_edad: int = st.number_input(
-            label="Edad", min_value=EDAD_MIN, max_value=EDAD_MAX, value=EDAD_DEFAULT
-        )
-        opcion_apache: int = st.number_input(
-            label="Apache",
-            min_value=APACHE_MIN,
-            max_value=APACHE_MAX,
-            value=APACHE_DEFAULT,
-            help=HELP_MSG_APACHE,
-        )
-        opcion_tiempo_vam: int = st.number_input(
-            label="Tiempo en Ventilación Artificial",
-            min_value=T_VAM_MIN,
-            max_value=T_VAM_MAX,
-            value=T_VAM_DEFAULT,
-        )
-        opcion_estad_uti: int = st.number_input(
-            label="Tiempo de Estadía en UCI",
-            min_value=ESTAD_UTI_MIN,
-            max_value=ESTAD_UTI_MAX,
-            value=ESTAD_UTI_DEFAULT,
-            help=HELP_MSG_ESTAD_UTI,
-        )
+        col1a_paciente, col1b_paciente = st.columns(2)
+        with col1a_paciente:
+            opcion_edad: int = st.number_input(
+                label="Edad", min_value=EDAD_MIN, max_value=EDAD_MAX, value=EDAD_DEFAULT
+            )
+            opcion_tiempo_vam: int = st.number_input(
+                label="Tiempo VA",
+                min_value=T_VAM_MIN,
+                max_value=T_VAM_MAX,
+                value=T_VAM_DEFAULT,
+                help=HELP_MSG_TIEMPO_VAM,
+            )
+            opcion_estad_preuti: int = st.number_input(
+                label="Tiempo Pre-UCI",
+                min_value=ESTAD_PREUTI_MIN,
+                max_value=ESTAD_PREUTI_MAX,
+                value=ESTAD_PREUTI_DEFAULT,
+                help=HELP_MSG_ESTAD_PREUTI,
+            )
+        with col1b_paciente:
+            opcion_apache: int = st.number_input(
+                label="Apache",
+                min_value=APACHE_MIN,
+                max_value=APACHE_MAX,
+                value=APACHE_DEFAULT,
+                help=HELP_MSG_APACHE,
+            )
+            opcion_estad_uti: int = st.number_input(
+                label="Tiempo UCI",
+                min_value=ESTAD_UTI_MIN,
+                max_value=ESTAD_UTI_MAX,
+                value=ESTAD_UTI_DEFAULT,
+                help=HELP_MSG_ESTAD_UTI,
+            )
+            input_porciento = st.number_input(
+                label="Porciento Tiempo UCI",
+                min_value=PORCIENTO_SIM_MIN,
+                max_value=PORCIENTO_SIM_MAX,
+                value=PORCIENTO_SIM_DEFAULT,
+                help=HELP_MSG_PORCIENTO_SIM,
+            )
     with col2_paciente:
         opcion_insuf_resp: str = st.selectbox(
             label="Tipo de Insuficiencia Respiratoria",
@@ -126,46 +145,40 @@ with simulacion_tab:
             label="Tipo de Ventilación Artificial",
             options=tuple(TIPO_VENT.values()),
         )
-        opcion_estad_preuti: int = st.number_input(
-            label="Tiempo de Estadía Pre-UCI",
-            min_value=ESTAD_PREUTI_MIN,
-            max_value=ESTAD_PREUTI_MAX,
-            value=ESTAD_PREUTI_DEFAULT,
-            help=HELP_MSG_ESTAD_PREUTI,
-        )
-        input_porciento = st.number_input(
-            label="Porciento de Tiempo en UCI",
-            min_value=PORCIENTO_SIM_MIN,
-            max_value=PORCIENTO_SIM_MAX,
-            value=PORCIENTO_SIM_DEFAULT,
-            help=HELP_MSG_PORCIENTO_SIM,
-        )
-    with col3_paciente:
-        opcion_diagn1: str = st.selectbox(
-            label="Diagnóstico 1", options=tuple(DIAG_PREUCI.values()), index=0
-        )
-        opcion_diagn2: str = st.selectbox(
-            label="Diagnóstico 2", options=tuple(DIAG_PREUCI.values()), index=0
-        )
-        opcion_diagn3: str = st.selectbox(
-            label="Diagnóstico 3", options=tuple(DIAG_PREUCI.values()), index=0
-        )
-        opcion_diagn4: str = st.selectbox(
-            label="Diagnóstico 4", options=tuple(DIAG_PREUCI.values()), index=0
-        )
+        col1_diag, col2_diagn = st.columns(2)
+        with col1_diag:
+            with st.popover("Diagnósticos Ingreso"):
+                st.markdown("Seleccione los diagnósticos del paciente:")
+                opcion_diag_ing1: str = st.selectbox(
+                    label="Diagnóstico 1", options=tuple(DIAG_PREUCI.values()), index=0
+                )
+                opcion_diag_ing2: str = st.selectbox(
+                    label="Diagnóstico 2", options=tuple(DIAG_PREUCI.values()), index=0
+                )
+                opcion_diag_ing3: str = st.selectbox(
+                    label="Diagnóstico 3", options=tuple(DIAG_PREUCI.values()), index=0
+                )
+                opcion_diag_ing4: str = st.selectbox(
+                    label="Diagnóstico 4", options=tuple(DIAG_PREUCI.values()), index=0
+                )
+        with col2_diagn:
+            with st.popover("Diagnósticos Egreso"):
+
 
         # Datos Paciente Recolectados (Son los datos de entrada para ser procesados).
         edad: int = opcion_edad
         apache: int = opcion_apache
-        diagn1: int = key_categ("diag", opcion_diagn1)
-        diagn2: int = key_categ("diag", opcion_diagn2)
-        diagn3: int = key_categ("diag", opcion_diagn3)
-        diagn4: int = key_categ("diag", opcion_diagn4)
+        diagn1: int = key_categ("diag", opcion_diag_ing1)
+        diagn2: int = key_categ("diag", opcion_diag_ing2)
+        diagn3: int = key_categ("diag", opcion_diag_ing3)
+        diagn4: int = key_categ("diag", opcion_diag_ing4)
         tipo_vam: int = key_categ("va", opcion_tipo_vam)
         tiempo_vam: int = opcion_tiempo_vam
         estadia_uti: int = opcion_estad_uti
         estadia_preuti: int = opcion_estad_preuti
         insuf_resp: int = key_categ("insuf", opcion_insuf_resp)
+
+    st.divider()
 
     ##############
     # Simulación #

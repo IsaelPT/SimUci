@@ -38,15 +38,17 @@ PORCIENTO_SIM_DEFAULT = PORCIENTO_SIM_MIN
 
 # Mensajes de Ayuda en varios Widgets de la aplicación Streamlit
 HELP_MSG_APACHE: str = "Valor del APACHE."
-HELP_MSG_ESTAD_UTI: str = "Tiempo de estadía en UTI."
-HELP_MSG_ESTAD_PREUTI: str = "Tiempo de estadía pre UTI"
+HELP_MSG_ESTAD_UTI: str = "Tiempo de estadía en UTI (Unidad de Terapia Intensiva)."
+HELP_MSG_ESTAD_PREUTI: str = (
+    "Tiempo de estadía pre UTI (antes de ingresar a la Unidad de Terapia Intensiva)."
+)
 HELP_MSG_CORRIDA_SIM: str = (
     "La cantidad de corridas de la simulación brinda un mayor margen de precisión."
 )
 HELP_MSG_PORCIENTO_SIM: str = "Proporción de tiempo dentro de estancia UCI que se espera antes de entrar en Ventilación."
 INFO_STATISTIC: str = "***Statistic***: Este número indica cuánto difieren los datos entre sí, basándose en el orden de las diferencias; un valor más pequeño sugiere que hay más diferencias entre los grupos que estás comparando."
 INFO_P_VALUE: str = "***Valor de P***: Este número dice qué tan probable es que las diferencias que ves se deban al azar; si es menor a 0.05, es probable que las diferencias sean reales y no casuales."
-
+HELP_MSG_TIEMPO_VAM: str = "Tiempo en Ventilación Asistida Mecánica (VAM) en horas."
 TIPO_VENT: dict[int, str] = {0: "Tubo endotraqueal", 1: "Traqueostomía", 2: "Ambas"}
 
 DIAG_PREUCI: dict[int, str] = {
