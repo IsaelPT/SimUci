@@ -148,30 +148,70 @@ with simulacion_tab:
         col1_diag, col2_diagn = st.columns(2)
         with col1_diag:
             with st.popover("Diagnósticos Ingreso"):
-                st.markdown("Seleccione los diagnósticos del paciente:")
+                st.markdown("Seleccione los Diagnósticos de Ingreso del paciente:")
                 opcion_diag_ing1: str = st.selectbox(
-                    label="Diagnóstico 1", options=tuple(DIAG_PREUCI.values()), index=0
+                    label="Diagnóstico 1",
+                    options=tuple(DIAG_PREUCI.values()),
+                    index=0,
+                    key="diag-ing-1",
                 )
                 opcion_diag_ing2: str = st.selectbox(
-                    label="Diagnóstico 2", options=tuple(DIAG_PREUCI.values()), index=0
+                    label="Diagnóstico 2",
+                    options=tuple(DIAG_PREUCI.values()),
+                    index=0,
+                    key="diag-ing-2",
                 )
                 opcion_diag_ing3: str = st.selectbox(
-                    label="Diagnóstico 3", options=tuple(DIAG_PREUCI.values()), index=0
+                    label="Diagnóstico 3",
+                    options=tuple(DIAG_PREUCI.values()),
+                    index=0,
+                    key="diag-ing-3",
                 )
                 opcion_diag_ing4: str = st.selectbox(
-                    label="Diagnóstico 4", options=tuple(DIAG_PREUCI.values()), index=0
+                    label="Diagnóstico 4",
+                    options=tuple(DIAG_PREUCI.values()),
+                    index=0,
+                    key="diag-ing-4",
                 )
         with col2_diagn:
             with st.popover("Diagnósticos Egreso"):
-
+                st.markdown("Seleccione los Diagnósticos de Egreso del paciente:")
+                opcion_diag_egreso1: str = st.selectbox(
+                    label="Diagnóstico 1",
+                    options=tuple(DIAG_PREUCI.values()),
+                    index=0,
+                    key="diag-egreso-1",
+                )
+                opcion_diag_egreso2: str = st.selectbox(
+                    label="Diagnóstico 2",
+                    options=tuple(DIAG_PREUCI.values()),
+                    index=0,
+                    key="diag-egreso-2",
+                )
+                opcion_diag_egreso3: str = st.selectbox(
+                    label="Diagnóstico 3",
+                    options=tuple(DIAG_PREUCI.values()),
+                    index=0,
+                    key="diag-egreso-3",
+                )
+                opcion_diag_egreso4: str = st.selectbox(
+                    label="Diagnóstico 4",
+                    options=tuple(DIAG_PREUCI.values()),
+                    index=0,
+                    key="diag-egreso-4",
+                )
 
         # Datos Paciente Recolectados (Son los datos de entrada para ser procesados).
         edad: int = opcion_edad
         apache: int = opcion_apache
-        diagn1: int = key_categ("diag", opcion_diag_ing1)
-        diagn2: int = key_categ("diag", opcion_diag_ing2)
-        diagn3: int = key_categ("diag", opcion_diag_ing3)
-        diagn4: int = key_categ("diag", opcion_diag_ing4)
+        diag_ing1: int = key_categ("diag", opcion_diag_ing1)
+        diag_ing2: int = key_categ("diag", opcion_diag_ing2)
+        diag_ing3: int = key_categ("diag", opcion_diag_ing3)
+        diag_ing4: int = key_categ("diag", opcion_diag_ing4)
+        diag_egreso1: int = key_categ("diag", opcion_diag_egreso1)
+        diag_egreso2: int = key_categ("diag", opcion_diag_egreso2)
+        diag_egreso3: int = key_categ("diag", opcion_diag_egreso3)
+        diag_egreso4: int = key_categ("diag", opcion_diag_egreso4)
         tipo_vam: int = key_categ("va", opcion_tipo_vam)
         tiempo_vam: int = opcion_tiempo_vam
         estadia_uti: int = opcion_estad_uti
@@ -250,7 +290,7 @@ with simulacion_tab:
     if boton_comenzar_simulacion:
         # Validación de campos para realizar simulación.
         if not value_is_zero(
-            [diagn1, diagn2, diagn3, diagn4]
+            [diag_ing1, diag_ing2, diag_ing3, diag_ing4]
         ):  # campos de Diagnósticos OK?
             diag_ok = True
         else:
@@ -269,10 +309,10 @@ with simulacion_tab:
                 resultado_experimento = start_experiment(
                     corridas_sim,
                     edad,
-                    diagn1,
-                    diagn2,
-                    diagn3,
-                    diagn4,
+                    diag_ing1,
+                    diag_ing2,
+                    diag_ing3,
+                    diag_ing4,
                     apache,
                     insuf_resp,
                     insuf_resp,
