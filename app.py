@@ -176,30 +176,30 @@ with simulacion_tab:
         with col2_diagn:
             with st.popover("Diagnósticos Egreso"):
                 st.markdown("Seleccione los Diagnósticos de Egreso del paciente:")
-                opcion_diag_egreso1: str = st.selectbox(
-                    label="Diagnóstico 1",
-                    options=tuple(DIAG_PREUCI.values()),
-                    index=0,
-                    key="diag-egreso-1",
-                )
+                # opcion_diag_egreso1: str = st.selectbox(
+                #     label="Diagnóstico 1",
+                #     options=tuple(DIAG_PREUCI.values()),
+                #     index=0,
+                #     key="diag-egreso-1",
+                # )
                 opcion_diag_egreso2: str = st.selectbox(
                     label="Diagnóstico 2",
                     options=tuple(DIAG_PREUCI.values()),
                     index=0,
                     key="diag-egreso-2",
                 )
-                opcion_diag_egreso3: str = st.selectbox(
-                    label="Diagnóstico 3",
-                    options=tuple(DIAG_PREUCI.values()),
-                    index=0,
-                    key="diag-egreso-3",
-                )
-                opcion_diag_egreso4: str = st.selectbox(
-                    label="Diagnóstico 4",
-                    options=tuple(DIAG_PREUCI.values()),
-                    index=0,
-                    key="diag-egreso-4",
-                )
+                # opcion_diag_egreso3: str = st.selectbox(
+                #     label="Diagnóstico 3",
+                #     options=tuple(DIAG_PREUCI.values()),
+                #     index=0,
+                #     key="diag-egreso-3",
+                # )
+                # opcion_diag_egreso4: str = st.selectbox(
+                #     label="Diagnóstico 4",
+                #     options=tuple(DIAG_PREUCI.values()),
+                #     index=0,
+                #     key="diag-egreso-4",
+                # )
 
         # Datos Paciente Recolectados (Son los datos de entrada para ser procesados).
         edad: int = opcion_edad
@@ -208,10 +208,10 @@ with simulacion_tab:
         diag_ing2: int = key_categ("diag", opcion_diag_ing2)
         diag_ing3: int = key_categ("diag", opcion_diag_ing3)
         diag_ing4: int = key_categ("diag", opcion_diag_ing4)
-        diag_egreso1: int = key_categ("diag", opcion_diag_egreso1)
+        # diag_egreso1: int = key_categ("diag", opcion_diag_egreso1)
         diag_egreso2: int = key_categ("diag", opcion_diag_egreso2)
-        diag_egreso3: int = key_categ("diag", opcion_diag_egreso3)
-        diag_egreso4: int = key_categ("diag", opcion_diag_egreso4)
+        # diag_egreso3: int = key_categ("diag", opcion_diag_egreso3)
+        # diag_egreso4: int = key_categ("diag", opcion_diag_egreso4)
         tipo_vam: int = key_categ("va", opcion_tipo_vam)
         tiempo_vam: int = opcion_tiempo_vam
         estadia_uti: int = opcion_estad_uti

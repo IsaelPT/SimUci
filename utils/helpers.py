@@ -34,6 +34,8 @@ def key_categ(categoria: str, valor: str | int, viceversa: bool = False) -> int 
         Llave que representa en las colecciones de categorías el valor que se pasa por parámetros.
     """
 
+    categorias: dict[int:str]
+
     if categoria == "va":
         categorias = TIPO_VENT
     elif categoria == "diag":
