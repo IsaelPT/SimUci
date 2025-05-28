@@ -19,12 +19,12 @@ T_VAM_DEFAULT = T_VAM_MIN
 # Estadía UTI
 ESTAD_UTI_MIN = 0
 ESTAD_UTI_MAX = 200
-ESTAD_UTI_DEFAULT = ESTAD_UTI_MIN
+ESTAD_UTI_DEFAULT = 24
 
 # Estadía Pre-UTI -> días
 ESTAD_PREUTI_MIN = 0
 ESTAD_PREUTI_MAX = 34
-ESTAD_PREUTI_DEFAULT = ESTAD_PREUTI_MIN
+ESTAD_PREUTI_DEFAULT = 10
 
 # Corridas Simulación
 CORRIDAS_SIM_MIN = 50
@@ -34,7 +34,7 @@ CORRIDAS_SIM_DEFAULT = CORRIDAS_SIM_MIN
 # Porciento
 PORCIENTO_SIM_MIN = 0
 PORCIENTO_SIM_MAX = 10
-PORCIENTO_SIM_DEFAULT = PORCIENTO_SIM_MIN
+PORCIENTO_SIM_DEFAULT = 2
 
 # Mensajes de Ayuda en varios Widgets de la aplicación Streamlit
 HELP_MSG_APACHE: str = "Valor del APACHE."
@@ -116,6 +116,8 @@ try:
     RUTA_DATOS_CSV = os.path.join("data", "datos.csv")
     RUTA_FICHERODEDATOS_CSV = os.path.join("data", "Ficherodedatos(MO)17-1-2023.csv")
     RUTA_DFCENTROIDES_CSV = os.path.join("data", "DF_Centroides.csv")
+    RUTA_PREDICCIONES_CSV = os.path.join("data", "data_with_pred_and_prob.csv")
+    RUTA_MODELO_PREDICCION = os.path.join("data", "new_workflow.joblib")
 except Exception as experimento:
     print(
         f"Error al cargar el archivo la base de datos.\n>>>\nExcepcion\n>>>{experimento}"

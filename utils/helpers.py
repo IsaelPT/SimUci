@@ -7,18 +7,19 @@ import pandas as pd
 from pandas import DataFrame
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-from utils.constants import CORRIDAS_SIM_DEFAULT, TIPO_VENT, DIAG_PREUCI, INSUF_RESP
+import imaplib
+
+from utils.constants import (
+    CORRIDAS_SIM_DEFAULT,
+    RUTA_MODELO_PREDICCION,
+    TIPO_VENT,
+    DIAG_PREUCI,
+    INSUF_RESP,
+)
 from uci.experiment import Experiment, multiple_replication
 from uci.stats import StatsUtils
 
 from joblib import load
-
-
-def predict(df: DataFrame):
-    model = load("new_workflow.joblib")
-    preds = model.predict(df)
-    preds_proba = model.predict_proba(df)
-    return preds, round(preds_proba[:, 1], 2)
 
 
 def key_categ(categoria: str, valor: str | int, viceversa: bool = False) -> int | str:
@@ -515,3 +516,39 @@ def fix_seed(seed: int = None):
             np.random.seed(None)
     except Exception as e:
         print(e)
+
+
+def predict(df: DataFrame) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Realiza una predicción utilizando un modelo previamente entrenado y guardado en 'new_workflow.joblib'.
+
+    Args:
+        df (DataFrame): DataFrame con los datos de entrada para la predicción.
+
+    Returns:
+        tuple[np.ndarray, np.ndarray]: Una tupla con el array de predicciones y el array de probabilidades de la clase positiva.
+
+    Ejemplo de resultado devuelto:
+    >>> preds, preds_proba = predict(df)
+    >>> print(preds)
+    [1, 0, 1]
+    >>> print(preds_proba)
+    [0.85, 0.12, 0.97]
+
+    Raises:
+        FileNotFoundError: Si el archivo 'new_workflow.joblib' no se encuentra.
+        ValueError: Si el DataFrame de entrada no tiene las columnas esperadas.
+    """
+
+    try:
+        model = load(RUTA_MODELO_PREDICCION)
+    except Exception as e:
+        raise RuntimeError(f"Ocurrió un error al cargar el modelo: {e}")
+
+    try:
+        preds = model.predict(df)
+        preds_proba = model.predict_proba(df)
+    except Exception as e:
+        raise RuntimeError(f"Ocurrió un error durante la predicción: {e}")
+
+    return preds, np.round(preds_proba[:, 1], 2)

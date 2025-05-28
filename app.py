@@ -8,6 +8,7 @@ from streamlit.runtime.uploaded_file_manager import UploadedFile
 from utils.helpers import (
     generate_id,
     key_categ,
+    predict,
     value_is_zero,
     start_experiment,
     build_df_stats,
@@ -251,7 +252,7 @@ with simulacion_tab:
         toggle_format = st.toggle(
             "Tiempo en días",
             value=True,
-            help="Formato de tiempo. Al activar muestra las horas en su aproximación a lo que sería en días.",
+            help="Formato de Tiempo. Al activar esta opción se muestran los días convertidos en horas.",
             key="formato-tiempo-simulacion",
         )
         df_simulacion = build_df_stats(
@@ -271,6 +272,21 @@ with simulacion_tab:
             hide_index=True,
             use_container_width=True,
         )
+
+        # Mostrar predicción de clases y porcentaje.
+        if (
+            "prediccion_clases" in st.session_state
+            and "prediccion_porcentaje" in st.session_state
+        ):
+            prediccion_clases: int = st.session_state.prediccion_clases
+            prediccion_porcentaje: float = st.session_state.prediccion_porcentaje
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(
+                    "### No fallece" if prediccion_clases == 0 else "### Fallece"
+                )
+            with col2:
+                st.metric("Probabilidad", f"{prediccion_porcentaje:.2f}%")
 
         # Lógica para guardar resultados localmente.
         csv = st.session_state.df_resultado.to_csv(index=False).encode("UTF-8")
@@ -302,7 +318,7 @@ with simulacion_tab:
         else:
             st.warning("Seleccione un tipo de Insuficiencia Respiratoria.")
 
-        # Desarrollo de la Simulación.
+        # Desarrollo de la SIMULACIÓN.
         if diag_ok and insuf_ok:
             try:
                 # Experimento / Simulación.
@@ -322,6 +338,23 @@ with simulacion_tab:
                     input_porciento,
                 )
 
+                # Predicción de clases y porcentaje.
+                if "prediccion_clases" not in st.session_state:
+                    st.session_state.prediccion_clases = 0
+                if "prediccion_porcentaje" not in st.session_state:
+                    st.session_state.prediccion_porcentaje = 0.0
+
+                # __df_to_predict = st.session_state.df_resultado.copy()
+                # __pred = predict(__df_to_predict)
+
+                # if __pred is not None:
+                #     st.session_state.prediccion_clases = __pred[0][0]
+                #     st.session_state.prediccion_porcentaje = __pred[1][0]
+
+                print(
+                    f"Predicción: {st.session_state.prediccion_clases}, Porcentaje: {st.session_state.prediccion_porcentaje}"
+                )
+
                 # Guardar resultados (forma local del proyecto).
                 path_base = f"experiments\\paciente-id-{st.session_state.id_paciente}"
                 if not os.path.exists(path_base):
@@ -331,12 +364,11 @@ with simulacion_tab:
                 path: str = f"{path_base}\\experimento-id {generate_id(5)} fecha {fecha} corridas {corridas_sim}.csv"
                 resultado_experimento.to_csv(path, index=False)
                 st.session_state.df_resultado = resultado_experimento
-
-                st.rerun()
-            except Exception as experimento:
+            except Exception as exception:
                 st.exception(
-                    f"No se pudo efectuar la simulación. Error asociado:\n{experimento}"
+                    f"No se pudo efectuar la simulación. Error asociado: \n{exception}"
                 )
+            # st.rerun()
 
 ###############################
 # SIMULACION CON DATOS REALES #
@@ -396,12 +428,12 @@ with datos_reales_tab:
             key="formato-tiempo-datosreales",
         )
 
-        experimento: tuple[float] = simulate_real_data(
+        exception: tuple[float] = simulate_real_data(
             ruta_fichero_csv=RUTA_FICHERODEDATOS_CSV, df_selection=selection
         )
 
         df_sim_datos_reales = build_df_stats(
-            experimento,
+            exception,
             CORRIDAS_SIM_DEFAULT,
             include_mean=True,
             include_std=True,
@@ -544,17 +576,17 @@ with comparaciones_tab:
                         # Corrección de que existen la misma cantidad de filas en ambas tablas.
                         len_dif = abs(len(x) - len(y))
 
-                        def len_info_msg(exp):
-                            return f"Se eliminaron filas del experimento {exp} para coincidir con el experimento {2 if exp == 1 else 1} ({len_dif} filas diferentes)."
-
-                        # La cantidad de filas de x, excede las de y.
-                        if x.shape[0] > y.shape[0]:
+                        # Ajustar el tamaño de las muestras si es necesario
+                        if x.shape[0] > y.shape[0]:  # X mayor que Y
                             x = x.head(y.shape[0])
-                            st.info(len_info_msg(1))
-                        # La cantidad de filas de y, excede las de x.
-                        elif y.shape[0] > x.shape[0]:
+                            st.info(
+                                f"Se eliminaron filas del experimento 1 para coincidir con el experimento 2 ({len_dif} filas diferentes)."
+                            )
+                        elif x.shape[0] < y.shape[0]:  # Y mayor que X
                             y = y.head(x.shape[0])
-                            st.info(len_info_msg(2))
+                            st.info(
+                                f"Se eliminaron filas del experimento 2 para coincidir con el experimento 1 ({len_dif} filas diferentes)."
+                            )
 
                         try:
                             # Test de Wilcoxon
@@ -571,8 +603,8 @@ with comparaciones_tab:
                             )
                             st.markdown(INFO_STATISTIC)
                             st.markdown(INFO_P_VALUE)
-                        except Exception as experimento:
-                            st.exception(experimento)
+                        except Exception as exception:
+                            st.exception(exception)
     with friedman_tab:
         st.markdown("### Friedman")
 
@@ -634,5 +666,5 @@ with comparaciones_tab:
                         )
                         st.markdown(INFO_STATISTIC)
                         st.markdown(INFO_P_VALUE)
-                    except Exception as experimento:
-                        st.exception(experimento)
+                    except Exception as exception:
+                        st.exception(exception)
