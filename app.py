@@ -338,22 +338,27 @@ with simulacion_tab:
                     input_porciento,
                 )
 
-                # Predicción de clases y porcentaje.
-                if "prediccion_clases" not in st.session_state:
-                    st.session_state.prediccion_clases = 0
-                if "prediccion_porcentaje" not in st.session_state:
-                    st.session_state.prediccion_porcentaje = 0.0
+                try:
+                    # Predicción de clases y porcentaje.
+                    if "prediccion_clases" not in st.session_state:
+                        st.session_state.prediccion_clases = 0
+                    if "prediccion_porcentaje" not in st.session_state:
+                        st.session_state.prediccion_porcentaje = 0.0
 
-                # __df_to_predict = st.session_state.df_resultado.copy()
-                # __pred = predict(__df_to_predict)
+                    __df_to_predict = st.session_state.df_resultado.copy()
+                    __pred = predict(__df_to_predict)
 
-                # if __pred is not None:
-                #     st.session_state.prediccion_clases = __pred[0][0]
-                #     st.session_state.prediccion_porcentaje = __pred[1][0]
+                    if __pred is not None:
+                        st.session_state.prediccion_clases = __pred[0][0]
+                        st.session_state.prediccion_porcentaje = __pred[1][0]
 
-                print(
-                    f"Predicción: {st.session_state.prediccion_clases}, Porcentaje: {st.session_state.prediccion_porcentaje}"
-                )
+                    print(
+                        f"Predicción: {st.session_state.prediccion_clases}, Porcentaje: {st.session_state.prediccion_porcentaje}"
+                    )
+                except Exception as e:
+                    st.error(
+                        f"No se pudo realizar la predicción de clases y porcentaje. Error asociado: {e}"
+                    )
 
                 # Guardar resultados (forma local del proyecto).
                 path_base = f"experiments\\paciente-id-{st.session_state.id_paciente}"

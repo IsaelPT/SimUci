@@ -117,7 +117,7 @@ try:
     RUTA_FICHERODEDATOS_CSV = os.path.join("data", "Ficherodedatos(MO)17-1-2023.csv")
     RUTA_DFCENTROIDES_CSV = os.path.join("data", "DF_Centroides.csv")
     RUTA_PREDICCIONES_CSV = os.path.join("data", "data_with_pred_and_prob.csv")
-    RUTA_MODELO_PREDICCION = os.path.join("data", "new_workflow.joblib")
+    RUTA_MODELO_PREDICCION = os.path.join("models", "new_workflow.joblib")
 except Exception as experimento:
     print(
         f"Error al cargar el archivo la base de datos.\n>>>\nExcepcion\n>>>{experimento}"
