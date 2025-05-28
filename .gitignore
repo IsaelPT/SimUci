@@ -15,10 +15,10 @@
 *.pyd
 
 # Jupyter Notebooks checkpoints
-*.ipynb_checkpoints/
+# *.ipynb_checkpoints/
 
 # Joblib/model files
-*.joblib
+# *.joblib
 
 # Local Experiments and Outputs
 experiments/
