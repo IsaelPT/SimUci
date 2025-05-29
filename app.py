@@ -7,8 +7,10 @@ from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 from utils.helpers import (
     generate_id,
+    get_prediction_data,
     key_categ,
     predict,
+    predict_table,
     value_is_zero,
     start_experiment,
     build_df_stats,
@@ -27,6 +29,7 @@ from utils.constants import (
     APACHE_DEFAULT,
     HELP_MSG_APACHE,
     HELP_MSG_TIEMPO_VAM,
+    RUTA_PREDICCIONES_CSV,
     T_VAM_MIN,
     T_VAM_MAX,
     T_VAM_DEFAULT,
@@ -55,7 +58,7 @@ from utils.constants import (
     INFO_STATISTIC,
     INFO_P_VALUE,
 )
-from uci.stats import Wilcoxon, Friedman
+from uci.stats import Wilcoxon, Friedman, StatsUtils
 
 
 ########
@@ -278,15 +281,42 @@ with simulacion_tab:
             "prediccion_clases" in st.session_state
             and "prediccion_porcentaje" in st.session_state
         ):
-            prediccion_clases: int = st.session_state.prediccion_clases
-            prediccion_porcentaje: float = st.session_state.prediccion_porcentaje
             col1, col2 = st.columns(2)
             with col1:
                 st.markdown(
-                    "### No fallece" if prediccion_clases == 0 else "### Fallece"
+                    "### Paciente no fallece"
+                    if st.session_state.prediccion_clases == 0
+                    else "### Paciente fallece"
                 )
             with col2:
-                st.metric("Probabilidad", f"{prediccion_porcentaje:.2f}%")
+                prev_pred = st.session_state.get("prev_prediccion_porcentaje", None)
+                current_pred = st.session_state.prediccion_porcentaje
+                delta_label = ""
+                delta_color = "normal"
+                if prev_pred is not None:
+                    diff = current_pred - prev_pred
+                    if diff > 0:
+                        delta_label = f"Aumento de {abs(diff):.2f}%"
+                        delta_color = "normal"
+                    elif diff < 0:
+                        delta_label = f"Disminución de {abs(diff):.2f}%"
+                        delta_color = "inverse"
+                    else:
+                        delta_label = "Sin cambio"
+                        delta_color = "normal"
+                else:
+                    delta_label = None
+                    delta_color = "normal"
+
+                st.metric(
+                    label="Probabilidad",
+                    value=f"{current_pred:.2f}%",
+                    delta=delta_label,
+                    delta_color=delta_color,
+                    border=True,
+                )
+
+                st.session_state.prev_prediccion_porcentaje = current_pred
 
         # Lógica para guardar resultados localmente.
         csv = st.session_state.df_resultado.to_csv(index=False).encode("UTF-8")
@@ -345,12 +375,21 @@ with simulacion_tab:
                     if "prediccion_porcentaje" not in st.session_state:
                         st.session_state.prediccion_porcentaje = 0.0
 
-                    __df_to_predict = st.session_state.df_resultado.copy()
-                    __pred = predict(__df_to_predict)
+                    df_to_predict = get_prediction_data(
+                        {
+                            "Edad": edad,
+                            "Diag.Ing1": diag_ing1,
+                            "Diag.Ing2": diag_ing2,
+                            "Diag.Egr2": diag_egreso2,
+                            "TiempoVAM": tiempo_vam,
+                            "APACHE": apache,
+                        }
+                    )
+                    prediction = predict(df_to_predict)
 
-                    if __pred is not None:
-                        st.session_state.prediccion_clases = __pred[0][0]
-                        st.session_state.prediccion_porcentaje = __pred[1][0]
+                    if prediction is not None:
+                        st.session_state.prediccion_clases = prediction[0][0]
+                        st.session_state.prediccion_porcentaje = prediction[1][0]
 
                     print(
                         f"Predicción: {st.session_state.prediccion_clases}, Porcentaje: {st.session_state.prediccion_porcentaje}"
@@ -463,23 +502,35 @@ with datos_reales_tab:
         key="simular_tabla",
     ):
         with st.spinner(
-            "Simulando todos los datos en la tabla. Esto puede tardar varios minutos..."
+            text="Simulando todos los datos en la tabla. Esto puede tardar varios minutos...",
+            show_time=True,
         ):
-            lst_e: list[tuple[float]] = simulate_real_data(
-                RUTA_FICHERODEDATOS_CSV, df_selection=-1
-            )
+            try:
+                lst_e: list[tuple[float]] = simulate_real_data(
+                    RUTA_FICHERODEDATOS_CSV, df_selection=-1
+                )
 
-            # DataFrame con todos los resultados de simulaciones a todos los pacientes en la tabla.
-            df_sim_datos_reales = build_df_stats(
-                lst_e,
-                CORRIDAS_SIM_DEFAULT,
-                include_mean=True,
-                include_std=False,
-                include_confint=False,
-                include_info_label=False,
-            )
-            df_sim_datos_reales.index.name = "Paciente"
-            st.session_state.df_sim_datos_reales = df_sim_datos_reales
+                # DataFrame con todos los resultados de simulaciones a todos los pacientes en la tabla.
+                df_sim_datos_reales = build_df_stats(
+                    lst_e,
+                    CORRIDAS_SIM_DEFAULT,
+                    include_mean=True,
+                    include_std=False,
+                    include_confint=False,
+                    include_info_label=False,
+                )
+                df_sim_datos_reales.index.name = "Paciente"
+                st.session_state.df_sim_datos_reales = df_sim_datos_reales
+
+                st.toast(
+                    "Se ha realizado la simulación a cada paciente de la tabla.",
+                    icon="✅",
+                )
+            except Exception as e:
+                st.toast(
+                    f"Se ha producido un error al realizar la simulación: {e}",
+                    icon="⚠️",
+                )
 
     # Mostrar simulación con datos reales.
     if not st.session_state.df_sim_datos_reales.empty:
@@ -503,7 +554,40 @@ with datos_reales_tab:
             key="guardar_sim_datos_reales",
         )
 
-        st.success("Se ha realizado la simulación para cada paciente.")
+    st.divider()
+    st.markdown("### Validación de predicción")
+
+    if st.button(label="Validar predicción", type="primary", use_container_width=True):
+        with st.spinner(
+            text="Validando predicción para valores reales. Esto puede tardar unos minutos...",
+            show_time=True,
+        ):
+            try:
+                df_data_pred = pd.read_csv(RUTA_PREDICCIONES_CSV)
+
+                y_true = df_data_pred["Prob Fallece"].values
+                y_pred = df_data_pred["Prediccion"].values
+                intervals = [0.8, 0.9, 0.95]
+
+                calibration_metric = StatsUtils.calibration_metric_predict(
+                    y_true, y_pred, intervals
+                )
+
+                # print(calibration_metric)
+
+                st.markdown("### Resultados de validación")
+                st.dataframe(
+                    pd.DataFrame(
+                        {
+                            "Intervalo": intervals,
+                            "Porcentaje dentro del intervalo": calibration_metric,
+                        }
+                    ),
+                    hide_index=True,
+                    use_container_width=True,
+                )
+            except Exception as e:
+                st.error(f"Error al validar la predicción: {e}")
 
 #################
 # COMPARACIONES #

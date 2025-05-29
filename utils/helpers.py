@@ -7,8 +7,6 @@ import pandas as pd
 from pandas import DataFrame
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-import imaplib
-
 from utils.constants import (
     CORRIDAS_SIM_DEFAULT,
     RUTA_MODELO_PREDICCION,
@@ -20,6 +18,9 @@ from uci.experiment import Experiment, multiple_replication
 from uci.stats import StatsUtils
 
 from joblib import load
+import sys
+import traceback
+import streamlit as st
 
 
 def key_categ(categoria: str, valor: str | int, viceversa: bool = False) -> int | str:
@@ -281,7 +282,7 @@ def bin_to_df(files: UploadedFile | list[UploadedFile]) -> DataFrame | list[Data
         return [pd.read_csv(f) for f in files]
 
 
-def extract_real_data(
+def _extract_real_data(
     ruta_archivo_csv: str, index: int, return_type: str = "df"
 ) -> DataFrame | tuple[float]:
     data = pd.read_csv(ruta_archivo_csv)
@@ -305,7 +306,7 @@ def extract_real_data(
                 "tiempo_vam": int(data["TiempoVAM"].iloc[data_index]),
                 "estpreuci": int(data["Est. PreUCI"].iloc[data_index] * 24),
             }
-            print(output.values())
+            # print(output.values())
             return output
         else:
             raise ValueError("El parámetro data_index debe ser un entero positivo.")
@@ -313,9 +314,9 @@ def extract_real_data(
     extracted_data = build_row(index)
 
     if return_type == "df":
-        return pd.DataFrame([extracted_data])  # Alternative Return Type (Tuple)
+        return pd.DataFrame([extracted_data])  # Default Return Type (DataFrame)
     elif return_type == "tuple":
-        return tuple(extracted_data.values())  # Default Return Type (DataFrame)
+        return tuple(extracted_data.values())  # Alternative Return Type (Tuple)
     else:
         raise ValueError("El parámetro return_type debe ser 'df' o 'tuple'.")
 
@@ -470,7 +471,7 @@ def simulate_real_data(
         return e
 
     if df_selection != -1:
-        t: tuple[float] = extract_real_data(
+        t: tuple[float] = _extract_real_data(
             ruta_fichero_csv, index=df_selection, return_type="tuple"
         )
 
@@ -483,7 +484,7 @@ def simulate_real_data(
         return [
             experiment_helper(t)
             for t in [
-                extract_real_data(ruta_fichero_csv, index=i, return_type="tuple")
+                _extract_real_data(ruta_fichero_csv, index=i, return_type="tuple")
                 for i in range(datalen)
             ]
         ]
@@ -524,6 +525,8 @@ def predict(df: DataFrame) -> tuple[np.ndarray, np.ndarray]:
 
     Args:
         df (DataFrame): DataFrame con los datos de entrada para la predicción.
+            El DataFrame de entrada debe contener únicamente las siguientes columnas:
+            {'Diag.Ing1', 'Diag.Ing2', 'Diag.Egr2', 'TiempoVAM', 'APACHE', 'Edad'}
 
     Returns:
         tuple[np.ndarray, np.ndarray]: Una tupla con el array de predicciones y el array de probabilidades de la clase positiva.
@@ -537,18 +540,75 @@ def predict(df: DataFrame) -> tuple[np.ndarray, np.ndarray]:
 
     Raises:
         FileNotFoundError: Si el archivo 'new_workflow.joblib' no se encuentra.
-        ValueError: Si el DataFrame de entrada no tiene las columnas esperadas.
     """
 
     try:
         model = load(RUTA_MODELO_PREDICCION)
-    except Exception as e:
-        raise RuntimeError(f"Ocurrió un error al cargar el modelo: {e}")
-
-    try:
         preds = model.predict(df)
         preds_proba = model.predict_proba(df)
-    except Exception as e:
-        raise RuntimeError(f"Ocurrió un error durante la predicción: {e}")
+        return preds, np.round(preds_proba[:, 1], 2)
+    except Exception:
+        tb_text = "".join(traceback.format_exception(*sys.exc_info()))
+        st.error("Ocurrió un error durante la predicción: ")
+        st.code(tb_text, language="python")
+        raise
 
-    return preds, np.round(preds_proba[:, 1], 2)
+
+def get_prediction_data(data: dict[str:int] | pd.DataFrame) -> pd.DataFrame:
+    """
+    Genera un DataFrame de pandas con los datos necesarios para realizar una predicción.
+    Args:
+        data (dict[str, int | float]): Diccionario que contiene los valores de las variables requeridas para la predicción.
+            Las claves esperadas son: 'Edad', 'Diag.Ing1', 'Diag.Ing2', 'Diag.Egr2', 'TiempoVAM', 'APACHE'.
+    Returns:
+        pd.DataFrame: DataFrame con una sola fila y las columnas correspondientes a las variables de entrada.
+    Raises:
+        Exception: Si ocurre un error durante la construcción del DataFrame, se imprime el traceback y se relanza la excepción.
+    """
+
+    # NOTE Required: {'Diag.Ing2', 'Diag.Egr2', 'Diag.Ing1', 'TiempoVAM', 'APACHE', 'Edad'}
+
+    try:
+        if isinstance(data, pd.DataFrame):
+            required_cols = [
+                "Edad",
+                "Diag.Ing1",
+                "Diag.Ing2",
+                "Diag.Egr2",
+                "TiempoVAM",
+                "APACHE",
+            ]
+            if not all(col in data.columns for col in required_cols):
+                raise ValueError(
+                    f"El DataFrame debe contener las columnas: {', '.join(f'{required_cols}')}."
+                )
+            return data[required_cols]
+
+        elif isinstance(data, dict):
+            diag_ing2 = data.get("Diag.Ing2", 1)
+            diag_egr2 = data.get("Diag.Egr2", 2)
+            diag_ing1 = data.get("Diag.Ing1", 3)
+            tiempo_vam = data.get("TiempoVAM", 4)
+            edad = data.get("Edad", 6)
+            apache = data.get("APACHE", 5)
+            return pd.DataFrame(
+                {
+                    "Edad": [edad],
+                    "Diag.Ing1": [diag_ing1],
+                    "Diag.Ing2": [diag_ing2],
+                    "Diag.Egr2": [diag_egr2],
+                    "TiempoVAM": [tiempo_vam],
+                    "APACHE": [apache],
+                }
+            )
+
+    except Exception as e:
+        tb_text = "".join(traceback.format_exception(*sys.exc_info()))
+        print(f"Error building prediction data: {e}\n{tb_text}")
+        raise
+
+
+def predict_table(df: pd.DataFrame) -> pd.DataFrame:
+    data: pd.DataFrame = get_prediction_data(df)
+    preds, preds_proba = predict(data)
+    return pd.DataFrame({"pred": preds, "prob": preds_proba})
