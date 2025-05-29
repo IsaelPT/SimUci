@@ -606,9 +606,3 @@ def get_prediction_data(data: dict[str:int] | pd.DataFrame) -> pd.DataFrame:
         tb_text = "".join(traceback.format_exception(*sys.exc_info()))
         print(f"Error building prediction data: {e}\n{tb_text}")
         raise
-
-
-def predict_table(df: pd.DataFrame) -> pd.DataFrame:
-    data: pd.DataFrame = get_prediction_data(df)
-    preds, preds_proba = predict(data)
-    return pd.DataFrame({"pred": preds, "prob": preds_proba})
