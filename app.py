@@ -10,7 +10,6 @@ from utils.helpers import (
     get_prediction_data,
     key_categ,
     predict,
-    predict_table,
     value_is_zero,
     start_experiment,
     build_df_stats,
@@ -59,6 +58,7 @@ from utils.constants import (
     INFO_P_VALUE,
 )
 from uci.stats import Wilcoxon, Friedman, StatsUtils
+import traceback
 
 
 ########
@@ -296,21 +296,21 @@ with simulacion_tab:
                 if prev_pred is not None:
                     diff = current_pred - prev_pred
                     if diff > 0:
-                        delta_label = f"Aumento de {abs(diff):.2f}%"
+                        delta_label = f"Aumento de {round(abs(diff) * 100)}%"
                         delta_color = "normal"
                     elif diff < 0:
-                        delta_label = f"Disminución de {abs(diff):.2f}%"
+                        delta_label = f"Disminución de {round(abs(diff) * 100)}%"
                         delta_color = "inverse"
                     else:
                         delta_label = "Sin cambio"
-                        delta_color = "normal"
+                        delta_color = "off"
                 else:
                     delta_label = None
                     delta_color = "normal"
 
                 st.metric(
                     label="Probabilidad",
-                    value=f"{current_pred:.2f}%",
+                    value=f"{round(current_pred * 100)}%",
                     delta=delta_label,
                     delta_color=delta_color,
                     border=True,
@@ -404,15 +404,15 @@ with simulacion_tab:
                 if not os.path.exists(path_base):
                     os.makedirs(path_base)
                 fecha: str = datetime.now().strftime("%d-%m-%Y")
-
                 path: str = f"{path_base}\\experimento-id {generate_id(5)} fecha {fecha} corridas {corridas_sim}.csv"
                 resultado_experimento.to_csv(path, index=False)
                 st.session_state.df_resultado = resultado_experimento
+
+                st.rerun()
             except Exception as exception:
                 st.exception(
                     f"No se pudo efectuar la simulación. Error asociado: \n{exception}"
                 )
-            # st.rerun()
 
 ###############################
 # SIMULACION CON DATOS REALES #
@@ -565,8 +565,18 @@ with datos_reales_tab:
             try:
                 df_data_pred = pd.read_csv(RUTA_PREDICCIONES_CSV)
 
-                y_true = df_data_pred["Prob Fallece"].values
-                y_pred = df_data_pred["Prediccion"].values
+                dfdf = get_prediction_data(df_data_pred)
+                df_predic = predict(dfdf)
+
+                with st.expander("Datos de entrada"):
+                    st.dataframe(
+                        df_data_pred,
+                        hide_index=True,
+                        use_container_width=True,
+                    )
+
+                y_true = df_data_pred["Fallece"]
+                y_pred = df_predic[0]
                 intervals = [0.8, 0.9, 0.95]
 
                 calibration_metric = StatsUtils.calibration_metric_predict(
@@ -575,7 +585,6 @@ with datos_reales_tab:
 
                 # print(calibration_metric)
 
-                st.markdown("### Resultados de validación")
                 st.dataframe(
                     pd.DataFrame(
                         {
@@ -588,6 +597,7 @@ with datos_reales_tab:
                 )
             except Exception as e:
                 st.error(f"Error al validar la predicción: {e}")
+                st.exception(traceback.format_exc())
 
 #################
 # COMPARACIONES #

@@ -606,3 +606,39 @@ def get_prediction_data(data: dict[str:int] | pd.DataFrame) -> pd.DataFrame:
         tb_text = "".join(traceback.format_exception(*sys.exc_info()))
         print(f"Error building prediction data: {e}\n{tb_text}")
         raise
+ 
+def get_statistics(df: pd.DataFrame) -> tuple[float]:
+    stats: dict[str:float] = {
+        "mean": 0.0,
+        "std": 0.0,
+        "confint_lower": 0.0,
+        "confint_upper": 0.0,
+    }
+        # Media
+        mean: DataFrame = df.mean().to_frame().T
+        stats["mean"] = mean
+
+        # Desviación Estándar
+        std: DataFrame = df.std().to_frame().T
+        stats["std"] = std
+
+        # Intervalo de Confianza
+        sample_size = df.shape[0]
+        if not sample_size or sample_size <= 0:
+            raise ValueError(
+                f"Para realizar el intervalo de confianza debe usarse un tamaño de muestra válido."
+                f"Found: {sample_size}"
+            )
+        else:
+            confint = StatsUtils.confidenceinterval(mean, std, sample_size)
+            li = pd.DataFrame(confint[0])
+            ls = pd.DataFrame(confint[1])
+            li["confint_lower"] = mean.columns.to_list()
+            ls["confint_upper"] = mean.columns.to_list()
+            stats["confint_lower"] = li
+            stats["confint_upper"] = ls
+
+    if len(stats.items()) == 4:
+        return stats
+    else:
+        raise Exception("El valor de retorno no cumple con las condiciones")
