@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import ndarray
+import pandas as pd
 from scipy.stats import wilcoxon, friedmanchisquare, norm
 
 
@@ -27,9 +28,11 @@ class Friedman:
 
 class StatsUtils:
     @staticmethod
-    def confidenceinterval(mean, std, n) -> tuple[ndarray[float], ndarray[float]]:
+    def confidenceinterval(
+        mean, std, n, coef=0.95
+    ) -> tuple[ndarray[float], ndarray[float]]:
         sem = std / np.sqrt(n)
-        conf_int = norm.interval(confidence=0.95, loc=mean, scale=sem)
+        conf_int = norm.interval(confidence=coef, loc=mean, scale=sem)
         arr_limite_inferior: ndarray[float] = conf_int[0]
         arr_limite_superior: ndarray[float] = conf_int[1]
         return arr_limite_inferior, arr_limite_superior
@@ -44,6 +47,15 @@ class StatsUtils:
         return within_interval
 
     @staticmethod
-    def calibration_metric_simulation(y_true, lower, upper):
-        within_interval = np.mean((y_true >= lower) & (y_true <= upper))
-        return within_interval
+    def calibration_metric_simulation(y_true, lower, upper) -> float:
+        match y_true:
+            case float() | int():
+                return float(lower <= y_true <= upper)
+
+            case list() | np.ndarray() | pd.Series() | pd.DataFrame():
+                y_true = np.array(y_true)
+                within_interval = np.mean((y_true >= lower) & (y_true <= upper))
+                return within_interval
+
+            case _:
+                raise TypeError(f"Tipo no soportado para y_true: {type(y_true)}")

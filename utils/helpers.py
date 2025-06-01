@@ -9,6 +9,7 @@ from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 from utils.constants import (
     CORRIDAS_SIM_DEFAULT,
+    VARIABLES_EXPERIMENTO,
     RUTA_MODELO_PREDICCION,
     TIPO_VENT,
     DIAG_PREUCI,
@@ -108,25 +109,30 @@ def generate_id(digits: int = 10) -> str:
     return "".join([str(secrets.randbelow(digits)) for _ in range(digits)])
 
 
-def format_df_time(df: DataFrame) -> DataFrame:
+def format_df_time(df: DataFrame, rows_to_format: list[int] = None) -> DataFrame:
     """
     Toma todas las columnas y convierte los valores numéricos en texto con formato, mostrando los días y las horas.
+    Permite especificar qué filas formatear.
 
     Args:
         df: DataFrame a trasformar.
+        rows_to_format: Lista de índices de filas a formatear. Si es None, formatea todas las filas.
 
     Returns:
-        DataFrame donde cada celda que contenga números tendrá el formato (# d (# h)).
+        DataFrame donde las filas especificadas que contengan números tendrán el formato (# d (# h)).
 
         Ejemplo:
-
         >>> {2.0 d (48.0 h)} # -> 2 días, 48 horas.
-
     """
 
-    def fmt(col: pd.Series):
+    def fmt(col: pd.Series, rows: list[int] = None):
         mascara: pd.Series = pd.to_numeric(col, errors="coerce").notna()
-        format: pd.Series = col.astype(object)  # Para filtrar los valores NaN.
+        format: pd.Series = col.astype(object)
+
+        if rows is not None:
+            # Solo aplicar formato a las filas especificadas
+            mascara = mascara & col.index.isin(rows)
+
         valores_numericos = col[mascara].astype(float)
         format[mascara] = [
             (
@@ -138,7 +144,7 @@ def format_df_time(df: DataFrame) -> DataFrame:
         ]
         return format
 
-    return df.apply(fmt)
+    return df.apply(lambda x: fmt(x, rows_to_format))
 
 
 def format_df_stats(
@@ -153,7 +159,8 @@ def format_df_stats(
         "Promedio",
         "Desviación Estándar",
         "Límite Inferior",
-        "Límite Superior"
+        "Límite Superior",
+        "Métrica de Calibración"
     ]
 
     Args:
@@ -169,6 +176,7 @@ def format_df_stats(
     df.loc[1, label] = "Desviación Estándar"
     df.loc[2, label] = "Límite Inferior"
     df.loc[3, label] = "Límite Superior"
+    df.loc[4, label] = "Métrica de Calibración"
     # for i in range(df.shape[0]):
     #     df.loc[i, label] = f"Paciente {i}"
 
@@ -181,6 +189,7 @@ def build_df_stats(
     include_mean=True,
     include_std=False,
     include_confint=False,
+    include_metrics=False,
     include_info_label=True,
     info_label: str = "Información",
 ) -> DataFrame:
@@ -193,6 +202,7 @@ def build_df_stats(
         include_mean (bool, optional): Mostrar el dato de la media en la tabla. Defaults to True.
         include_std (bool, optional): Mostrar el dato de la desviación estándar. Defaults to True.
         include_confint (bool, optional): Mostrar el dato del intervalor de confianza (límite inf, límite sup). Defaults to True.
+        include_metrics (bool, opcional): Mostrar las métricas de validación.
 
     Raises:
         ValueError: Cuando se debe incluir al menos 1 valor estadístico a mostrar.
@@ -240,6 +250,18 @@ def build_df_stats(
                     li.columns = mean.columns.to_list()
                     ls.columns = mean.columns.to_list()
                     stats_values.extend([li, ls])
+
+                    if include_metrics:
+                        # Validación métricas
+                        metrics = []
+                        for v in VARIABLES_EXPERIMENTO:
+                            metric = StatsUtils.calibration_metric_simulation(
+                                df[v].to_list(),
+                                float(li[v].iloc[0]),
+                                float(ls[v].iloc[0]),
+                            )
+                            metrics.append(metric * 100)  # Convertir a porcentaje
+                        stats_values.append(pd.DataFrame([metrics], columns=df.columns))
 
         df_final = pd.concat(stats_values, axis=0, ignore_index=True)
 
@@ -606,39 +628,3 @@ def get_prediction_data(data: dict[str:int] | pd.DataFrame) -> pd.DataFrame:
         tb_text = "".join(traceback.format_exception(*sys.exc_info()))
         print(f"Error building prediction data: {e}\n{tb_text}")
         raise
- 
-def get_statistics(df: pd.DataFrame) -> tuple[float]:
-    stats: dict[str:float] = {
-        "mean": 0.0,
-        "std": 0.0,
-        "confint_lower": 0.0,
-        "confint_upper": 0.0,
-    }
-        # Media
-        mean: DataFrame = df.mean().to_frame().T
-        stats["mean"] = mean
-
-        # Desviación Estándar
-        std: DataFrame = df.std().to_frame().T
-        stats["std"] = std
-
-        # Intervalo de Confianza
-        sample_size = df.shape[0]
-        if not sample_size or sample_size <= 0:
-            raise ValueError(
-                f"Para realizar el intervalo de confianza debe usarse un tamaño de muestra válido."
-                f"Found: {sample_size}"
-            )
-        else:
-            confint = StatsUtils.confidenceinterval(mean, std, sample_size)
-            li = pd.DataFrame(confint[0])
-            ls = pd.DataFrame(confint[1])
-            li["confint_lower"] = mean.columns.to_list()
-            ls["confint_upper"] = mean.columns.to_list()
-            stats["confint_lower"] = li
-            stats["confint_upper"] = ls
-
-    if len(stats.items()) == 4:
-        return stats
-    else:
-        raise Exception("El valor de retorno no cumple con las condiciones")

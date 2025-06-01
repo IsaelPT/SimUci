@@ -268,7 +268,7 @@ with simulacion_tab:
         )
 
         if toggle_format:
-            df_simulacion = format_df_time(df_simulacion)
+            df_simulacion = format_df_time(df=df_simulacion, rows_to_format=[0, 1, 2])
 
         st.dataframe(
             df_simulacion,
@@ -409,9 +409,9 @@ with simulacion_tab:
                 st.session_state.df_resultado = resultado_experimento
 
                 st.rerun()
-            except Exception as exception:
+            except Exception as data:
                 st.exception(
-                    f"No se pudo efectuar la simulación. Error asociado: \n{exception}"
+                    f"No se pudo efectuar la simulación. Error asociado: \n{data}"
                 )
 
 ###############################
@@ -447,7 +447,7 @@ with datos_reales_tab:
         height=300,
     )["selection"]["rows"]
 
-    # df_selection devuelve un dict de la forma:
+    # El `df_selection` devuelve un dict de la forma:
     # {
     #     "selection": {
     #         "rows": [0, 1, 2, ...],
@@ -465,34 +465,55 @@ with datos_reales_tab:
     if selection == 0 or selection is not None:
         st.markdown("Resultados de simulación con paciente seleccionado")
 
-        toggle_format = st.toggle(
-            "Tiempo en días",
-            value=False,
-            help="Formato de tiempo. Al activar muestra las horas en su aproximación a lo que sería en días.",
-            key="formato-tiempo-datosreales",
-        )
+        corridas_sim = CORRIDAS_SIM_DEFAULT
 
-        exception: tuple[float] = simulate_real_data(
+        col1, col2 = st.columns(2)
+        with col1:
+            toggle_format = st.toggle(
+                "Tiempo en días",
+                value=False,
+                help="Formato de tiempo. Al activar muestra las horas en su aproximación a lo que sería en días.",
+            )
+        with col2:
+            with st.popover(
+                label="Cantidad de Simulaciones",
+                use_container_width=True,
+                help=HELP_MSG_CORRIDA_SIM,
+            ):
+                corridas_sim = st.number_input(
+                    label="Cantidad de Simulaciones",
+                    min_value=CORRIDAS_SIM_MIN,
+                    max_value=CORRIDAS_SIM_MAX,
+                    value=CORRIDAS_SIM_DEFAULT,
+                    help=HELP_MSG_CORRIDA_SIM,
+                )
+
+        data: tuple[float] = simulate_real_data(
             ruta_fichero_csv=RUTA_FICHERODEDATOS_CSV, df_selection=selection
         )
 
         df_sim_datos_reales = build_df_stats(
-            exception,
-            CORRIDAS_SIM_DEFAULT,
+            data,
+            corridas_sim,
             include_mean=True,
             include_std=True,
             include_confint=True,
+            include_metrics=True,
             include_info_label=True,
         )
 
         if toggle_format:
-            df_sim_datos_reales = format_df_time(df_sim_datos_reales)
-
-        st.dataframe(
-            df_sim_datos_reales,
-            hide_index=True,
-            use_container_width=True,
-        )
+            st.dataframe(
+                format_df_time(df_sim_datos_reales),
+                hide_index=True,
+                use_container_width=True,
+            )
+        else:
+            st.dataframe(
+                df_sim_datos_reales,
+                hide_index=True,
+                use_container_width=True,
+            )
 
     # Simular todos los datos en la tabla.
     if st.button(
@@ -506,13 +527,13 @@ with datos_reales_tab:
             show_time=True,
         ):
             try:
-                lst_e: list[tuple[float]] = simulate_real_data(
+                lista_experimentos: list[tuple[float]] = simulate_real_data(
                     RUTA_FICHERODEDATOS_CSV, df_selection=-1
                 )
 
                 # DataFrame con todos los resultados de simulaciones a todos los pacientes en la tabla.
                 df_sim_datos_reales = build_df_stats(
-                    lst_e,
+                    lista_experimentos,
                     CORRIDAS_SIM_DEFAULT,
                     include_mean=True,
                     include_std=False,
@@ -555,7 +576,7 @@ with datos_reales_tab:
         )
 
     st.divider()
-    st.markdown("### Validación de predicción")
+    st.markdown("# Validación de la predicción para todos los Datos Reales")
 
     if st.button(label="Validar predicción", type="primary", use_container_width=True):
         with st.spinner(
@@ -702,8 +723,8 @@ with comparaciones_tab:
                             )
                             st.markdown(INFO_STATISTIC)
                             st.markdown(INFO_P_VALUE)
-                        except Exception as exception:
-                            st.exception(exception)
+                        except Exception as data:
+                            st.exception(data)
     with friedman_tab:
         st.markdown("### Friedman")
 
@@ -765,5 +786,5 @@ with comparaciones_tab:
                         )
                         st.markdown(INFO_STATISTIC)
                         st.markdown(INFO_P_VALUE)
-                    except Exception as exception:
-                        st.exception(exception)
+                    except Exception as data:
+                        st.exception(data)
