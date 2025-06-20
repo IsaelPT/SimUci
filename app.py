@@ -14,6 +14,7 @@ from utils.helpers import (
     start_experiment,
     build_df_stats,
     format_df_time,
+    format_value_for_display,
     simulate_real_data,
     bin_to_df,
     adjust_df_sizes,
@@ -237,8 +238,7 @@ with simulacion_tab:
     if "df_resultado" not in st.session_state:
         st.session_state.df_resultado = pd.DataFrame()
 
-    sim_buttons_container = st.container()
-    with sim_buttons_container:
+    with st.container():
         corridas_sim = st.number_input(
             "Corridas de la Simulación",
             min_value=CORRIDAS_SIM_MIN,
@@ -264,14 +264,24 @@ with simulacion_tab:
             include_mean=True,
             include_std=True,
             include_confint=True,
+            include_metrics=True,
             include_info_label=True,
         )
 
+        # Aplicar formato si está habilitado
         if toggle_format:
-            df_simulacion = format_df_time(df=df_simulacion, rows_to_format=[0, 1, 2])
+            # Crear una copia del DataFrame para mostrar
+            display_df = df_simulacion.copy()
+
+            # Aplicar formato a todas las columnas que contengan 'Tiempo' en el nombre para todas las filas
+            for col in display_df.columns:
+                if "Tiempo" in col and display_df[col].dtype != object:
+                    display_df[col] = display_df[col].apply(format_value_for_display)
+        else:
+            display_df = df_simulacion
 
         st.dataframe(
-            df_simulacion,
+            display_df,
             hide_index=True,
             use_container_width=True,
         )
@@ -283,12 +293,14 @@ with simulacion_tab:
         ):
             col1, col2 = st.columns(2)
             with col1:
+                # CLASES PREVIEW
                 st.markdown(
                     "### Paciente no fallece"
                     if st.session_state.prediccion_clases == 0
                     else "### Paciente fallece"
                 )
             with col2:
+                # METRIC PREVIEW
                 prev_pred = st.session_state.get("prev_prediccion_porcentaje", None)
                 current_pred = st.session_state.prediccion_porcentaje
                 delta_label = ""
@@ -343,6 +355,7 @@ with simulacion_tab:
             st.warning(
                 "Todos los diagnósticos están vacíos. Se debe incluir mínimo un diagnóstico para realizar la simulación."
             )
+
         if not value_is_zero(insuf_resp):  # campo de dInsuficiencia Respiratoria OK?
             insuf_ok = True
         else:
@@ -368,8 +381,8 @@ with simulacion_tab:
                     input_porciento,
                 )
 
+                # Predicción de clases y porcentaje.
                 try:
-                    # Predicción de clases y porcentaje.
                     if "prediccion_clases" not in st.session_state:
                         st.session_state.prediccion_clases = 0
                     if "prediccion_porcentaje" not in st.session_state:
@@ -390,6 +403,10 @@ with simulacion_tab:
                     if prediction is not None:
                         st.session_state.prediccion_clases = prediction[0][0]
                         st.session_state.prediccion_porcentaje = prediction[1][0]
+                    else:
+                        raise ValueError(
+                            "No se pudo realizar la predicción de clases y porcentaje."
+                        )
 
                     print(
                         f"Predicción: {st.session_state.prediccion_clases}, Porcentaje: {st.session_state.prediccion_porcentaje}"
@@ -404,7 +421,9 @@ with simulacion_tab:
                 if not os.path.exists(path_base):
                     os.makedirs(path_base)
                 fecha: str = datetime.now().strftime("%d-%m-%Y")
-                path: str = f"{path_base}\\experimento-id {generate_id(5)} fecha {fecha} corridas {corridas_sim}.csv"
+                path: str = (
+                    f"{path_base}\\experimento-id {generate_id(5)} fecha {fecha} corridas {corridas_sim}.csv"
+                )
                 resultado_experimento.to_csv(path, index=False)
                 st.session_state.df_resultado = resultado_experimento
 
@@ -555,8 +574,28 @@ with datos_reales_tab:
 
     # Mostrar simulación con datos reales.
     if not st.session_state.df_sim_datos_reales.empty:
+        # Usar el mismo formato que en la sección de simulación
+        toggle_format_reales = st.toggle(
+            "Tiempo en días",
+            value=True,
+            help="Formato de Tiempo. Al activar esta opción se muestran los días convertidos en horas.",
+            key="formato-tiempo-reales",
+        )
+
+        # Crear una copia para mostrar sin modificar los datos originales
+        display_df_reales = st.session_state.df_sim_datos_reales.copy()
+
+        # Aplicar formato si está habilitado
+        if toggle_format_reales:
+            # Aplicar formato a todas las columnas que contengan 'Tiempo' en el nombre
+            for col in display_df_reales.columns:
+                if "Tiempo" in col:
+                    display_df_reales[col] = display_df_reales[col].apply(
+                        format_value_for_display
+                    )
+
         st.dataframe(
-            format_df_time(st.session_state.df_sim_datos_reales),
+            display_df_reales,
             hide_index=False,
             use_container_width=True,
         )
@@ -586,8 +625,8 @@ with datos_reales_tab:
             try:
                 df_data_pred = pd.read_csv(RUTA_PREDICCIONES_CSV)
 
-                dfdf = get_prediction_data(df_data_pred)
-                df_predic = predict(dfdf)
+                df_predic = get_prediction_data(df_data_pred)
+                df_predic = predict(df_predic)
 
                 with st.expander("Datos de entrada"):
                     st.dataframe(
@@ -596,21 +635,26 @@ with datos_reales_tab:
                         use_container_width=True,
                     )
 
-                y_true = df_data_pred["Fallece"]
-                y_pred = df_predic[0]
+                # Asegurar que y_true sea un array numérico sin nulos
+                y_true = (
+                    pd.to_numeric(df_data_pred["Fallece"], errors="coerce")
+                    .fillna(-1)
+                    .to_numpy()
+                )
+                # Probabilidades de la clase positiva
+                y_pred_proba = df_predic[1]
+
                 intervals = [0.8, 0.9, 0.95]
 
                 calibration_metric = StatsUtils.calibration_metric_predict(
-                    y_true, y_pred, intervals
+                    y_true, y_pred_proba, intervals
                 )
-
-                # print(calibration_metric)
 
                 st.dataframe(
                     pd.DataFrame(
                         {
                             "Intervalo": intervals,
-                            "Porcentaje dentro del intervalo": calibration_metric,
+                            "Muestras dentro del intervalo": calibration_metric,
                         }
                     ),
                     hide_index=True,

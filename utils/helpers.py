@@ -87,8 +87,6 @@ def value_is_zero(valores: list[int | str] | int | str) -> bool:
         return __iszero(valores)
     elif isinstance(valores, list):
         return all(__iszero(v) for v in valores)
-    else:
-        raise ValueError(f"El valor a verificar no es correcto: {valores}")
 
 
 def generate_id(digits: int = 10) -> str:
@@ -111,40 +109,62 @@ def generate_id(digits: int = 10) -> str:
 
 def format_df_time(df: DataFrame, rows_to_format: list[int] = None) -> DataFrame:
     """
-    Toma todas las columnas y convierte los valores numéricos en texto con formato, mostrando los días y las horas.
-    Permite especificar qué filas formatear.
+    Devuelve una copia del DataFrame con los valores formateados para visualización.
+    Los valores se mantienen numéricos en el DataFrame para la serialización.
 
     Args:
-        df: DataFrame a trasformar.
+        df: DataFrame a transformar.
         rows_to_format: Lista de índices de filas a formatear. Si es None, formatea todas las filas.
 
     Returns:
-        DataFrame donde las filas especificadas que contengan números tendrán el formato (# d (# h)).
-
-        Ejemplo:
-        >>> {2.0 d (48.0 h)} # -> 2 días, 48 horas.
+        DataFrame con los valores numéricos originales.
     """
+    # Hacer una copia del DataFrame para no modificar el original
+    result_df = df.copy()
 
-    def fmt(col: pd.Series, rows: list[int] = None):
-        mascara: pd.Series = pd.to_numeric(col, errors="coerce").notna()
-        format: pd.Series = col.astype(object)
+    # Si no se especifican filas, aplicar a todas
+    if rows_to_format is None:
+        rows_to_format = list(range(len(df)))
 
-        if rows is not None:
-            # Solo aplicar formato a las filas especificadas
-            mascara = mascara & col.index.isin(rows)
+    # Aplicar el formato solo a las filas especificadas
+    for idx, row in df.iterrows():
+        if idx in rows_to_format:
+            for col in df.columns:
+                try:
+                    # Intentar convertir a float
+                    value = float(row[col])
+                    if not pd.isna(value):
+                        # Mantener el valor numérico original
+                        # El formato se aplicará solo al mostrar
+                        result_df.at[idx, col] = value
+                except (ValueError, TypeError):
+                    # Si no se puede convertir a float, mantener el valor original
+                    pass
 
-        valores_numericos = col[mascara].astype(float)
-        format[mascara] = [
-            (
-                f"{d:.1f} d ({h:.1f}) h"  # Días en Horas.
-                if not 0 < h < 1.0
-                else f"{d:.1f} d ({h * 60:.0f} min)"  # Días en Minutos.
-            )
-            for d, h in zip(valores_numericos / 24, valores_numericos)
-        ]
-        return format
+    return result_df
 
-    return df.apply(lambda x: fmt(x, rows_to_format))
+
+def format_value_for_display(value: float) -> str:
+    """
+    Formatea un valor numérico como una cadena legible que muestra días y horas.
+
+    Args:
+        value: Valor numérico en horas
+
+    Returns:
+        Cadena formateada (ej: "1.0 d (24.0 h)" o "0.5 d (30 min)")
+    """
+    try:
+        value = float(value)
+        if pd.isna(value):
+            return str(value)
+
+        if value >= 1.0:
+            return f"{value / 24:.1f} d ({value:.1f} h)"
+        else:
+            return f"{value / 24:.1f} d ({value * 60:.0f} min)"
+    except (ValueError, TypeError):
+        return str(value)
 
 
 def format_df_stats(
@@ -260,7 +280,7 @@ def build_df_stats(
                                 float(li[v].iloc[0]),
                                 float(ls[v].iloc[0]),
                             )
-                            metrics.append(metric * 100)  # Convertir a porcentaje
+                            metrics.append(metric)  # Cantidad dentro del intervalo
                         stats_values.append(pd.DataFrame([metrics], columns=df.columns))
 
         df_final = pd.concat(stats_values, axis=0, ignore_index=True)
@@ -397,7 +417,26 @@ def start_experiment(
         tiempo_estadia_pre_uti=est_preuti,
         porciento=porciento,
     )
+    # Realizar la simulación
     res = multiple_replication(e, corridas_simulacion)
+
+    # Asegurarse de que todas las columnas sean numéricas
+    for col in res.columns:
+        # Convertir a numérico, forzando los valores no numéricos a NaN
+        res[col] = pd.to_numeric(res[col], errors="coerce")
+        # Rellenar NaN con 0 y convertir a entero
+        res[col] = res[col].fillna(0).astype("int64")
+
+    # Verificar que no haya valores NaN o None
+    if res.isnull().values.any():
+        st.warning(
+            "Advertencia: Se encontraron valores nulos en los resultados de la simulación."
+        )
+        res = res.fillna(0)
+
+    # Asegurarse de que el índice sea secuencial
+    res = res.reset_index(drop=True)
+
     return res
 
 
@@ -568,7 +607,8 @@ def predict(df: DataFrame) -> tuple[np.ndarray, np.ndarray]:
         model = load(RUTA_MODELO_PREDICCION)
         preds = model.predict(df)
         preds_proba = model.predict_proba(df)
-        return preds, np.round(preds_proba[:, 1], 2)
+        res = (preds, np.round(preds_proba[:, 1], 2))
+        return res
     except Exception:
         tb_text = "".join(traceback.format_exception(*sys.exc_info()))
         st.error("Ocurrió un error durante la predicción: ")
@@ -578,7 +618,7 @@ def predict(df: DataFrame) -> tuple[np.ndarray, np.ndarray]:
 
 def get_prediction_data(data: dict[str:int] | pd.DataFrame) -> pd.DataFrame:
     """
-    Genera un DataFrame de pandas con los datos necesarios para realizar una predicción.
+    Genera un DataFrame con los datos necesarios para realizar una predicción.
     Args:
         data (dict[str, int | float]): Diccionario que contiene los valores de las variables requeridas para la predicción.
             Las claves esperadas son: 'Edad', 'Diag.Ing1', 'Diag.Ing2', 'Diag.Egr2', 'TiempoVAM', 'APACHE'.

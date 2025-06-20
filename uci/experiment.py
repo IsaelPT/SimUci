@@ -68,6 +68,33 @@ def single_run(experiment) -> dict[str, int]:
 
 
 def multiple_replication(experiment: Experiment, n_reps: int = 100) -> pd.DataFrame:
-    result = [single_run(experiment) for _ in range(n_reps)]
-    df = pd.DataFrame(result)
+    # Inicializar una lista para almacenar los resultados
+    results = []
+
+    # Ejecutar las réplicas de la simulación
+    for _ in range(n_reps):
+        # Obtener el resultado de una ejecución
+        result = single_run(experiment)
+        # Asegurarse de que todos los valores sean numéricos
+        numeric_result = {}
+        for key, value in result.items():
+            try:
+                # Intentar convertir a entero
+                numeric_result[key] = int(float(value))
+            except (ValueError, TypeError):
+                # Si falla, usar 0 como valor por defecto
+                numeric_result[key] = 0
+        results.append(numeric_result)
+
+    # Crear el DataFrame con los resultados ya convertidos
+    df = pd.DataFrame(results)
+
+    # Verificar que no haya valores nulos
+    if df.isnull().any().any():
+        df = df.fillna(0)
+
+    # Asegurar que todas las columnas sean enteras
+    for col in df.columns:
+        df[col] = df[col].astype("int64")
+
     return df

@@ -39,22 +39,25 @@ class StatsUtils:
 
     @staticmethod
     def calibration_metric_predict(y_true, y_pred, intervals):
-        within_interval = np.zeros(len(intervals))
+        """Devuelve la CANTIDAD de muestras cuyo valor verdadero cae dentro del intervalo
+        de confianza definido por *alpha* para las probabilidades predichas.
+        """
+        within_interval = np.zeros(len(intervals), dtype=int)
         for i, alpha in enumerate(intervals):
             lower = np.percentile(y_pred, (1 - alpha) / 2 * 100, axis=0)
             upper = np.percentile(y_pred, (1 + alpha) / 2 * 100, axis=0)
-            within_interval[i] = np.mean((y_true >= lower) & (y_true <= upper))
+            within_interval[i] = int(np.sum((y_true >= lower) & (y_true <= upper)))
         return within_interval
 
     @staticmethod
-    def calibration_metric_simulation(y_true, lower, upper) -> float:
+    def calibration_metric_simulation(y_true, lower, upper) -> int:
         match y_true:
             case float() | int():
-                return float(lower <= y_true <= upper)
+                return int(lower <= y_true <= upper)
 
             case list() | np.ndarray() | pd.Series() | pd.DataFrame():
                 y_true = np.array(y_true)
-                within_interval = np.mean((y_true >= lower) & (y_true <= upper))
+                within_interval = int(np.sum((y_true >= lower) & (y_true <= upper)))
                 return within_interval
 
             case _:
