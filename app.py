@@ -6,19 +6,20 @@ import streamlit as st
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 from utils.helpers import (
+    adjust_df_sizes,
+    bin_to_df,
+    build_df_stats,
+    build_df_test_result,
+    format_df_time,
+    format_time_columns,
+    format_value_for_display,
     generate_id,
     get_prediction_data,
     key_categ,
     predict,
-    value_is_zero,
-    start_experiment,
-    build_df_stats,
-    format_df_time,
-    format_value_for_display,
     simulate_real_data,
-    bin_to_df,
-    adjust_df_sizes,
-    build_df_test_result,
+    start_experiment,
+    value_is_zero,
 )
 from utils.constants import (
     EDAD_MIN,
@@ -270,13 +271,9 @@ with simulacion_tab:
 
         # Aplicar formato si está habilitado
         if toggle_format:
-            # Crear una copia del DataFrame para mostrar
-            display_df = df_simulacion.copy()
-
-            # Aplicar formato a todas las columnas que contengan 'Tiempo' en el nombre para todas las filas
-            for col in display_df.columns:
-                if "Tiempo" in col and display_df[col].dtype != object:
-                    display_df[col] = display_df[col].apply(format_value_for_display)
+            display_df = format_time_columns(
+                df_simulacion, exclude_rows=["Métrica de Calibración"]
+            )
         else:
             display_df = df_simulacion
 
@@ -523,7 +520,9 @@ with datos_reales_tab:
 
         if toggle_format:
             st.dataframe(
-                format_df_time(df_sim_datos_reales),
+                format_time_columns(
+                    df_sim_datos_reales, exclude_rows=["Métrica de Calibración"]
+                ),
                 hide_index=True,
                 use_container_width=True,
             )
@@ -574,7 +573,6 @@ with datos_reales_tab:
 
     # Mostrar simulación con datos reales.
     if not st.session_state.df_sim_datos_reales.empty:
-        # Usar el mismo formato que en la sección de simulación
         toggle_format_reales = st.toggle(
             "Tiempo en días",
             value=True,
@@ -582,17 +580,13 @@ with datos_reales_tab:
             key="formato-tiempo-reales",
         )
 
-        # Crear una copia para mostrar sin modificar los datos originales
         display_df_reales = st.session_state.df_sim_datos_reales.copy()
 
-        # Aplicar formato si está habilitado
         if toggle_format_reales:
-            # Aplicar formato a todas las columnas que contengan 'Tiempo' en el nombre
-            for col in display_df_reales.columns:
-                if "Tiempo" in col:
-                    display_df_reales[col] = display_df_reales[col].apply(
-                        format_value_for_display
-                    )
+            display_df_reales = format_time_columns(
+                display_df_reales,
+                exclude_rows=["Métrica de Calibración"],
+            )
 
         st.dataframe(
             display_df_reales,
@@ -600,7 +594,6 @@ with datos_reales_tab:
             use_container_width=True,
         )
 
-        # Lógica para guardar resultados localmente.
         csv_sim_datos_reales = st.session_state.df_sim_datos_reales.to_csv(
             index=False
         ).encode("UTF-8")

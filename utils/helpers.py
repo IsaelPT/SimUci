@@ -144,7 +144,101 @@ def format_df_time(df: DataFrame, rows_to_format: list[int] = None) -> DataFrame
     return result_df
 
 
-def format_value_for_display(value: float) -> str:
+def format_time_columns(
+    df: DataFrame,
+    exclude_rows: list[str] = None,
+) -> DataFrame:
+    """
+    Formatea las columnas que contienen valores de tiempo en horas.
+    Excluye filas específicas del formato.
+
+    Args:
+        df: DataFrame con los datos a formatear
+        exclude_rows: Lista de nombres de filas a excluir del formato (buscados en la columna 'Información')
+
+    Returns:
+        DataFrame con las columnas de tiempo formateadas
+    """
+    if exclude_rows is None:
+        exclude_rows = []
+
+    # Hacer una copia para no modificar el original
+    result_df = df.copy()
+
+    # Columnas que suelen contener tiempo
+    time_columns = [
+        "Tiempo Pre VAM",
+        "Tiempo VAM",
+        "Tiempo Post VAM",
+        "Estadia UCI",
+        "Estadia Post UCI",
+    ]
+
+    # Filtrar solo las columnas que existen en el DataFrame
+    time_columns = [col for col in time_columns if col in result_df.columns]
+
+    # Si no hay columnas de tiempo, retornar el DataFrame sin cambios
+    if not time_columns:
+        return result_df
+
+    # Verificar si es un DataFrame con columna 'Información'
+    has_info_column = "Información" in result_df.columns
+
+    # Aplicar formato a las columnas de tiempo
+    for col in time_columns:
+        # Crear una copia de la columna y cambiar su tipo a 'object' para evitar FutureWarning
+        formatted_col = result_df[col].astype(object)
+
+        # Si hay columna 'Información', buscar las filas a excluir
+        if has_info_column:
+            for idx in result_df.index:
+                # Verificar si la fila actual está en la lista de exclusión
+                if result_df.at[idx, "Información"] not in exclude_rows:
+                    try:
+                        value = result_df.at[idx, col]
+                        if pd.notna(value):
+                            try:
+                                # Convertir a string para evitar problemas de tipo
+                                formatted_col.at[idx] = format_value_for_display(value)
+                            except (ValueError, TypeError) as e:
+                                print(
+                                    f"Error al formatear valor {value} en columna '{col}', fila {idx} (Información: {result_df.at[idx, 'Información']}): {str(e)}"
+                                )
+                    except Exception as e:
+                        print(
+                            f"Error inesperado al acceder a los datos en columna '{col}', fila {idx}: {str(e)}"
+                        )
+        # Si no hay columna 'Información' pero el índice tiene nombre 'Información'
+        elif result_df.index.name == "Información":
+            for idx in result_df.index:
+                if idx not in exclude_rows:
+                    try:
+                        value = result_df.at[idx, col]
+                        if pd.notna(value):
+                            try:
+                                # Convertir a string para evitar problemas de tipo
+                                formatted_col.at[idx] = format_value_for_display(value)
+                            except (ValueError, TypeError) as e:
+                                print(
+                                    f"Error al formatear valor {value} en columna '{col}', índice '{idx}': {str(e)}"
+                                )
+                    except Exception as e:
+                        print(
+                            f"Error inesperado al acceder a los datos en columna '{col}', índice '{idx}': {str(e)}"
+                        )
+        else:
+            # Para DataFrames normales, formatear todas las filas
+            formatted_col = result_df[col].apply(
+                lambda x: format_value_for_display(x) if pd.notna(x) else x
+            )
+
+        # Asignar la columna formateada de vuelta, convirtiendo todo a string para evitar ArrowTypeError
+        result_df[col] = formatted_col.astype(str)
+
+    return result_df
+
+
+def format_value_for_display(value: float | int) -> str:
     """
     Formatea un valor numérico como una cadena legible que muestra días y horas.
 
@@ -154,6 +248,7 @@ def format_value_for_display(value: float) -> str:
     Returns:
         Cadena formateada (ej: "1.0 d (24.0 h)" o "0.5 d (30 min)")
     """
+
     try:
         value = float(value)
         if pd.isna(value):
@@ -271,8 +366,8 @@ def build_df_stats(
                     ls.columns = mean.columns.to_list()
                     stats_values.extend([li, ls])
 
+                    # Métricas
                     if include_metrics:
-                        # Validación métricas
                         metrics = []
                         for v in VARIABLES_EXPERIMENTO:
                             metric = StatsUtils.calibration_metric_simulation(
@@ -287,7 +382,7 @@ def build_df_stats(
 
         return df_final
 
-    # Nota: cuando se provee una lista, se hace un promedio de los resultados para cada paciente. Por lo tanto, se debe
+    # Nota: cuando se pasa una lista, se hace un promedio de los resultados para cada paciente. Por lo tanto, se debe
     # realizar un promedio de las listas de resultados de cada paciente.
     df_output = (
         build_helper(data)
@@ -424,6 +519,7 @@ def start_experiment(
     for col in res.columns:
         # Convertir a numérico, forzando los valores no numéricos a NaN
         res[col] = pd.to_numeric(res[col], errors="coerce")
+
         # Rellenar NaN con 0 y convertir a entero
         res[col] = res[col].fillna(0).astype("int64")
 
@@ -460,7 +556,7 @@ def adjust_df_sizes(dataframes: List[DataFrame]) -> Tuple[List[DataFrame], int]:
             return None
         return len(set(lst)) == 1
 
-    df_sizes = [df.shape[0] for df in dataframes]
+    df_sizes: list[int] = [df.shape[0] for df in dataframes]
 
     try:
         if all_equal(df_sizes):
