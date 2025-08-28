@@ -8,13 +8,13 @@ from streamlit.runtime.uploaded_file_manager import UploadedFile
 from utils.helpers import (
     adjust_df_sizes,
     bin_to_df,
-    build_df_stats,
+    build_df_for_stats,
     build_df_test_result,
     format_df_time,
     format_time_columns,
     format_value_for_display,
     generate_id,
-    get_prediction_data,
+    get_data_for_prediction,
     key_categ,
     predict,
     simulate_real_data,
@@ -29,6 +29,7 @@ from utils.constants import (
     APACHE_MAX,
     APACHE_DEFAULT,
     HELP_MSG_APACHE,
+    HELP_MSG_PREDICCION_METRIC,
     HELP_MSG_TIEMPO_VAM,
     RUTA_PREDICCIONES_CSV,
     T_VAM_MIN,
@@ -66,9 +67,7 @@ import traceback
 ########
 # TABS #
 ########
-simulacion_tab, datos_reales_tab, comparaciones_tab = st.tabs(
-    ("Simulación", "Datos reales", "Comparaciones")
-)
+simulacion_tab, datos_reales_tab, comparaciones_tab = st.tabs(("Simulación", "Datos reales", "Comparaciones"))
 
 with simulacion_tab:
     ############
@@ -102,9 +101,7 @@ with simulacion_tab:
     with col1_paciente:
         col1a_paciente, col1b_paciente = st.columns(2)
         with col1a_paciente:
-            opcion_edad: int = st.number_input(
-                label="Edad", min_value=EDAD_MIN, max_value=EDAD_MAX, value=EDAD_DEFAULT
-            )
+            opcion_edad: int = st.number_input(label="Edad", min_value=EDAD_MIN, max_value=EDAD_MAX, value=EDAD_DEFAULT)
             opcion_tiempo_vam: int = st.number_input(
                 label="Tiempo VA",
                 min_value=T_VAM_MIN,
@@ -247,9 +244,7 @@ with simulacion_tab:
             value=CORRIDAS_SIM_DEFAULT,
             help=HELP_MSG_CORRIDA_SIM,
         )
-        boton_comenzar_simulacion = st.button(
-            "Comenzar Simulación", type="primary", use_container_width=True
-        )
+        boton_comenzar_simulacion = st.button("Comenzar Simulación", type="primary", use_container_width=True)
 
     # Mostrar DataFrame con resultado de la simulación para ese paciente.
     if not st.session_state.df_resultado.empty:
@@ -259,21 +254,25 @@ with simulacion_tab:
             help="Formato de Tiempo. Al activar esta opción se muestran los días convertidos en horas.",
             key="formato-tiempo-simulacion",
         )
-        df_simulacion = build_df_stats(
+        df_simulacion = build_df_for_stats(
             data=st.session_state.df_resultado,
             sample_size=corridas_sim,
             include_mean=True,
             include_std=True,
             include_confint=True,
-            include_metrics=True,
+            include_metrics=False,
             include_info_label=True,
+            labels_structure={
+                0: "Promedio",
+                1: "Desviación Estándar",
+                2: "Límite Inf",
+                3: "Límite Sup",
+            },
         )
 
         # Aplicar formato si está habilitado
         if toggle_format:
-            display_df = format_time_columns(
-                df_simulacion, exclude_rows=["Métrica de Calibración"]
-            )
+            display_df = format_time_columns(df_simulacion, exclude_rows=["Métrica de Calibración"])
         else:
             display_df = df_simulacion
 
@@ -284,48 +283,63 @@ with simulacion_tab:
         )
 
         # Mostrar predicción de clases y porcentaje.
-        if (
-            "prediccion_clases" in st.session_state
-            and "prediccion_porcentaje" in st.session_state
-        ):
-            col1, col2 = st.columns(2)
-            with col1:
-                # CLASES PREVIEW
-                st.markdown(
-                    "### Paciente no fallece"
-                    if st.session_state.prediccion_clases == 0
-                    else "### Paciente fallece"
-                )
-            with col2:
-                # METRIC PREVIEW
-                prev_pred = st.session_state.get("prev_prediccion_porcentaje", None)
-                current_pred = st.session_state.prediccion_porcentaje
-                delta_label = ""
-                delta_color = "normal"
-                if prev_pred is not None:
-                    diff = current_pred - prev_pred
-                    if diff > 0:
-                        delta_label = f"Aumento de {round(abs(diff) * 100)}%"
-                        delta_color = "normal"
-                    elif diff < 0:
-                        delta_label = f"Disminución de {round(abs(diff) * 100)}%"
-                        delta_color = "inverse"
-                    else:
+        if "prediccion_clases" in st.session_state and "prediccion_porcentaje" in st.session_state:
+            # METRIC PREVIEW
+            prev_pred = st.session_state.get("prev_prediccion_porcentaje", None)
+
+            # Asegurar que el valor actual sea un float
+            current_pred = float(st.session_state.prediccion_porcentaje)
+
+            delta_label = ""
+            delta_color = "normal"
+
+            # Lógica del valor anterior
+            if prev_pred is not None:
+                try:
+                    prev_val = float(prev_pred)
+
+                    # Calcular el cambio porcentual
+                    change = current_pred - prev_val
+                    percent_change = change * 100
+
+                    how_chaged: str
+
+                    if change > 0:
+                        how_chaged = "Incremento"
+                        delta_color = "inverse"  # Flecha verde hacia arriba
+                    if change < 0:
+                        how_chaged = "Disminución"
+                        delta_color = "normal"  # Flecha roja hacia abajo
+
+                    if change == 0:
                         delta_label = "Sin cambio"
-                        delta_color = "off"
-                else:
+                        delta_color = "off"  # Sin flecha
+                    else:
+                        delta_label = f"{how_chaged} de un {abs(percent_change):.0f}% de la probabilidad de fallecer del paciente respecto a la predicción anterior"
+
+                except Exception:
+                    # Si ocurre un error, no mostrar delta
                     delta_label = None
                     delta_color = "normal"
 
-                st.metric(
-                    label="Probabilidad",
-                    value=f"{round(current_pred * 100)}%",
-                    delta=delta_label,
-                    delta_color=delta_color,
-                    border=True,
-                )
+            else:
+                delta_color = "normal"
 
-                st.session_state.prev_prediccion_porcentaje = current_pred
+            # Variable clasificación binaria (0, 1) <-> (False, True)
+            paciente_vive: bool = True if st.session_state.prediccion_clases == 0 else False
+            metric_display_value: str = f"{'Paciente no fallece' if paciente_vive else 'Paciente fallece'} (predicción de {(current_pred * 100):.0f}% )"
+
+            st.metric(
+                label="Predicción de probabilidad de fallecimiento del paciente",
+                value=metric_display_value,
+                delta=delta_label,
+                delta_color=delta_color,
+                width="stretch",
+                border=True,
+                help=HELP_MSG_PREDICCION_METRIC,
+            )
+
+            st.session_state.prev_prediccion_porcentaje = current_pred
 
         # Lógica para guardar resultados localmente.
         csv = st.session_state.df_resultado.to_csv(index=False).encode("UTF-8")
@@ -338,22 +352,18 @@ with simulacion_tab:
             key="guardar_simulacion",
         )
 
-        st.success(
-            f"La simulación ha concluido tras haber completado {corridas_sim} iteraciones."
-        )
+        st.success(f"Concluyó la **simulación** tras {corridas_sim} corridas.")
 
     if boton_comenzar_simulacion:
         # Validación de campos para realizar simulación.
-        if not value_is_zero(
-            [diag_ing1, diag_ing2, diag_ing3, diag_ing4]
-        ):  # campos de Diagnósticos OK?
+        if not value_is_zero([diag_ing1, diag_ing2, diag_ing3, diag_ing4]):  # campos de Diagnósticos OK?
             diag_ok = True
         else:
             st.warning(
                 "Todos los diagnósticos están vacíos. Se debe incluir mínimo un diagnóstico para realizar la simulación."
             )
 
-        if not value_is_zero(insuf_resp):  # campo de dInsuficiencia Respiratoria OK?
+        if not value_is_zero(insuf_resp):  # campo de Insuficiencia Respiratoria OK?
             insuf_ok = True
         else:
             st.warning("Seleccione un tipo de Insuficiencia Respiratoria.")
@@ -385,7 +395,7 @@ with simulacion_tab:
                     if "prediccion_porcentaje" not in st.session_state:
                         st.session_state.prediccion_porcentaje = 0.0
 
-                    df_to_predict = get_prediction_data(
+                    df_to_predict = get_data_for_prediction(
                         {
                             "Edad": edad,
                             "Diag.Ing1": diag_ing1,
@@ -401,34 +411,26 @@ with simulacion_tab:
                         st.session_state.prediccion_clases = prediction[0][0]
                         st.session_state.prediccion_porcentaje = prediction[1][0]
                     else:
-                        raise ValueError(
-                            "No se pudo realizar la predicción de clases y porcentaje."
-                        )
+                        raise ValueError("No se pudo realizar la predicción de clases y porcentaje.")
 
                     print(
                         f"Predicción: {st.session_state.prediccion_clases}, Porcentaje: {st.session_state.prediccion_porcentaje}"
                     )
                 except Exception as e:
-                    st.error(
-                        f"No se pudo realizar la predicción de clases y porcentaje. Error asociado: {e}"
-                    )
+                    st.error(f"No se pudo realizar la predicción de clases y porcentaje. Error asociado: {e}")
 
                 # Guardar resultados (forma local del proyecto).
                 path_base = f"experiments\\paciente-id-{st.session_state.id_paciente}"
                 if not os.path.exists(path_base):
                     os.makedirs(path_base)
                 fecha: str = datetime.now().strftime("%d-%m-%Y")
-                path: str = (
-                    f"{path_base}\\experimento-id {generate_id(5)} fecha {fecha} corridas {corridas_sim}.csv"
-                )
+                path: str = f"{path_base}\\experimento-id {generate_id(5)} fecha {fecha} corridas {corridas_sim}.csv"
                 resultado_experimento.to_csv(path, index=False)
                 st.session_state.df_resultado = resultado_experimento
 
                 st.rerun()
             except Exception as data:
-                st.exception(
-                    f"No se pudo efectuar la simulación. Error asociado: \n{data}"
-                )
+                st.exception(f"No se pudo efectuar la simulación. Error asociado: \n{data}")
 
 ###############################
 # SIMULACION CON DATOS REALES #
@@ -491,24 +493,23 @@ with datos_reales_tab:
                 help="Formato de tiempo. Al activar muestra las horas en su aproximación a lo que sería en días.",
             )
         with col2:
+            _label = "Cantidad de Simulaciones por paciente"
             with st.popover(
-                label="Cantidad de Simulaciones",
+                label=_label,
                 use_container_width=True,
                 help=HELP_MSG_CORRIDA_SIM,
             ):
                 corridas_sim = st.number_input(
-                    label="Cantidad de Simulaciones",
+                    label=_label,
                     min_value=CORRIDAS_SIM_MIN,
                     max_value=CORRIDAS_SIM_MAX,
                     value=CORRIDAS_SIM_DEFAULT,
                     help=HELP_MSG_CORRIDA_SIM,
                 )
 
-        data: tuple[float] = simulate_real_data(
-            ruta_fichero_csv=RUTA_FICHERODEDATOS_CSV, df_selection=selection
-        )
+        data: tuple[float] = simulate_real_data(ruta_fichero_csv=RUTA_FICHERODEDATOS_CSV, df_selection=selection)
 
-        df_sim_datos_reales = build_df_stats(
+        df_sim_datos_reales = build_df_for_stats(
             data,
             corridas_sim,
             include_mean=True,
@@ -520,9 +521,7 @@ with datos_reales_tab:
 
         if toggle_format:
             st.dataframe(
-                format_time_columns(
-                    df_sim_datos_reales, exclude_rows=["Métrica de Calibración"]
-                ),
+                format_time_columns(df_sim_datos_reales, exclude_rows=["Métrica de Calibración"]),
                 hide_index=True,
                 use_container_width=True,
             )
@@ -545,12 +544,10 @@ with datos_reales_tab:
             show_time=True,
         ):
             try:
-                lista_experimentos: list[tuple[float]] = simulate_real_data(
-                    RUTA_FICHERODEDATOS_CSV, df_selection=-1
-                )
+                lista_experimentos: list[tuple[float]] = simulate_real_data(RUTA_FICHERODEDATOS_CSV, df_selection=-1)
 
                 # DataFrame con todos los resultados de simulaciones a todos los pacientes en la tabla.
-                df_sim_datos_reales = build_df_stats(
+                df_sim_datos_reales = build_df_for_stats(
                     lista_experimentos,
                     CORRIDAS_SIM_DEFAULT,
                     include_mean=True,
@@ -594,9 +591,7 @@ with datos_reales_tab:
             use_container_width=True,
         )
 
-        csv_sim_datos_reales = st.session_state.df_sim_datos_reales.to_csv(
-            index=False
-        ).encode("UTF-8")
+        csv_sim_datos_reales = st.session_state.df_sim_datos_reales.to_csv(index=False).encode("UTF-8")
 
         st.download_button(
             label="Guardar resultados",
@@ -608,40 +603,45 @@ with datos_reales_tab:
         )
 
     st.divider()
-    st.markdown("# Validación de la predicción para todos los Datos Reales")
+    st.header("Validación de la predicción para Datos Reales")
 
     if st.button(label="Validar predicción", type="primary", use_container_width=True):
         with st.spinner(
-            text="Validando predicción para valores reales. Esto puede tardar unos minutos...",
+            text="Validando predicción. Esto puede tardar unos minutos...",
             show_time=True,
         ):
             try:
                 df_data_pred = pd.read_csv(RUTA_PREDICCIONES_CSV)
 
-                df_predic = get_prediction_data(df_data_pred)
+                if "Unnamed: 0" in df_data_pred.columns:
+                    df_data_pred = df_data_pred.drop(columns=["Unnamed: 0"])
+
+                df_predic = get_data_for_prediction(df_data_pred)
                 df_predic = predict(df_predic)
 
-                with st.expander("Datos de entrada"):
+                with st.expander("Datos de entrada", expanded=False):
+                    st.markdown("Tabla con datos reales de pacientes y sus predicciones")
                     st.dataframe(
                         df_data_pred,
-                        hide_index=True,
+                        hide_index=False,
                         use_container_width=True,
                     )
 
                 # Asegurar que y_true sea un array numérico sin nulos
-                y_true = (
-                    pd.to_numeric(df_data_pred["Fallece"], errors="coerce")
-                    .fillna(-1)
-                    .to_numpy()
-                )
+                y_true = pd.to_numeric(df_data_pred["Prob Fallece"], errors="coerce").fillna(-1).to_numpy()
+
+                if -1 in y_true:
+                    print(f"ATENCIÓN: Verificar datos sucios en arreglo de valores reales: {y_true}")
+
                 # Probabilidades de la clase positiva
                 y_pred_proba = df_predic[1]
 
+                # print(y_true)
+                # print(y_pred_proba)
+
                 intervals = [0.8, 0.9, 0.95]
 
-                calibration_metric = StatsUtils.calibration_metric_predict(
-                    y_true, y_pred_proba, intervals
-                )
+                calibration_metric = StatsUtils.calibration_metric_predict(y_true, y_pred_proba, intervals)
 
                 st.dataframe(
                     pd.DataFrame(
@@ -674,13 +674,9 @@ with comparaciones_tab:
         with st.container():
             col1, col2 = st.columns(2)
             with col1:
-                file_upl1 = st.file_uploader(
-                    label="Experimento 1", type=[".csv"], accept_multiple_files=False
-                )
+                file_upl1 = st.file_uploader(label="Experimento 1", type=[".csv"], accept_multiple_files=False)
             with col2:
-                file_upl2 = st.file_uploader(
-                    label="Experimento 2", type=[".csv"], accept_multiple_files=False
-                )
+                file_upl2 = st.file_uploader(label="Experimento 2", type=[".csv"], accept_multiple_files=False)
 
             with st.expander("Previsualización", expanded=False):
                 if file_upl1:
@@ -755,9 +751,7 @@ with comparaciones_tab:
                                 statistic=wilcoxon_data.statistic,
                                 p_value=wilcoxon_data.p_value,
                             )
-                            st.dataframe(
-                                df_mostrar, hide_index=True, use_container_width=True
-                            )
+                            st.dataframe(df_mostrar, hide_index=True, use_container_width=True)
                             st.markdown(INFO_STATISTIC)
                             st.markdown(INFO_P_VALUE)
                         except Exception as data:
@@ -770,15 +764,11 @@ with comparaciones_tab:
 
         # File Uploader.
         with st.container():
-            file_upl_experimentos = st.file_uploader(
-                label="Experimentos", type=[".csv"], accept_multiple_files=True
-            )
+            file_upl_experimentos = st.file_uploader(label="Experimentos", type=[".csv"], accept_multiple_files=True)
             dataframes_experimentos = bin_to_df(file_upl_experimentos)
 
         # Columna a comparar.
-        opcion_col_comparacion = st.selectbox(
-            "Seleccione una columna para comparar", VARIABLES_EXPERIMENTO, key=3
-        )
+        opcion_col_comparacion = st.selectbox("Seleccione una columna para comparar", VARIABLES_EXPERIMENTO, key=3)
         boton_comparacion = st.button(
             "Realizar prueba de Friedman",
             type="primary",
@@ -789,13 +779,9 @@ with comparaciones_tab:
         with st.container():
             if boton_comparacion:
                 if len(file_upl_experimentos) == 0:
-                    st.warning(
-                        "No se han cargado datos de resultados de experimentos para realizar esta prueba."
-                    )
+                    st.warning("No se han cargado datos de resultados de experimentos para realizar esta prueba.")
                 elif not len(file_upl_experimentos) >= 3:
-                    st.warning(
-                        "Debe cargar más de 3 muestras para realizar esta prueba."
-                    )
+                    st.warning("Debe cargar más de 3 muestras para realizar esta prueba.")
                 else:
                     adjusted_sample_tuple = adjust_df_sizes(
                         [df[opcion_col_comparacion] for df in dataframes_experimentos]
@@ -818,9 +804,7 @@ with comparaciones_tab:
                             statistic=friedman_result.statistic,
                             p_value=friedman_result.p_value,
                         )
-                        st.dataframe(
-                            df_mostrar, hide_index=True, use_container_width=True
-                        )
+                        st.dataframe(df_mostrar, hide_index=True, use_container_width=True)
                         st.markdown(INFO_STATISTIC)
                         st.markdown(INFO_P_VALUE)
                     except Exception as data:

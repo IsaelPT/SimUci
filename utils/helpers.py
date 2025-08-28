@@ -18,7 +18,8 @@ from utils.constants import (
 from uci.experiment import Experiment, multiple_replication
 from uci.stats import StatsUtils
 
-from joblib import load
+import joblib
+
 import sys
 import traceback
 import streamlit as st
@@ -57,13 +58,9 @@ def key_categ(categoria: str, valor: str | int, viceversa: bool = False) -> int 
                 return v
 
     if not viceversa:
-        raise Exception(
-            f"El valor (value) que se proporcionó no se encuentra en el conjunto de categorías {categoria}"
-        )
+        raise Exception(f"El valor (value) que se proporcionó no se encuentra en el conjunto de categorías {categoria}")
     else:
-        raise Exception(
-            f"La llave (key) que se proporcionó no se encuentra en el conjunto de categórias {categoria}"
-        )
+        raise Exception(f"La llave (key) que se proporcionó no se encuentra en el conjunto de categórias {categoria}")
 
 
 def value_is_zero(valores: list[int | str] | int | str) -> bool:
@@ -101,9 +98,7 @@ def generate_id(digits: int = 10) -> str:
     """
 
     if not 0 < digits <= 10:
-        raise Exception(
-            f"La cantidad de dígitos n={digits} debe estar en el rango de 0 < d <= 10."
-        )
+        raise Exception(f"La cantidad de dígitos n={digits} debe estar en el rango de 0 < d <= 10.")
     return "".join([str(secrets.randbelow(digits)) for _ in range(digits)])
 
 
@@ -205,9 +200,7 @@ def format_time_columns(
                                     f"Error al formatear valor {value} en columna '{col}', fila {idx} (Información: {result_df.at[idx, 'Información']}): {str(e)}"
                                 )
                     except Exception as e:
-                        print(
-                            f"Error inesperado al acceder a los datos en columna '{col}', fila {idx}: {str(e)}"
-                        )
+                        print(f"Error inesperado al acceder a los datos en columna '{col}', fila {idx}: {str(e)}")
         # Si no hay columna 'Información' pero el índice tiene nombre 'Información'
         elif result_df.index.name == "Información":
             for idx in result_df.index:
@@ -219,18 +212,12 @@ def format_time_columns(
                                 # Convertir a string para evitar problemas de tipo
                                 formatted_col.at[idx] = format_value_for_display(value)
                             except (ValueError, TypeError) as e:
-                                print(
-                                    f"Error al formatear valor {value} en columna '{col}', índice '{idx}': {str(e)}"
-                                )
+                                print(f"Error al formatear valor {value} en columna '{col}', índice '{idx}': {str(e)}")
                     except Exception as e:
-                        print(
-                            f"Error inesperado al acceder a los datos en columna '{col}', índice '{idx}': {str(e)}"
-                        )
+                        print(f"Error inesperado al acceder a los datos en columna '{col}', índice '{idx}': {str(e)}")
         else:
             # Para DataFrames normales, formatear todas las filas
-            formatted_col = result_df[col].apply(
-                lambda x: format_value_for_display(x) if pd.notna(x) else x
-            )
+            formatted_col = result_df[col].apply(lambda x: format_value_for_display(x) if pd.notna(x) else x)
 
         # Asignar la columna formateada de vuelta, convirtiendo todo a string para evitar ArrowTypeError
         result_df[col] = formatted_col.astype(str)
@@ -264,41 +251,71 @@ def format_value_for_display(value: float | int) -> str:
 
 def format_df_stats(
     df: DataFrame,
-    label: str = "Información",
+    column_label: str = "Información",
+    labels_structure: dict[int | str] | list[str] | None = None,
 ) -> DataFrame:
     """
     Agrega una columna al extremo izquierdo del DataFrame por parámetros con el nombre de columna "Información".
-    Brinda de soporte visual para comprender los datos de las tablas.
-    Columna:
-    >>> [
-        "Promedio",
-        "Desviación Estándar",
-        "Límite Inferior",
-        "Límite Superior",
-        "Métrica de Calibración"
-    ]
+    Si se proporciona `labels_structure` (dict o list), asigna los labels a las filas correspondientes.
+
+    Comportamiento:
+    - Si `labels_structure` es un dict: las claves son índices de fila y los valores son los labels.
+    - Si `labels_structure` es una lista: se asigna en orden a las filas 0..len(list)-1.
+    - Si `labels_structure` es None o no cubre todas las filas:
+        - Para DataFrames con índice tipo RangeIndex y más de una fila (caso de múltiples pacientes), las filas
+          sin label se rellenan con "Paciente {i}".
+        - En otros casos, las filas sin label se rellenan con "---".
 
     Args:
         df: DataFrame a aplicar dicho formato.
-        label: Nombre de la columna a agregar. Default = "Información".
+        column_label: Nombre de la columna a agregar. Default = "Información".
+        labels_structure: Estructura de labels (dict índice->label o lista de labels) o None.
 
     Returns:
-        DataFrame con una nueva columna a la izquierda ("Información") con datos estadísticos de utilidad.
+        DataFrame con una nueva columna a la izquierda (`column_label`) con labels aplicados.
     """
-    df.insert(0, label, "")
 
-    df.loc[0, label] = "Promedio"
-    df.loc[1, label] = "Desviación Estándar"
-    df.loc[2, label] = "Límite Inferior"
-    df.loc[3, label] = "Límite Superior"
-    df.loc[4, label] = "Métrica de Calibración"
-    # for i in range(df.shape[0]):
-    #     df.loc[i, label] = f"Paciente {i}"
+    # Insertar columna al principio
+    df.insert(0, column_label, "")
+
+    unassigned_label = "---"
+
+    n_rows = df.shape[0]
+
+    # Normalizar labels_structure a dict
+    labels_map: dict[int, str] = {}
+    if labels_structure is None:
+        labels_map = {}
+    elif isinstance(labels_structure, dict):
+        # convertir claves a int si es posible
+        for k, v in labels_structure.items():
+            try:
+                idx = int(k)
+            except Exception:
+                continue
+            labels_map[idx] = str(v)
+    elif isinstance(labels_structure, list):
+        for i, v in enumerate(labels_structure):
+            labels_map[i] = str(v)
+
+    # Asignar labels proporcionados
+    for idx, label in labels_map.items():
+        if 0 <= idx < n_rows:
+            df.at[idx, column_label] = label
+
+    # Rellenar filas sin label
+    for i in range(n_rows):
+        if df.at[i, column_label] == "":
+            # Si parece un DataFrame de múltiples pacientes (filas > 1 y el índice es RangeIndex), usar 'Paciente i'
+            if n_rows > 1 and isinstance(df.index, pd.RangeIndex):
+                df.at[i, column_label] = f"Paciente {i}"
+            else:
+                df.at[i, column_label] = unassigned_label
 
     return df
 
 
-def build_df_stats(
+def build_df_for_stats(
     data: DataFrame | list[DataFrame],
     sample_size: int | None = None,
     include_mean=True,
@@ -306,100 +323,140 @@ def build_df_stats(
     include_confint=False,
     include_metrics=False,
     include_info_label=True,
-    info_label: str = "Información",
+    labels_structure: dict[int | str] | list[str] | None = None,
+    metrics_as_percentage: bool = False,
+    metrics_reference: pd.Series | dict | None = None,
 ) -> DataFrame:
-    """Construye un dataframe que contiene los datos producto de los estudios estadísticos realizados al o a los pacientes.
+    """
+    Resumen rápido: construye un DataFrame con estadísticas (media, std, intervalos y métricas)
+    a partir de un DataFrame (resumen vertical) o una lista de DataFrames (una fila por paciente).
 
     Args:
-        data (DataFrame | list[DataFrame]): DataFrame o lista de DataFrames con los datos a estudiar.
-        sample_size (int | None, optional): Tamaño de muestra. También entendido como cantidad de simulaciones que se tomas en consideración; cantidad de iteraciones. Defaults to None.
-        include_info_label (bool, optional): Mostrar en la tabla una columna informativa sobre los campos. Defaults to False.
-        include_mean (bool, optional): Mostrar el dato de la media en la tabla. Defaults to True.
-        include_std (bool, optional): Mostrar el dato de la desviación estándar. Defaults to True.
-        include_confint (bool, optional): Mostrar el dato del intervalor de confianza (límite inf, límite sup). Defaults to True.
-        include_metrics (bool, opcional): Mostrar las métricas de validación.
+      - data: DataFrame o list[DataFrame].
+      - sample_size: necesario si include_confint=True.
+      - include_*: flags para incluir media, std, confint y métricas.
+      - include_info_label: añade la columna 'Información' si True.
+      - labels_structure: (opcional) dict {index: label} o list de labels; si se pasa, se usa tal cual.
 
-    Raises:
-        ValueError: Cuando se debe incluir al menos 1 valor estadístico a mostrar.
-        ValueError: Cuando al realizar el cálculo de intervalo de confianza no se tengan la media y la desviación estándar.
-        ValueError: Cuando al realizar el cálculo de intervalo de confianza se provea un tamaño de muestra incorrecto (x > 0)
+    Notas clave:
+      - Para confint se requieren mean y std y sample_size>0.
+      - Si no se pasa labels_structure, se generan labels en el orden lógico según los flags.
 
-    Returns:
-        DataFrame: DataFrame incluyendo todos los datos recogidos y calculados.
+    Ejemplo rápido:
+      build_df_for_stats(df, include_mean=True, include_std=True, include_confint=True, sample_size=100, include_info_label=True)
     """
-    if not any([include_mean, include_std, include_confint]):
-        raise ValueError("Se debe al menos incluir 1 valor estadísticos.")
+    # Implementación resumida y robusta.
+    column_label = "Información"
 
-    single_patient = True if isinstance(data, DataFrame) else False
+    # Validaciones mínimas
+    if include_confint and (not include_mean or not include_std):
+        raise ValueError("Para calcular intervalos de confianza se requieren include_mean=True e include_std=True.")
+    if include_confint and (sample_size is None or sample_size <= 0):
+        raise ValueError("`sample_size` debe ser > 0 cuando include_confint=True.")
 
-    def build_helper(df: DataFrame) -> DataFrame:
-        stats_values = []
+    # Si se pasa una lista de DataFrames: producir una fila por paciente con medias
+    if isinstance(data, list):
+        if not data:
+            return pd.DataFrame()
 
-        # Media
+        rows = []
+        for df_i in data:
+            # Tomar medias de las columnas esperadas; si faltan columnas, pandas llenará con NaN
+            rows.append(df_i[VARIABLES_EXPERIMENTO].mean())
+
+        df_out = pd.DataFrame(rows).reset_index(drop=True)
+
+        if include_info_label:
+            # Si se pasan labels explícitos, se aplican; en otro caso format_df_stats rellenará 'Paciente i'
+            df_out = format_df_stats(df_out, column_label=column_label, labels_structure=labels_structure)
+
+        return df_out
+
+    # Si es un único DataFrame: construir filas verticales según flags
+    if isinstance(data, DataFrame):
+        df_single = data
+        rows = []
+        auto_labels: list[str] = []
+
         if include_mean:
-            mean: DataFrame = df.mean().to_frame().T
-            stats_values.append(mean)
+            rows.append(df_single[VARIABLES_EXPERIMENTO].mean())
+            auto_labels.append("Promedio")
 
-        # Desviación Estándar
         if include_std:
-            std: DataFrame = df.std().to_frame().T
-            stats_values.append(std)
+            rows.append(df_single[VARIABLES_EXPERIMENTO].std())
+            auto_labels.append("Desviación Estándar")
 
-        # Intervalo de Confianza
         if include_confint:
-            if not include_mean and include_std:
-                raise ValueError(
-                    f"Para realizar el intervalo de confianza son necesarios: "
-                    f"mean y std: Falta {'mean' if not include_mean else 'std'}"
-                )
+            mean = df_single[VARIABLES_EXPERIMENTO].mean()
+            std = df_single[VARIABLES_EXPERIMENTO].std()
+            li, ls = StatsUtils.confidenceinterval(mean.values, std.values, sample_size)
+            # convertir arrays a Series con mismos índices
+            li_s = pd.Series(li, index=VARIABLES_EXPERIMENTO)
+            ls_s = pd.Series(ls, index=VARIABLES_EXPERIMENTO)
+            rows.append(li_s)
+            auto_labels.append("Límite Inf")
+            rows.append(ls_s)
+            auto_labels.append("Límite Sup")
+
+        if include_metrics:
+            # Métrica de calibración: contar cuántas iteraciones quedaron dentro del intervalo [LI, LS]
+            # Si se proporciona `metrics_reference` como Series/dict con valores reales, se evalúa cobertura real->IC
+            # Si `metrics_as_percentage=True`, devolvemos porcentaje en lugar de conteo.
+            if include_confint:
+                try:
+                    counts = {}
+                    for col in VARIABLES_EXPERIMENTO:
+                        lower = li_s[col]
+                        upper = ls_s[col]
+
+                        if metrics_reference is not None:
+                            # Si metrics_reference tiene un valor escalar para la columna -> 0/1 si entra en el intervalo
+                            if isinstance(metrics_reference, pd.Series) or isinstance(metrics_reference, dict):
+                                ref_val = metrics_reference.get(col) if isinstance(metrics_reference, dict) else metrics_reference.get(col, None)
+                                if ref_val is None:
+                                    counts[col] = 0
+                                else:
+                                    counts[col] = int(lower <= ref_val <= upper)
+                            else:
+                                # No soportado, usar placeholder
+                                counts[col] = 0
+                        else:
+                            # Contar filas en el DataFrame original que estén dentro del intervalo
+                            counts[col] = int(((df_single[col] >= lower) & (df_single[col] <= upper)).sum())
+
+                    metrics_row = pd.Series([counts.get(col, 0) for col in VARIABLES_EXPERIMENTO], index=VARIABLES_EXPERIMENTO)
+
+                    # Si se solicita porcentaje y estamos trabajando con conteos sobre iteraciones
+                    if metrics_as_percentage and metrics_reference is None:
+                        denom = df_single.shape[0] if df_single.shape[0] > 0 else 1
+                        metrics_row = metrics_row.astype(float) / denom * 100.0
+                    elif metrics_as_percentage and metrics_reference is not None:
+                        # Cuando comparamos con una referencia escalar, porcentaje es 0 o 100
+                        metrics_row = metrics_row.astype(float) * 100.0
+
+                except Exception:
+                    # En caso de fallo, usar placeholder
+                    metrics_row = pd.Series([0] * len(VARIABLES_EXPERIMENTO), index=VARIABLES_EXPERIMENTO)
             else:
-                if not sample_size or sample_size <= 0:
-                    raise ValueError(
-                        f"Para realizar el intervalo de confianza debe usarse un tamaño de muestra válido."
-                        f"Found: {sample_size}"
-                    )
-                else:
-                    confint = StatsUtils.confidenceinterval(mean, std, sample_size)
-                    li = pd.DataFrame(confint[0])
-                    ls = pd.DataFrame(confint[1])
-                    li.columns = mean.columns.to_list()
-                    ls.columns = mean.columns.to_list()
-                    stats_values.extend([li, ls])
+                # Si no se calculó intervalo, no tiene sentido contar cobertura — usar placeholder
+                metrics_row = pd.Series([0] * len(VARIABLES_EXPERIMENTO), index=VARIABLES_EXPERIMENTO)
 
-                    # Métricas
-                    if include_metrics:
-                        metrics = []
-                        for v in VARIABLES_EXPERIMENTO:
-                            metric = StatsUtils.calibration_metric_simulation(
-                                df[v].to_list(),
-                                float(li[v].iloc[0]),
-                                float(ls[v].iloc[0]),
-                            )
-                            metrics.append(metric)  # Cantidad dentro del intervalo
-                        stats_values.append(pd.DataFrame([metrics], columns=df.columns))
+            rows.append(metrics_row)
+            auto_labels.append("Métrica de Calibración")
 
-        df_final = pd.concat(stats_values, axis=0, ignore_index=True)
+        if not rows:
+            raise ValueError("Debe incluir al menos un estadístico (mean/std/confint/metrics).")
 
-        return df_final
+        df_out = pd.DataFrame(rows).reset_index(drop=True)
 
-    # Nota: cuando se pasa una lista, se hace un promedio de los resultados para cada paciente. Por lo tanto, se debe
-    # realizar un promedio de las listas de resultados de cada paciente.
-    df_output = (
-        build_helper(data)
-        if single_patient
-        else pd.DataFrame(
-            [build_helper(df).iloc[0] for df in data],
-            index=[f"Paciente {i}" for i in range(len(data))],
-        )
-    )
+        if include_info_label:
+            # Si se pasa labels_structure se aplica; si no, usar auto_labels para un único paciente
+            labels_to_use = labels_structure if labels_structure is not None else auto_labels
+            df_out = format_df_stats(df_out, column_label=column_label, labels_structure=labels_to_use)
 
-    if include_info_label:
-        return format_df_stats(
-            df=df_output,
-            label=info_label,
-        )
+        return df_out
 
-    return df_output
+    raise TypeError("`data` debe ser un DataFrame o una lista de DataFrames.")
 
 
 def bin_to_df(files: UploadedFile | list[UploadedFile]) -> DataFrame | list[DataFrame]:
@@ -419,9 +476,7 @@ def bin_to_df(files: UploadedFile | list[UploadedFile]) -> DataFrame | list[Data
         return [pd.read_csv(f) for f in files]
 
 
-def _extract_real_data(
-    ruta_archivo_csv: str, index: int, return_type: str = "df"
-) -> DataFrame | tuple[float]:
+def _extract_real_data(ruta_archivo_csv: str, index: int, return_type: str = "df") -> DataFrame | tuple[float]:
     data = pd.read_csv(ruta_archivo_csv)
 
     def build_row(data_index: int):
@@ -525,9 +580,7 @@ def start_experiment(
 
     # Verificar que no haya valores NaN o None
     if res.isnull().values.any():
-        st.warning(
-            "Advertencia: Se encontraron valores nulos en los resultados de la simulación."
-        )
+        st.warning("Advertencia: Se encontraron valores nulos en los resultados de la simulación.")
         res = res.fillna(0)
 
     # Asegurarse de que el índice sea secuencial
@@ -586,17 +639,15 @@ def build_df_test_result(statistic: float, p_value: float) -> DataFrame:
     return df
 
 
-def simulate_real_data(
-    ruta_fichero_csv: str, df_selection: int
-) -> tuple[float] | list[tuple[float]]:
-    """A partir de una porción de los datos reales, realiza una simulación para un paciente seleccionado o para todos los pacientes.
+def simulate_real_data(ruta_fichero_csv: str, df_selection: int) -> tuple[float] | list[tuple[float]]:
+    """Realiza la simulación desde datos reales.
 
     Args:
-        ruta_fichero_csv (str): Ruta del archivo de datos reales.
-        df_selection (int): Indice del paciente seleccionado. Si es None, realiza una simulación para todos los pacientes.
+        ruta_fichero_csv: Ruta del CSV de datos reales.
+        df_selection: Índice del paciente seleccionado; usar -1 para procesar todos los pacientes.
 
     Returns:
-        tuple[float] | list[tuple[float]]: Tuple con los resultados de la simulación para un paciente o lista de tuples con los resultados de la simulación para todos los pacientes.
+        Tuple con los resultados de la simulación para un paciente, o lista de tuples para todos los pacientes.
     """
 
     def experiment_helper(t: tuple[float]) -> DataFrame:
@@ -628,9 +679,7 @@ def simulate_real_data(
         return e
 
     if df_selection != -1:
-        t: tuple[float] = _extract_real_data(
-            ruta_fichero_csv, index=df_selection, return_type="tuple"
-        )
+        t: tuple[float] = _extract_real_data(ruta_fichero_csv, index=df_selection, return_type="tuple")
 
         # Se retorna un tuple[float]
         return experiment_helper(t)
@@ -640,10 +689,7 @@ def simulate_real_data(
         # Se retorna un list[tuple[float]]
         return [
             experiment_helper(t)
-            for t in [
-                _extract_real_data(ruta_fichero_csv, index=i, return_type="tuple")
-                for i in range(datalen)
-            ]
+            for t in [_extract_real_data(ruta_fichero_csv, index=i, return_type="tuple") for i in range(datalen)]
         ]
     else:
         raise ValueError("El parámetro df_selection debe ser -1 o un entero positivo.")
@@ -664,9 +710,7 @@ def fix_seed(seed: int = None):
     try:
         if seed is not None:
             if seed > np.iinfo(np.int32).max:
-                raise ValueError(
-                    "Se excedió el tamaño de semilla permisible (2^32 - 1)"
-                )
+                raise ValueError("Se excedió el tamaño de semilla permisible (2^32 - 1)")
             if seed < 0:
                 raise ValueError("Semilla debe ser un número entero positivo (uint32)")
             np.random.seed(seed)
@@ -700,19 +744,22 @@ def predict(df: DataFrame) -> tuple[np.ndarray, np.ndarray]:
     """
 
     try:
-        model = load(RUTA_MODELO_PREDICCION)
+        # 8/26/2025 - version del modelo entrenada: sklearn - 1.6.1
+        model = joblib.load(RUTA_MODELO_PREDICCION)
+
         preds = model.predict(df)
         preds_proba = model.predict_proba(df)
         res = (preds, np.round(preds_proba[:, 1], 2))
+
         return res
     except Exception:
         tb_text = "".join(traceback.format_exception(*sys.exc_info()))
-        st.error("Ocurrió un error durante la predicción: ")
+        st.error("Ocurrió un error durante la predicción, contacte con los desarrolladores")
         st.code(tb_text, language="python")
-        raise
+        # st.stop()
 
 
-def get_prediction_data(data: dict[str:int] | pd.DataFrame) -> pd.DataFrame:
+def get_data_for_prediction(data: dict[str:int] | pd.DataFrame) -> pd.DataFrame:
     """
     Genera un DataFrame con los datos necesarios para realizar una predicción.
     Args:
@@ -737,9 +784,7 @@ def get_prediction_data(data: dict[str:int] | pd.DataFrame) -> pd.DataFrame:
                 "APACHE",
             ]
             if not all(col in data.columns for col in required_cols):
-                raise ValueError(
-                    f"El DataFrame debe contener las columnas: {', '.join(f'{required_cols}')}."
-                )
+                raise ValueError(f"El DataFrame debe contener las columnas: {', '.join(f'{required_cols}')}.")
             return data[required_cols]
 
         elif isinstance(data, dict):

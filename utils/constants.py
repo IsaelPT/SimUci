@@ -9,7 +9,7 @@ EDAD_DEFAULT = 22
 # Apache
 APACHE_MIN = 0  # Excepcionalmente.
 APACHE_MAX = 36
-APACHE_DEFAULT = 5
+APACHE_DEFAULT = 12
 
 # Tiempo VAM
 T_VAM_MIN = 24
@@ -34,19 +34,20 @@ CORRIDAS_SIM_DEFAULT = 200
 # Porciento
 PORCIENTO_SIM_MIN = 0
 PORCIENTO_SIM_MAX = 10
-PORCIENTO_SIM_DEFAULT = 2
+PORCIENTO_SIM_DEFAULT = 3
 
 # Mensajes de Ayuda en varios Widgets de la aplicación Streamlit
-HELP_MSG_APACHE: str = "Valor del APACHE."
-HELP_MSG_ESTAD_UTI: str = (
-    "Tiempo de estadía en UTI (Unidad de Terapia Intensiva) en horas."
+HELP_MSG_APACHE: str = f"Valor del APACHE (Acute Physiology and Chronic Health Evaluation) es un puntaje clínico que se usa en cuidados intensivos para medir la gravedad de un paciente crítico y estimar su riesgo de mortalidad. Un riesgo bajo sería {APACHE_MIN} y un riesgo alto sería {APACHE_MAX}."
+HELP_MSG_ESTAD_UTI: str = "Tiempo de estadía en Unidad de Terapia Intensiva (UTI) en **horas**."
+HELP_MSG_ESTAD_PREUTI: str = "Tiempo de estadía pre Unidad de Terapia Intensiva (UTI) antes de ingresar a la Unidad de Terapia Intensiva en **horas**."
+HELP_MSG_CORRIDA_SIM: str = "La cantidad de corridas de la simulación. Brinda mayor precisión en los resultado. Una cantidad mayor mejora la precisión, pero también incrementa el tiempo de procesamiento. Una cantidad de 200 corridas es un buen punto de partida para la simulación."
+HELP_MSG_PORCIENTO_SIM: str = (
+    "Proporción de tiempo dentro de estancia UCI que se espera antes de entrar en Ventilación."
 )
-HELP_MSG_ESTAD_PREUTI: str = "Tiempo de estadía pre UTI (antes de ingresar a la Unidad de Terapia Intensiva) en horas."
-HELP_MSG_CORRIDA_SIM: str = "La cantidad de corridas de la simulación brinda mayor precisión en los resultado. Una cantidad mayor puede mejorar la precisión, pero también incrementa el tiempo de procesamiento. Una cantidad de 200 corridas es un buen punto de partida para la simulación."
-HELP_MSG_PORCIENTO_SIM: str = "Proporción de tiempo dentro de estancia UCI que se espera antes de entrar en Ventilación."
-INFO_STATISTIC: str = "***Statistic***: Este número indica cuánto difieren los datos entre sí, basándose en el orden de las diferencias; un valor más pequeño sugiere que hay más diferencias entre los grupos que estás comparando."
+HELP_MSG_PREDICCION_METRIC: str = "La predicción de fallecimiento del paciente se realiza a través de un modelo de Inteligencia Artificial entrenado con datos de pacientes en Unidades de Cuidados Intensivos. Variables como *Diagnóstico Ingreso 1*, *Diagnóstico Ingreso 2*, *Diagnósito Egreso 2*, *Tiempo en VAM*, *Apache* y la *Edad* del paciente intervienen en la estimación de probabilidad del modelo."
+INFO_STATISTIC: str = "***Statistic***: Este número indica cuánto difieren los datos entre sí, basándose en el orden de las diferencias; un valor más pequeño sugiere que hay más diferencias entre los grupos que se están comparando."
 INFO_P_VALUE: str = "***Valor de P***: Este número dice qué tan probable es que las diferencias que ves se deban al azar; si es menor a 0.05, es probable que las diferencias sean reales y no casuales."
-HELP_MSG_TIEMPO_VAM: str = "Tiempo en Ventilación Asistida Mecánica (VAM) en horas."
+HELP_MSG_TIEMPO_VAM: str = "Tiempo en Ventilación Asistida Mecánica (VAM) en **horas**."
 TIPO_VENT: dict[int, str] = {0: "Tubo endotraqueal", 1: "Traqueostomía", 2: "Ambas"}
 
 DIAG_PREUCI: dict[int, str] = {
@@ -117,9 +118,7 @@ try:
     RUTA_PREDICCIONES_CSV = os.path.join("data", "data_with_pred_and_prob.csv")
     RUTA_MODELO_PREDICCION = os.path.join("models", "new_workflow.joblib")
 except Exception as experimento:
-    print(
-        f"Error al cargar el archivo la base de datos.\n>>>\nExcepcion\n>>>{experimento}"
-    )
+    print(f"Error al cargar el archivo la base de datos.\n>>>\nExcepcion\n>>>{experimento}")
 
 try:
     import toml

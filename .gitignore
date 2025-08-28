@@ -37,3 +37,7 @@ Thumbs.db
 !README.md
 !requirements.txt
 !app.py
+
+# Pytest and test artifacts
+.pytest_cache/
+.coverage
