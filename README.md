@@ -9,7 +9,7 @@ toma de decisiones en el ámbito de la salud. En unidades de cuidados intensivos
 médico una herramienta poderosa para comprender mejor las variables que afectan el pronóstico de los pacientes,
 optimizando así la atención y los recursos disponibles.
 
-## Descripción situación problémica
+## Descripción situación problemática
 
 La dificultad para predecir con precisión el tiempo de estancia en la Unidad de Cuidados Intensivos (UCI) de los
 pacientes que requieren ventilación artificial, así como su posterior pronóstico de supervivencia o alta hospitalaria,
@@ -98,7 +98,7 @@ Y otras bibliotecas como:
 
 Este proyecto está desplegado hasta la fecha en Streamlit Community Cloud. Se puede acceder a través de la siguiente dirección:
 
-- https://simuci-v0.streamlit.app/
+[SimUCI en Streamlit Community Cloud](https://simuci-v0.streamlit.app/)
 
 ## **Importante**
 
@@ -106,7 +106,7 @@ Para los usuarios cubanos, es necesario el uso de VPN para el acceso a la plataf
 > Error: Forbidden.
 > Your client does not have permission to get URL / from this server.
 
-## Corrida de la aplicación vía Script.
+## Corrida de la aplicación vía Script
 
 Para correr la aplicación de manera local se utiliza el comando
 
@@ -118,3 +118,37 @@ streamlit run app.py
   backend.
 
 *El comando debe ejecutarse desde la raíz del proyecto.*
+
+## Cambios recientes (resumen)
+
+- Fecha: 2025-08-28
+- Se realizaron tareas de saneamiento del proyecto y mejoras en el módulo de estadísticas:
+  - `build_df_for_stats` ahora calcula una métrica de calibración útil: cuenta de iteraciones de la simulación dentro del intervalo de confianza (opcionalmente como porcentaje) y admite una referencia externa para comparar datos reales.
+  - `format_df_stats` acepta ahora estructuras de etiquetas flexibles (`dict`, `list` o `None`) y aplica nombres por defecto sensatos.
+  - Se añadieron pruebas unitarias básicas en `tests/test_helpers.py` que validan conteo, porcentaje y referencia externa.
+  - Se actualizaron `.gitignore` y `requirements.txt` para incluir herramientas de test (`pytest`) y artefactos comunes de pruebas.
+
+## Cómo ejecutar los tests y la aplicación
+
+1. Instalar dependencias (recomendado dentro de un virtualenv):
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+2. Ejecutar la suite de tests:
+
+```powershell
+python -m pytest -q
+```
+
+3. Ejecutar la aplicación Streamlit (desde la raíz del proyecto):
+
+```powershell
+streamlit run app.py
+```
+
+Notas:
+- Se recomienda integrar los tests en CI (por ejemplo GitHub Actions) para ejecutar `pytest` en cada push/pull request.
+
+- Si usas un entorno virtual, activa el entorno antes de instalar dependencias.
