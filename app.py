@@ -72,16 +72,14 @@ st.set_page_config(
     page_title="Simulación UCI - Análisis de Pacientes", page_icon="🏥", layout="wide", initial_sidebar_state="expanded"
 )
 
-
-# Theme configs
 if "theme" not in st.session_state:
     st.session_state.theme = "light"
 
-# Barra lateral con controles
+apply_theme(st.session_state.theme)
+
 with st.sidebar:
     st.title("Controles")
 
-    # Toggle de modo oscuro con mejor diseño
     theme_toggle = st.toggle(
         "Modo Oscuro", value=st.session_state.theme == "dark", help="Cambiar entre modo claro y oscuro"
     )
