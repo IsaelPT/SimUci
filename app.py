@@ -604,35 +604,10 @@ with datos_reales_tab:
             st.session_state.prediccion_datos_reales_clases = preds[0]
             st.session_state.prediccion_datos_reales_porcentaje = preds_proba[0]
 
-            # Mostrar métrica de predicción
-            prev_pred = st.session_state.get("prev_prediccion_datos_reales_porcentaje", None)
             current_pred = float(st.session_state.prediccion_datos_reales_porcentaje)
 
             delta_label = ""
             delta_color = "normal"
-
-            if prev_pred is not None:
-                try:
-                    prev_val = float(prev_pred)
-                    change = current_pred - prev_val
-                    percent_change = change * 100
-
-                    if change > 0:
-                        how_changed = "Incremento"
-                        delta_color = "inverse"
-                    elif change < 0:
-                        how_changed = "Disminución"
-                        delta_color = "normal"
-                    else:
-                        delta_label = "Sin cambio"
-                        delta_color = "off"
-
-                    if change != 0:
-                        delta_label = f"{how_changed} de {abs(percent_change):.0f}% en la probabilidad de fallecimiento"
-
-                except Exception:
-                    delta_label = ""
-                    delta_color = "normal"
 
             paciente_vive = st.session_state.prediccion_datos_reales_clases == 0
             metric_display_value = (
