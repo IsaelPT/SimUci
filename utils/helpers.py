@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame
 from streamlit.runtime.uploaded_file_manager import UploadedFile
+import streamlit as st
 
 from utils.constants import (
     CORRIDAS_SIM_DEFAULT,
@@ -1204,3 +1205,17 @@ def build_comprehensive_stats_table(
     except Exception as e:
         messages["errors"].append(f"Error en build_comprehensive_stats_table: {e}")
         raise
+
+
+def apply_theme(theme_name):
+    """Aplica el tema seleccionado a la aplicación"""
+    if theme_name == "dark":
+        st._config.set_option("theme.base", "dark")
+        st._config.set_option("theme.primaryColor", "#66C5A0")
+        st._config.set_option("theme.backgroundColor", "#0E1117")
+        st._config.set_option("theme.secondaryBackgroundColor", "#262730")
+    else:
+        st._config.set_option("theme.base", "light")
+        st._config.set_option("theme.primaryColor", "#66C5A0")
+        st._config.set_option("theme.backgroundColor", "#FFFFF8")
+        st._config.set_option("theme.secondaryBackgroundColor", "#F3F6F0")

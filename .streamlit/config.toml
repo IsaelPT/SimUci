@@ -3,3 +3,15 @@ base = "light"
 primaryColor = "#66C5A0"
 backgroundColor = "#FFFFF8"
 secondaryBackgroundColor = "#F3F6F0"
+
+[theme.dark]
+base = "dark"
+primaryColor = "#66C5A0"
+backgroundColor = "#0E1117"
+secondaryBackgroundColor = "#262730"
+
+[theme.light]
+base = "light"
+primaryColor = "#66C5A0"
+backgroundColor = "#FFFFF8"
+secondaryBackgroundColor = "#F3F6F0"

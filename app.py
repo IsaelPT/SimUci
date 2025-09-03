@@ -21,6 +21,7 @@ from utils.helpers import (
     prepare_patient_data_for_prediction,
     _extract_real_data,
     build_comprehensive_stats_table,
+    apply_theme,
 )
 from utils.constants import (
     EDAD_MIN,
@@ -65,6 +66,48 @@ from utils.constants import (
 )
 from uci.stats import Wilcoxon, Friedman
 
+
+# Configuración inicial de la página
+st.set_page_config(
+    page_title="Simulación UCI - Análisis de Pacientes", page_icon="🏥", layout="wide", initial_sidebar_state="expanded"
+)
+
+
+# Theme configs
+if "theme" not in st.session_state:
+    st.session_state.theme = "light"
+
+# Barra lateral con controles
+with st.sidebar:
+    st.title("Controles")
+
+    # Toggle de modo oscuro con mejor diseño
+    theme_toggle = st.toggle(
+        "Modo Oscuro", value=st.session_state.theme == "dark", help="Cambiar entre modo claro y oscuro"
+    )
+
+    # Actualizar tema si cambió
+    new_theme = "dark" if theme_toggle else "light"
+    if new_theme != st.session_state.theme:
+        st.session_state.theme = new_theme
+        apply_theme(new_theme)
+        st.rerun()
+
+    st.divider()
+
+    # Información adicional sobre la app
+    st.markdown("### 📊 Sobre la App")
+    st.markdown("""
+    Esta aplicación permite:
+    - Simular pacientes UCI
+    - Analizar datos reales
+    - Realizar predicciones
+    - Comparar resultados estadísticos
+    """)
+
+    # Versión
+    st.markdown("---")
+    st.caption("Versión 2.0 - Septiembre 2025")
 
 ########
 # TABS #
