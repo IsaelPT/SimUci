@@ -79,7 +79,6 @@ utilizan recursos open-source y frameworks de Python entre los que se destacan:
 
 ___
 
-
 Los requisitos mínimos son Python v3.9 o superior.
 En la ruta raíz del proyecto existe un archivo `requirements.txt` con las dependencias básicas de Frameworks que
 necesita el proyecto para su funcionamiento.
@@ -149,6 +148,7 @@ streamlit run app.py
 ```
 
 Notas:
+
 - Se recomienda integrar los tests en CI (por ejemplo GitHub Actions) para ejecutar `pytest` en cada push/pull request.
 
 - Si usas un entorno virtual, activa el entorno antes de instalar dependencias.

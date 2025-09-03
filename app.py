@@ -10,9 +10,7 @@ from utils.helpers import (
     bin_to_df,
     build_df_for_stats,
     build_df_test_result,
-    format_df_time,
     format_time_columns,
-    format_value_for_display,
     generate_id,
     get_data_for_prediction,
     key_categ,
@@ -20,6 +18,9 @@ from utils.helpers import (
     simulate_real_data,
     start_experiment,
     value_is_zero,
+    prepare_patient_data_for_prediction,
+    _extract_real_data,
+    build_comprehensive_stats_table,
 )
 from utils.constants import (
     EDAD_MIN,
@@ -31,7 +32,9 @@ from utils.constants import (
     HELP_MSG_APACHE,
     HELP_MSG_PREDICCION_METRIC,
     HELP_MSG_TIEMPO_VAM,
-    RUTA_PREDICCIONES_CSV,
+    HELP_MSG_TIME_FORMAT,
+    LABEL_PREDICTION_METRIC,
+    LABEL_TIME_FORMAT,
     T_VAM_MIN,
     T_VAM_MAX,
     T_VAM_DEFAULT,
@@ -52,7 +55,7 @@ from utils.constants import (
     DIAG_PREUCI,
     RUTA_FICHERODEDATOS_CSV,
     PRIMARY_COLOR,
-    VARIABLES_EXPERIMENTO,
+    EXPERIMENT_VARIABLES as EXP_VARIABLES,
     CORRIDAS_SIM_MIN,
     CORRIDAS_SIM_MAX,
     CORRIDAS_SIM_DEFAULT,
@@ -60,14 +63,21 @@ from utils.constants import (
     INFO_STATISTIC,
     INFO_P_VALUE,
 )
-from uci.stats import Wilcoxon, Friedman, StatsUtils
-import traceback
+from uci.stats import Wilcoxon, Friedman
 
 
 ########
 # TABS #
 ########
 simulacion_tab, datos_reales_tab, comparaciones_tab = st.tabs(("Simulación", "Datos reales", "Comparaciones"))
+
+# Inicializar session_state para datos reales
+if "df_sim_datos_reales" not in st.session_state:
+    st.session_state.df_sim_datos_reales = pd.DataFrame()
+if "df_pacientes_individuales" not in st.session_state:
+    st.session_state.df_pacientes_individuales = pd.DataFrame()
+if "friedman_results" not in st.session_state:
+    st.session_state.friedman_results = {}
 
 with simulacion_tab:
     ############
@@ -249,9 +259,9 @@ with simulacion_tab:
     # Mostrar DataFrame con resultado de la simulación para ese paciente.
     if not st.session_state.df_resultado.empty:
         toggle_format = st.toggle(
-            "Tiempo en días",
+            label=LABEL_TIME_FORMAT,
             value=True,
-            help="Formato de Tiempo. Al activar esta opción se muestran los días convertidos en horas.",
+            help=HELP_MSG_TIME_FORMAT,
             key="formato-tiempo-simulacion",
         )
         df_simulacion = build_df_for_stats(
@@ -330,7 +340,7 @@ with simulacion_tab:
             metric_display_value: str = f"{'Paciente no fallece' if paciente_vive else 'Paciente fallece'} (predicción de {(current_pred * 100):.0f}% )"
 
             st.metric(
-                label="Predicción de probabilidad de fallecimiento del paciente",
+                label=LABEL_PREDICTION_METRIC,
                 value=metric_display_value,
                 delta=delta_label,
                 delta_color=delta_color,
@@ -481,26 +491,27 @@ with datos_reales_tab:
 
     # DataFrame se encuentra con resultado de experimento con datos reales
     if selection == 0 or selection is not None:
-        st.markdown("Resultados de simulación con paciente seleccionado")
-
         corridas_sim = CORRIDAS_SIM_DEFAULT
 
         col1, col2 = st.columns(2)
+
+        # with st.expander(expanded=True, width="stretch", label="Resultados de simulación con paciente seleccionado"):
+        # with st.popover(label="Resultados de simulación con paciente seleccionado"):
+
         with col1:
             toggle_format = st.toggle(
-                "Tiempo en días",
-                value=False,
-                help="Formato de tiempo. Al activar muestra las horas en su aproximación a lo que sería en días.",
+                label=LABEL_TIME_FORMAT, value=False, help=HELP_MSG_TIME_FORMAT, key="formato-tiempo-datos-reales"
             )
         with col2:
-            _label = "Cantidad de Simulaciones por paciente"
+            label: str = "Cantidad de Simulaciones por paciente"
+
             with st.popover(
-                label=_label,
+                label=label,
                 use_container_width=True,
                 help=HELP_MSG_CORRIDA_SIM,
             ):
                 corridas_sim = st.number_input(
-                    label=_label,
+                    label=label,
                     min_value=CORRIDAS_SIM_MIN,
                     max_value=CORRIDAS_SIM_MAX,
                     value=CORRIDAS_SIM_DEFAULT,
@@ -509,6 +520,9 @@ with datos_reales_tab:
 
         data: tuple[float] = simulate_real_data(ruta_fichero_csv=RUTA_FICHERODEDATOS_CSV, df_selection=selection)
 
+        patient_tuple = _extract_real_data(RUTA_FICHERODEDATOS_CSV, selection, "tuple")
+        patient_data = prepare_patient_data_for_prediction(patient_tuple)
+
         df_sim_datos_reales = build_df_for_stats(
             data,
             corridas_sim,
@@ -516,6 +530,9 @@ with datos_reales_tab:
             include_std=True,
             include_confint=True,
             include_metrics=True,
+            include_prediction_mean=True,
+            metrics_as_percentage=True,
+            patient_data=patient_data,
             include_info_label=True,
         )
 
@@ -532,36 +549,125 @@ with datos_reales_tab:
                 use_container_width=True,
             )
 
+        # Mostrar predicción del paciente seleccionado
+        try:
+            prediction_df = get_data_for_prediction(patient_data)
+            preds, preds_proba = predict(prediction_df)
+
+            # Almacenar predicción en session_state
+            if "prediccion_datos_reales_clases" not in st.session_state:
+                st.session_state.prediccion_datos_reales_clases = 0
+            if "prediccion_datos_reales_porcentaje" not in st.session_state:
+                st.session_state.prediccion_datos_reales_porcentaje = 0.0
+
+            st.session_state.prediccion_datos_reales_clases = preds[0]
+            st.session_state.prediccion_datos_reales_porcentaje = preds_proba[0]
+
+            # Mostrar métrica de predicción
+            prev_pred = st.session_state.get("prev_prediccion_datos_reales_porcentaje", None)
+            current_pred = float(st.session_state.prediccion_datos_reales_porcentaje)
+
+            delta_label = ""
+            delta_color = "normal"
+
+            if prev_pred is not None:
+                try:
+                    prev_val = float(prev_pred)
+                    change = current_pred - prev_val
+                    percent_change = change * 100
+
+                    if change > 0:
+                        how_changed = "Incremento"
+                        delta_color = "inverse"
+                    elif change < 0:
+                        how_changed = "Disminución"
+                        delta_color = "normal"
+                    else:
+                        delta_label = "Sin cambio"
+                        delta_color = "off"
+
+                    if change != 0:
+                        delta_label = f"{how_changed} de {abs(percent_change):.0f}% en la probabilidad de fallecimiento"
+
+                except Exception:
+                    delta_label = ""
+                    delta_color = "normal"
+
+            paciente_vive = st.session_state.prediccion_datos_reales_clases == 0
+            metric_display_value = (
+                f"{'Paciente no fallece' if paciente_vive else 'Paciente fallece'} ({(current_pred * 100):.0f}%)"
+            )
+
+            st.metric(
+                label=LABEL_PREDICTION_METRIC,
+                value=metric_display_value,
+                delta=delta_label,
+                delta_color=delta_color,
+                border=True,
+                width="stretch",
+                help="Predicción basada en el modelo de machine learning entrenado con datos históricos",
+            )
+
+            st.session_state.prev_prediccion_datos_reales_porcentaje = current_pred
+
+        except Exception as e:
+            st.warning(f"No se pudo realizar la predicción: {e}")
+
+    st.divider()
+
     # Simular todos los datos en la tabla.
     if st.button(
-        "Simular todos los datos en la tabla",
+        "Simular y evaluar todos los datos en la tabla",
         type="primary",
         use_container_width=True,
         key="simular_tabla",
     ):
         with st.spinner(
-            text="Simulando todos los datos en la tabla. Esto puede tardar varios minutos...",
+            text="Simulando todos los datos en la tabla y calculando predicciones. Esto puede tardar varios minutos...",
             show_time=True,
         ):
             try:
-                lista_experimentos: list[tuple[float]] = simulate_real_data(RUTA_FICHERODEDATOS_CSV, df_selection=-1)
+                # Crear barra de progreso
+                progress_bar = st.progress(0)
 
-                # DataFrame con todos los resultados de simulaciones a todos los pacientes en la tabla.
-                df_sim_datos_reales = build_df_for_stats(
-                    lista_experimentos,
-                    CORRIDAS_SIM_DEFAULT,
-                    include_mean=True,
-                    include_std=False,
-                    include_confint=False,
-                    include_info_label=False,
-                )
-                df_sim_datos_reales.index.name = "Paciente"
-                st.session_state.df_sim_datos_reales = df_sim_datos_reales
+                # Función callback para actualizar progreso
+                def update_progress(progress):
+                    progress_bar.progress(progress)
 
-                st.toast(
-                    "Se ha realizado la simulación a cada paciente de la tabla.",
-                    icon="✅",
+                # Usar la nueva función para tabla comprehensiva
+                df_pacientes, df_general, df_calibracion, friedman_results, messages = build_comprehensive_stats_table(
+                    RUTA_FICHERODEDATOS_CSV, corridas_sim, progress_callback=update_progress
                 )
+
+                # Limpiar barra de progreso
+                progress_bar.empty()
+
+                if not df_general.empty:
+                    # Almacenar en session_state
+                    st.session_state.df_pacientes_individuales = df_pacientes
+                    st.session_state.df_sim_datos_reales = df_general
+                    st.session_state.df_calibracion = df_calibracion
+                    st.session_state.friedman_results = friedman_results
+
+                    # Mostrar mensajes informativos
+                    for msg in messages["info"]:
+                        st.info(msg)
+
+                    # Mostrar warnings si los hay
+                    for warning in messages["warnings"]:
+                        st.warning(warning)
+
+                    # Mostrar errores si los hay
+                    for error in messages["errors"]:
+                        st.error(error)
+
+                    st.toast(
+                        f"Se ha completado la simulación y predicción para {len(pd.read_csv(RUTA_FICHERODEDATOS_CSV))} pacientes. Se muestran resultados individuales y promedios generales.",
+                        icon="✅",
+                    )
+                else:
+                    st.error("No se pudo generar la tabla de resultados.")
+
             except Exception as e:
                 st.toast(
                     f"Se ha producido un error al realizar la simulación: {e}",
@@ -569,21 +675,44 @@ with datos_reales_tab:
                 )
 
     # Mostrar simulación con datos reales.
-    if not st.session_state.df_sim_datos_reales.empty:
-        toggle_format_reales = st.toggle(
-            "Tiempo en días",
-            value=True,
-            help="Formato de Tiempo. Al activar esta opción se muestran los días convertidos en horas.",
-            key="formato-tiempo-reales",
-        )
+    if (
+        "df_sim_datos_reales" in st.session_state
+        and hasattr(st.session_state.df_sim_datos_reales, "empty")
+        and not st.session_state.df_sim_datos_reales.empty
+        and "df_pacientes_individuales" in st.session_state
+        and hasattr(st.session_state.df_pacientes_individuales, "empty")
+        and not st.session_state.df_pacientes_individuales.empty
+        and "df_calibracion" in st.session_state
+        and hasattr(st.session_state.df_calibracion, "empty")
+        and not st.session_state.df_calibracion.empty
+    ):
+        st.subheader("📊 Estadísticas Comprehensivas de Simulación y Predicción")
 
-        display_df_reales = st.session_state.df_sim_datos_reales.copy()
-
-        if toggle_format_reales:
-            display_df_reales = format_time_columns(
-                display_df_reales,
-                exclude_rows=["Métrica de Calibración"],
+        # Mostrar tabla de pacientes individuales
+        if "df_pacientes_individuales" in st.session_state:
+            st.subheader("📋 Resultados Individuales por Paciente")
+            st.dataframe(
+                st.session_state.df_pacientes_individuales,
+                hide_index=True,
+                use_container_width=True,
             )
+            st.info("Esta tabla muestra el promedio de simulación para cada paciente individual.")
+
+        # Mostrar tabla de calibración
+        if "df_calibracion" in st.session_state:
+            st.subheader("🎯 Métricas de Calibración por Paciente")
+            st.dataframe(
+                st.session_state.df_calibracion,
+                hide_index=True,
+                use_container_width=True,
+            )
+            st.info(
+                "Esta tabla muestra qué porcentaje de las simulaciones de cada paciente están dentro del intervalo de confianza basado en sus valores reales."
+            )
+
+        # Mostrar tabla de promedio general
+        st.subheader("📈 Promedio General de Todos los Pacientes")
+        display_df_reales = st.session_state.df_sim_datos_reales.copy()
 
         st.dataframe(
             display_df_reales,
@@ -591,71 +720,114 @@ with datos_reales_tab:
             use_container_width=True,
         )
 
-        csv_sim_datos_reales = st.session_state.df_sim_datos_reales.to_csv(index=False).encode("UTF-8")
-
-        st.download_button(
-            label="Guardar resultados",
-            data=csv_sim_datos_reales,
-            file_name="Experimentos con Datos Reales.csv",
-            mime="text/csv",
-            use_container_width=True,
-            key="guardar_sim_datos_reales",
+        st.info(
+            "📈 **Interpretación:** La primera tabla muestra resultados individuales por paciente. La segunda tabla muestra métricas de calibración. La tercera tabla muestra el promedio general de todos los pacientes."
         )
 
-    st.divider()
-    st.header("Validación de la predicción para Datos Reales")
+        csv_sim_datos_reales = st.session_state.df_sim_datos_reales.to_csv(index=True).encode("UTF-8")
 
-    if st.button(label="Validar predicción", type="primary", use_container_width=True):
-        with st.spinner(
-            text="Validando predicción. Esto puede tardar unos minutos...",
-            show_time=True,
-        ):
-            try:
-                df_data_pred = pd.read_csv(RUTA_PREDICCIONES_CSV)
+        # st.download_button(
+        #     label="💾 Guardar resultados comprehensivos",
+        #     data=csv_sim_datos_reales,
+        #     file_name="Estadisticas_Comprehensivas_Simulacion_Prediccion.csv",
+        #     mime="text/csv",
+        #     use_container_width=True,
+        #     key="guardar_sim_datos_reales",
+        # )
 
-                if "Unnamed: 0" in df_data_pred.columns:
-                    df_data_pred = df_data_pred.drop(columns=["Unnamed: 0"])
+        # csv_pacientes_individuales = st.session_state.df_pacientes_individuales.to_csv(index=False).encode("UTF-8")
 
-                df_predic = get_data_for_prediction(df_data_pred)
-                df_predic = predict(df_predic)
+        # st.download_button(
+        #     label="💾 Guardar resultados individuales por paciente",
+        #     data=csv_pacientes_individuales,
+        #     file_name="Resultados_Individuales_Pacientes.csv",
+        #     mime="text/csv",
+        #     use_container_width=True,
+        #     key="guardar_pacientes_individuales",
+        # )
 
-                with st.expander("Datos de entrada", expanded=False):
-                    st.markdown("Tabla con datos reales de pacientes y sus predicciones")
-                    st.dataframe(
-                        df_data_pred,
-                        hide_index=False,
-                        use_container_width=True,
+        # csv_calibracion = st.session_state.df_calibracion.to_csv(index=False).encode("UTF-8")
+
+        # st.download_button(
+        #     label="💾 Guardar métricas de calibración",
+        #     data=csv_calibracion,
+        #     file_name="Metricas_Calibracion_Pacientes.csv",
+        #     mime="text/csv",
+        #     use_container_width=True,
+        #     key="guardar_calibracion",
+        # )
+
+        # Mostrar resultados del test de Friedman
+        if "friedman_results" in st.session_state and st.session_state.friedman_results:
+            st.subheader("🧪 Test de Friedman - Comparación entre Pacientes")
+
+            st.markdown("""
+            **Interpretación del Test de Friedman:**
+            - **Estadístico F:** Valor del test estadístico
+            - **Valor p:** Probabilidad de que las diferencias sean aleatorias
+            - **Significativo:** Si p < 0.05, hay diferencias significativas entre los pacientes
+            """)
+
+            # Crear tabla con resultados de Friedman
+            friedman_data = []
+            for var, results in st.session_state.friedman_results.items():
+                if results.get("error"):
+                    friedman_data.append(
+                        {
+                            "Variable": var,
+                            "Estadístico F": "N/A",
+                            "Valor p": "N/A",
+                            "Significativo": "Error",
+                        }
+                    )
+                else:
+                    friedman_data.append(
+                        {
+                            "Variable": var,
+                            "Estadístico F": f"{results.get('statistic', 'N/A'):.4f}"
+                            if results.get("statistic") is not None
+                            else "N/A",
+                            "Valor p": f"{results.get('p_value', 'N/A'):.4f}"
+                            if results.get("p_value") is not None
+                            else "N/A",
+                            "Significativo": "Sí" if results.get("significant") else "No",
+                        }
                     )
 
-                # Asegurar que y_true sea un array numérico sin nulos
-                y_true = pd.to_numeric(df_data_pred["Prob Fallece"], errors="coerce").fillna(-1).to_numpy()
+            friedman_df = pd.DataFrame(friedman_data)
+            st.dataframe(
+                friedman_df,
+                hide_index=True,
+                use_container_width=True,
+                column_config={
+                    "Variable": st.column_config.TextColumn("Variable", width="medium"),
+                    "Estadístico F": st.column_config.TextColumn("Estadístico F", width="small"),
+                    "Valor p": st.column_config.TextColumn("Valor p", width="small"),
+                    "Significativo": st.column_config.TextColumn("Significativo", width="small"),
+                },
+            )
 
-                if -1 in y_true:
-                    print(f"ATENCIÓN: Verificar datos sucios en arreglo de valores reales: {y_true}")
+            # Resumen de resultados significativos
+            significant_vars = [
+                var
+                for var, results in st.session_state.friedman_results.items()
+                if results.get("significant") and not results.get("error")
+            ]
 
-                # Probabilidades de la clase positiva
-                y_pred_proba = df_predic[1]
-
-                # print(y_true)
-                # print(y_pred_proba)
-
-                intervals = [0.8, 0.9, 0.95]
-
-                calibration_metric = StatsUtils.calibration_metric_predict(y_true, y_pred_proba, intervals)
-
-                st.dataframe(
-                    pd.DataFrame(
-                        {
-                            "Intervalo": intervals,
-                            "Muestras dentro del intervalo": calibration_metric,
-                        }
-                    ),
-                    hide_index=True,
-                    use_container_width=True,
+            if significant_vars:
+                st.success(f"📈 **Variables con diferencias significativas:** {', '.join(significant_vars)}")
+            else:
+                st.info(
+                    "📊 **No se encontraron diferencias significativas entre los pacientes para ninguna variable.**"
                 )
-            except Exception as e:
-                st.error(f"Error al validar la predicción: {e}")
-                st.exception(traceback.format_exc())
+
+            # Información adicional
+            st.info("""
+            **¿Qué significa esto?**
+            - Si una variable tiene p < 0.05, significa que hay diferencias estadísticamente significativas entre los pacientes
+            - Esto indica que los pacientes responden de manera diferente a las simulaciones
+            - Las predicciones también pueden variar significativamente entre pacientes
+            """)
 
 #################
 # COMPARACIONES #
@@ -701,7 +873,7 @@ with comparaciones_tab:
         # Columna a comparar.
         opcion_col_comparacion = st.selectbox(
             "Seleccione una columna para comparar",
-            VARIABLES_EXPERIMENTO,
+            EXP_VARIABLES,
             key="col-comparacion-wilcoxon",
         )
         boton_comparacion = st.button(
@@ -768,7 +940,7 @@ with comparaciones_tab:
             dataframes_experimentos = bin_to_df(file_upl_experimentos)
 
         # Columna a comparar.
-        opcion_col_comparacion = st.selectbox("Seleccione una columna para comparar", VARIABLES_EXPERIMENTO, key=3)
+        opcion_col_comparacion = st.selectbox("Seleccione una columna para comparar", EXP_VARIABLES, key=3)
         boton_comparacion = st.button(
             "Realizar prueba de Friedman",
             type="primary",

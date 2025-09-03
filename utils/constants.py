@@ -44,11 +44,15 @@ HELP_MSG_CORRIDA_SIM: str = "La cantidad de corridas de la simulación. Brinda m
 HELP_MSG_PORCIENTO_SIM: str = (
     "Proporción de tiempo dentro de estancia UCI que se espera antes de entrar en Ventilación."
 )
-HELP_MSG_PREDICCION_METRIC: str = "La predicción de fallecimiento del paciente se realiza a través de un modelo de Inteligencia Artificial entrenado con datos de pacientes en Unidades de Cuidados Intensivos. Variables como *Diagnóstico Ingreso 1*, *Diagnóstico Ingreso 2*, *Diagnósito Egreso 2*, *Tiempo en VAM*, *Apache* y la *Edad* del paciente intervienen en la estimación de probabilidad del modelo."
+HELP_MSG_PREDICCION_METRIC: str = "La predicción de fallecimiento del paciente se realiza a través de un modelo de Inteligencia Artificial entrenado con datos de pacientes en Unidades de Cuidados Intensivos. Variables como *Diagnóstico Ingreso 1*, *Diagnóstico Ingreso 2*, *Diagnóstico Egreso 2*, *Tiempo en VAM*, *Apache* y la *Edad* del paciente intervienen en la estimación de probabilidad del modelo."
+HELP_MSG_TIME_FORMAT: str = "Formato de tiempo. Activar esta opción muestra los días convertidos en horas."
 INFO_STATISTIC: str = "***Statistic***: Este número indica cuánto difieren los datos entre sí, basándose en el orden de las diferencias; un valor más pequeño sugiere que hay más diferencias entre los grupos que se están comparando."
 INFO_P_VALUE: str = "***Valor de P***: Este número dice qué tan probable es que las diferencias que ves se deban al azar; si es menor a 0.05, es probable que las diferencias sean reales y no casuales."
 HELP_MSG_TIEMPO_VAM: str = "Tiempo en Ventilación Asistida Mecánica (VAM) en **horas**."
 TIPO_VENT: dict[int, str] = {0: "Tubo endotraqueal", 1: "Traqueostomía", 2: "Ambas"}
+LABEL_TIME_FORMAT = "Tiempo en días"
+LABEL_PREDICTION_METRIC = "Predicción de fallecimiento del paciente seleccionado"
+
 
 DIAG_PREUCI: dict[int, str] = {
     0: "Vacío",
@@ -103,20 +107,18 @@ INSUF_RESP: dict[int, str] = {
     5: "Causas extrapulmonares",
 }
 
-VARIABLES_EXPERIMENTO = [
-    "Tiempo Pre VAM",
-    "Tiempo VAM",
-    "Tiempo Post VAM",
-    "Estadia UCI",
-    "Estadia Post UCI",
-]
+EXPERIMENT_VARIABLES = ["Tiempo Pre VAM", "Tiempo VAM", "Tiempo Post VAM", "Estadia UCI", "Estadia Post UCI"]
+
+EXPERIMENT_VARIABLES_DATAFRAME = EXPERIMENT_VARIABLES + ["Promedio Predicción"]
+
+# PREDICTION_VARIABLES = []
 
 try:
     RUTA_DATOS_CSV = os.path.join("data", "datos.csv")
     RUTA_FICHERODEDATOS_CSV = os.path.join("data", "Ficherodedatos(MO)17-1-2023.csv")
     RUTA_DFCENTROIDES_CSV = os.path.join("data", "DF_Centroides.csv")
     RUTA_PREDICCIONES_CSV = os.path.join("data", "data_with_pred_and_prob.csv")
-    RUTA_MODELO_PREDICCION = os.path.join("models", "new_workflow.joblib")
+    RUTA_MODELO_PREDICCION = os.path.join("models", "prediction_model.joblib")
 except Exception as experimento:
     print(f"Error al cargar el archivo la base de datos.\n>>>\nExcepcion\n>>>{experimento}")
 

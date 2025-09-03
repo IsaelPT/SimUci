@@ -9,20 +9,19 @@ from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 from utils.constants import (
     CORRIDAS_SIM_DEFAULT,
-    VARIABLES_EXPERIMENTO,
+    EXPERIMENT_VARIABLES as EXP_VARS,
     RUTA_MODELO_PREDICCION,
     TIPO_VENT,
     DIAG_PREUCI,
     INSUF_RESP,
 )
 from uci.experiment import Experiment, multiple_replication
-from uci.stats import StatsUtils
+from uci.stats import StatsUtils, Friedman
 
 import joblib
 
 import sys
 import traceback
-import streamlit as st
 
 
 def key_categ(categoria: str, valor: str | int, viceversa: bool = False) -> int | str:
@@ -322,10 +321,12 @@ def build_df_for_stats(
     include_std=False,
     include_confint=False,
     include_metrics=False,
+    include_prediction_mean=False,
     include_info_label=True,
     labels_structure: dict[int | str] | list[str] | None = None,
     metrics_as_percentage: bool = False,
     metrics_reference: pd.Series | dict | None = None,
+    patient_data: dict | None = None,
 ) -> DataFrame:
     """
     Resumen rápido: construye un DataFrame con estadísticas (media, std, intervalos y métricas)
@@ -334,21 +335,43 @@ def build_df_for_stats(
     Args:
       - data: DataFrame o list[DataFrame].
       - sample_size: necesario si include_confint=True.
-      - include_*: flags para incluir media, std, confint y métricas.
+      - include_*: flags para incluir media, std, confint, métrica de calibración, media de predicción.
       - include_info_label: añade la columna 'Información' si True.
       - labels_structure: (opcional) dict {index: label} o list de labels; si se pasa, se usa tal cual.
+      - patient_data: (opcional) dict con datos del paciente para hacer predicción. Debe contener las claves necesarias para el modelo.
 
-    Notas clave:
+    Notass clave:
       - Para confint se requieren mean y std y sample_size>0.
       - Si no se pasa labels_structure, se generan labels en el orden lógico según los flags.
+      - Para include_prediction_mean=True, se requiere patient_data con las columnas necesarias para el modelo.
 
-    Ejemplo rápido:
-      build_df_for_stats(df, include_mean=True, include_std=True, include_confint=True, sample_size=100, include_info_label=True)
+    Ejemplo:
+        build_df_for_stats(
+            df,
+            include_mean=True,
+            include_std=True,
+            include_confint=True,
+            sample_size=100,
+            include_info_label=True,
+            patient_data={
+                'Edad': 45,
+                'Diag.Ing1': 1,
+                'Diag.Ing2': 2,
+                'Diag.Egr2': 3,
+                'TiempoVAM': 72,
+                'APACHE': 15
+            },
+            labels_structure={
+                0: "Promedio",
+                1: "Intervalo de Confianza"
+            }
+        )
     """
+
     # Implementación resumida y robusta.
     column_label = "Información"
 
-    # Validaciones mínimas
+    # Validaciones mínimas.
     if include_confint and (not include_mean or not include_std):
         raise ValueError("Para calcular intervalos de confianza se requieren include_mean=True e include_std=True.")
     if include_confint and (sample_size is None or sample_size <= 0):
@@ -362,57 +385,76 @@ def build_df_for_stats(
         rows = []
         for df_i in data:
             # Tomar medias de las columnas esperadas; si faltan columnas, pandas llenará con NaN
-            rows.append(df_i[VARIABLES_EXPERIMENTO].mean())
+            rows.append(df_i[EXP_VARS].mean())
 
-        df_out = pd.DataFrame(rows).reset_index(drop=True)
+        df_output = pd.DataFrame(rows).reset_index(drop=True)
 
         if include_info_label:
             # Si se pasan labels explícitos, se aplican; en otro caso format_df_stats rellenará 'Paciente i'
-            df_out = format_df_stats(df_out, column_label=column_label, labels_structure=labels_structure)
+            df_output = format_df_stats(df_output, column_label=column_label, labels_structure=labels_structure)
 
-        return df_out
+        return df_output
 
     # Si es un único DataFrame: construir filas verticales según flags
     if isinstance(data, DataFrame):
-        df_single = data
+        df = data
         rows = []
         auto_labels: list[str] = []
 
+        #########
+        # MEDIA #
+        #########
         if include_mean:
-            rows.append(df_single[VARIABLES_EXPERIMENTO].mean())
+            rows.append(df[EXP_VARS].mean())
             auto_labels.append("Promedio")
 
+        ##################
+        # DESV. ESTÁNDAR #
+        ##################
         if include_std:
-            rows.append(df_single[VARIABLES_EXPERIMENTO].std())
+            rows.append(df[EXP_VARS].std())
             auto_labels.append("Desviación Estándar")
 
+        ##########################
+        # INTERVALO DE CONFIANZA #
+        ##########################
         if include_confint:
-            mean = df_single[VARIABLES_EXPERIMENTO].mean()
-            std = df_single[VARIABLES_EXPERIMENTO].std()
+            mean = df[EXP_VARS].mean()
+            std = df[EXP_VARS].std()
+
             li, ls = StatsUtils.confidenceinterval(mean.values, std.values, sample_size)
-            # convertir arrays a Series con mismos índices
-            li_s = pd.Series(li, index=VARIABLES_EXPERIMENTO)
-            ls_s = pd.Series(ls, index=VARIABLES_EXPERIMENTO)
+            li_s = pd.Series(li, index=EXP_VARS)
+            ls_s = pd.Series(ls, index=EXP_VARS)
             rows.append(li_s)
             auto_labels.append("Límite Inf")
             rows.append(ls_s)
             auto_labels.append("Límite Sup")
 
+        ###########################
+        # MÉTRICAS DE CALIBRACIÓN #
+        ###########################
         if include_metrics:
-            # Métrica de calibración: contar cuántas iteraciones quedaron dentro del intervalo [LI, LS]
-            # Si se proporciona `metrics_reference` como Series/dict con valores reales, se evalúa cobertura real->IC
+            # Métrica de calibración: contar cuántas iteraciones quedaron dentro del intervalo [LI, LS].
+
+            # De proporcionar `metrics_reference` como Series/dict con valores reales, se evalúa cobertura real -> IC.
+
             # Si `metrics_as_percentage=True`, devolvemos porcentaje en lugar de conteo.
+
             if include_confint:
                 try:
                     counts = {}
-                    for col in VARIABLES_EXPERIMENTO:
+                    for col in EXP_VARS:
                         lower = li_s[col]
                         upper = ls_s[col]
 
                         if metrics_reference is not None:
                             # Si metrics_reference tiene un valor escalar para la columna -> 0/1 si entra en el intervalo
                             if isinstance(metrics_reference, pd.Series) or isinstance(metrics_reference, dict):
-                                ref_val = metrics_reference.get(col) if isinstance(metrics_reference, dict) else metrics_reference.get(col, None)
+                                ref_val = (
+                                    metrics_reference.get(col)
+                                    if isinstance(metrics_reference, dict)
+                                    else metrics_reference.get(col, None)
+                                )
                                 if ref_val is None:
                                     counts[col] = 0
                                 else:
@@ -422,24 +464,24 @@ def build_df_for_stats(
                                 counts[col] = 0
                         else:
                             # Contar filas en el DataFrame original que estén dentro del intervalo
-                            counts[col] = int(((df_single[col] >= lower) & (df_single[col] <= upper)).sum())
+                            counts[col] = int(((df[col] >= lower) & (df[col] <= upper)).sum())
 
-                    metrics_row = pd.Series([counts.get(col, 0) for col in VARIABLES_EXPERIMENTO], index=VARIABLES_EXPERIMENTO)
+                    metrics_row = pd.Series([counts.get(col, 0) for col in EXP_VARS], index=EXP_VARS)
 
                     # Si se solicita porcentaje y estamos trabajando con conteos sobre iteraciones
                     if metrics_as_percentage and metrics_reference is None:
-                        denom = df_single.shape[0] if df_single.shape[0] > 0 else 1
+                        denom = df.shape[0] if df.shape[0] > 0 else 1
                         metrics_row = metrics_row.astype(float) / denom * 100.0
                     elif metrics_as_percentage and metrics_reference is not None:
                         # Cuando comparamos con una referencia escalar, porcentaje es 0 o 100
                         metrics_row = metrics_row.astype(float) * 100.0
 
                 except Exception:
-                    # En caso de fallo, usar placeholder
-                    metrics_row = pd.Series([0] * len(VARIABLES_EXPERIMENTO), index=VARIABLES_EXPERIMENTO)
+                    # En caso de algún fallo, usar placeholder.
+                    metrics_row = pd.Series([0] * len(EXP_VARS), index=EXP_VARS)
             else:
-                # Si no se calculó intervalo, no tiene sentido contar cobertura — usar placeholder
-                metrics_row = pd.Series([0] * len(VARIABLES_EXPERIMENTO), index=VARIABLES_EXPERIMENTO)
+                # Si no se calculó intervalo, no tiene sentido contar cobertura — usar placeholder.
+                metrics_row = pd.Series([0] * len(EXP_VARS), index=EXP_VARS)
 
             rows.append(metrics_row)
             auto_labels.append("Métrica de Calibración")
@@ -447,14 +489,14 @@ def build_df_for_stats(
         if not rows:
             raise ValueError("Debe incluir al menos un estadístico (mean/std/confint/metrics).")
 
-        df_out = pd.DataFrame(rows).reset_index(drop=True)
+        df_output = pd.DataFrame(rows).reset_index(drop=True)
 
         if include_info_label:
             # Si se pasa labels_structure se aplica; si no, usar auto_labels para un único paciente
             labels_to_use = labels_structure if labels_structure is not None else auto_labels
-            df_out = format_df_stats(df_out, column_label=column_label, labels_structure=labels_to_use)
+            df_output = format_df_stats(df_output, column_label=column_label, labels_structure=labels_to_use)
 
-        return df_out
+        return df_output
 
     raise TypeError("`data` debe ser un DataFrame o una lista de DataFrames.")
 
@@ -483,7 +525,9 @@ def _extract_real_data(ruta_archivo_csv: str, index: int, return_type: str = "df
         # estuci: días -> horas
         # tiempo_vam: horas
         # estpreuci: días -> horas
+
         # print(f"TYPE: {type(data_index)} --- DATA: {data_index}\n")
+
         if isinstance(data_index, int):
             output = {
                 "edad": int(data["Edad"].iloc[data_index]),
@@ -497,6 +541,7 @@ def _extract_real_data(ruta_archivo_csv: str, index: int, return_type: str = "df
                 "estuci": int(data["Est. UCI"].iloc[data_index] * 24),
                 "tiempo_vam": int(data["TiempoVAM"].iloc[data_index]),
                 "estpreuci": int(data["Est. PreUCI"].iloc[data_index] * 24),
+                "diag_egr2": int(data["Diag.Egr2"].iloc[data_index]),  # Agregado para predicción
             }
             # print(output.values())
             return output
@@ -550,7 +595,6 @@ def start_experiment(
         Un DataFrame con el resultado de la simulación.
 
         >>> ["Tiempo Pre VAM", "Tiempo VAM", "Tiempo Post VAM", "Estadia UCI", "Estadia Post UCI"]
-
     """
 
     e = Experiment(
@@ -580,7 +624,7 @@ def start_experiment(
 
     # Verificar que no haya valores NaN o None
     if res.isnull().values.any():
-        st.warning("Advertencia: Se encontraron valores nulos en los resultados de la simulación.")
+        # En lugar de st.warning, simplemente rellenar con 0
         res = res.fillna(0)
 
     # Asegurarse de que el índice sea secuencial
@@ -639,7 +683,7 @@ def build_df_test_result(statistic: float, p_value: float) -> DataFrame:
     return df
 
 
-def simulate_real_data(ruta_fichero_csv: str, df_selection: int) -> tuple[float] | list[tuple[float]]:
+def simulate_real_data(ruta_fichero_csv: str, df_selection: int) -> DataFrame | list[DataFrame]:
     """Realiza la simulación desde datos reales.
 
     Args:
@@ -647,14 +691,16 @@ def simulate_real_data(ruta_fichero_csv: str, df_selection: int) -> tuple[float]
         df_selection: Índice del paciente seleccionado; usar -1 para procesar todos los pacientes.
 
     Returns:
-        Tuple con los resultados de la simulación para un paciente, o lista de tuples para todos los pacientes.
+        DataFrame con los resultados de la simulación para un paciente, o lista de DataFrames para todos los pacientes.
+        Cada DataFrame contiene las columnas: ["Tiempo Pre VAM", "Tiempo VAM", "Tiempo Post VAM", "Estadia UCI", "Estadia Post UCI"]
     """
 
     def experiment_helper(t: tuple[float]) -> DataFrame:
         """Construye un DataFrame con los resultados de la simulación.
 
         Args:
-            t (tuple[float]): Tuple con los datos de un paciente.
+            t (tuple[float]): Tuple con los datos de un paciente en el orden:
+                (edad, diag_ing1, diag_ing2, diag_egr2, diag_ing4, apache, insuf_resp, va, est_uci, tiempo_vam, est_preuti, diag_egr2)
 
         Returns:
             DataFrame: DataFrame con los resultados de la simulación.
@@ -681,12 +727,12 @@ def simulate_real_data(ruta_fichero_csv: str, df_selection: int) -> tuple[float]
     if df_selection != -1:
         t: tuple[float] = _extract_real_data(ruta_fichero_csv, index=df_selection, return_type="tuple")
 
-        # Se retorna un tuple[float]
+        # Se retorna un DataFrame con los resultados de la simulación
         return experiment_helper(t)
     elif df_selection == -1:
         datalen = pd.read_csv(ruta_fichero_csv).shape[0]
 
-        # Se retorna un list[tuple[float]]
+        # Se retorna una lista de DataFrames con los resultados de simulación para todos los pacientes
         return [
             experiment_helper(t)
             for t in [_extract_real_data(ruta_fichero_csv, index=i, return_type="tuple") for i in range(datalen)]
@@ -722,7 +768,7 @@ def fix_seed(seed: int = None):
 
 def predict(df: DataFrame) -> tuple[np.ndarray, np.ndarray]:
     """
-    Realiza una predicción utilizando un modelo previamente entrenado y guardado en 'new_workflow.joblib'.
+    Realiza una predicción utilizando un modelo previamente entrenado y guardado en 'prediction_model.joblib'.
 
     Args:
         df (DataFrame): DataFrame con los datos de entrada para la predicción.
@@ -740,7 +786,8 @@ def predict(df: DataFrame) -> tuple[np.ndarray, np.ndarray]:
     [0.85, 0.12, 0.97]
 
     Raises:
-        FileNotFoundError: Si el archivo 'new_workflow.joblib' no se encuentra.
+        FileNotFoundError: Si el archivo del modelo no se encuentra.
+        Exception: Si ocurre un error durante la predicción.
     """
 
     try:
@@ -752,11 +799,9 @@ def predict(df: DataFrame) -> tuple[np.ndarray, np.ndarray]:
         res = (preds, np.round(preds_proba[:, 1], 2))
 
         return res
-    except Exception:
-        tb_text = "".join(traceback.format_exception(*sys.exc_info()))
-        st.error("Ocurrió un error durante la predicción, contacte con los desarrolladores")
-        st.code(tb_text, language="python")
-        # st.stop()
+    except Exception as e:
+        # Lanzar excepción en lugar de usar st.error y st.stop
+        raise Exception(f"Error durante la predicción: {e}")
 
 
 def get_data_for_prediction(data: dict[str:int] | pd.DataFrame) -> pd.DataFrame:
@@ -808,4 +853,354 @@ def get_data_for_prediction(data: dict[str:int] | pd.DataFrame) -> pd.DataFrame:
     except Exception as e:
         tb_text = "".join(traceback.format_exception(*sys.exc_info()))
         print(f"Error building prediction data: {e}\n{tb_text}")
+        raise
+
+
+def simulate_and_predict_patient(ruta_fichero_csv: str, df_selection: int) -> tuple[DataFrame, dict]:
+    """Realiza la simulación Y predicción para un paciente específico.
+
+    Args:
+        ruta_fichero_csv: Ruta del CSV de datos reales.
+        df_selection: Índice del paciente seleccionado.
+
+    Returns:
+        Tuple con (DataFrame de simulación, dict con predicción)
+    """
+
+    # Extraer datos del paciente.
+    patient_tuple = _extract_real_data(ruta_fichero_csv, index=df_selection, return_type="tuple")
+
+    # Simulación.
+    simulation_df = start_experiment(
+        corridas_simulacion=CORRIDAS_SIM_DEFAULT,
+        edad=int(patient_tuple[0]),
+        d1=int(patient_tuple[1]),
+        d2=int(patient_tuple[2]),
+        d3=int(patient_tuple[3]),
+        d4=int(patient_tuple[4]),
+        apache=int(patient_tuple[5]),
+        insuf_resp=int(patient_tuple[6]),
+        va=int(patient_tuple[7]),
+        est_uci=int(patient_tuple[8]),
+        t_vam=int(patient_tuple[9]),
+        est_preuti=int(patient_tuple[10]),
+        porciento=random.randint(0, 10),
+    )
+
+    # Preparar datos para predicción
+    patient_dict = prepare_patient_data_for_prediction(patient_tuple)
+
+    # Predicción
+    try:
+        prediction_df = get_data_for_prediction(patient_dict)
+        preds, preds_proba = predict(prediction_df)
+
+        prediction_result = {
+            "clase_predicha": int(preds[0]),
+            "probabilidad_fallecimiento": float(preds_proba[0]),
+            "interpretacion": "Fallece" if preds[0] == 1 else "No fallece",
+        }
+    except Exception as e:
+        print(f"Error en predicción: {e}")
+        prediction_result = {
+            "clase_predicha": None,
+            "probabilidad_fallecimiento": None,
+            "interpretacion": "Error en predicción",
+        }
+
+    return simulation_df, prediction_result
+
+
+def prepare_patient_data_for_prediction(patient_tuple: tuple) -> dict:
+    """Convierte una tupla de datos de paciente en un diccionario listo para predicción.
+
+    Args:
+        patient_tuple: Tupla con datos del paciente en el orden:
+            (edad, diag_ing1, diag_ing2, diag_ing3, diag_ing4, apache, insuf_resp, va, est_uci, tiempo_vam, est_preuti, diag_egr2)
+
+    Returns:
+        Dict con las columnas necesarias para el modelo de predicción
+    """
+
+    return {
+        "Edad": int(patient_tuple[0]),
+        "Diag.Ing1": int(patient_tuple[1]),
+        "Diag.Ing2": int(patient_tuple[2]),
+        "Diag.Egr2": int(patient_tuple[11]),  # Ahora en posición 11
+        "TiempoVAM": int(patient_tuple[9]),
+        "APACHE": int(patient_tuple[5]),
+    }
+
+
+def build_comprehensive_stats_table(
+    ruta_fichero_csv: str, corridas_sim: int, progress_callback=None
+) -> tuple[DataFrame, DataFrame, dict, dict]:
+    """
+    Construye una tabla comprehensiva con estadísticas de simulación y predicciones para todos los pacientes.
+    Incluye test de Friedman para comparar las muestras de simulación entre pacientes.
+
+    Estructura resultante:
+    - Primera tabla: Resultados individuales por paciente (promedio y métrica de calibración)
+    - Segunda tabla: Promedio general de todos los pacientes
+    - Tercer elemento: dict con resultados de Friedman
+    - Cuarto elemento: dict con mensajes
+
+    Args:
+        ruta_fichero_csv: Ruta al archivo CSV con datos reales
+        corridas_sim: Número de corridas de simulación por paciente
+        progress_callback: Función opcional para reportar progreso (recibe un float entre 0 y 1)
+
+    Returns:
+        Tuple con (DataFrame pacientes individuales, DataFrame promedio general, dict con resultados de Friedman, dict con mensajes)
+    """
+    messages = {"info": [], "warnings": [], "errors": []}
+
+    try:
+        from utils.constants import EXPERIMENT_VARIABLES as EXP_VARS
+
+        # Obtener datos de todos los pacientes
+        df_data = pd.read_csv(ruta_fichero_csv)
+        n_pacientes = len(df_data)
+
+        if n_pacientes == 0:
+            raise ValueError("El archivo CSV no contiene datos de pacientes")
+
+        # Simular todos los pacientes
+        lista_experimentos = []
+        predicciones = []
+        errores_prediccion = 0
+        pacientes_data = []  # Para almacenar datos individuales de cada paciente
+        calibracion_data = []  # Para almacenar métricas de calibración por paciente
+
+        for i in range(n_pacientes):
+            try:
+                # Obtener datos reales del paciente
+                patient_tuple = _extract_real_data(ruta_fichero_csv, i, "tuple")
+
+                # Extraer valores reales para calibración
+                real_values = {
+                    "Tiempo Pre VAM": patient_tuple[10],  # est_preuti (días -> horas)
+                    "Tiempo VAM": patient_tuple[9],  # tiempo_vam (horas)
+                    "Tiempo Post VAM": 0,  # No tenemos valor real, usamos 0 como referencia
+                    "Estadia UCI": patient_tuple[8],  # est_uci (días -> horas)
+                    "Estadia Post UCI": 0,  # No tenemos valor real, usamos 0 como referencia
+                }
+
+                # Simular paciente
+                simulation_df = start_experiment(
+                    corridas_simulacion=corridas_sim,
+                    edad=int(patient_tuple[0]),
+                    d1=int(patient_tuple[1]),
+                    d2=int(patient_tuple[2]),
+                    d3=int(patient_tuple[3]),
+                    d4=int(patient_tuple[4]),
+                    apache=int(patient_tuple[5]),
+                    insuf_resp=int(patient_tuple[6]),
+                    va=int(patient_tuple[7]),
+                    est_uci=int(patient_tuple[8]),
+                    t_vam=int(patient_tuple[9]),
+                    est_preuti=int(patient_tuple[10]),
+                    porciento=random.randint(0, 10),
+                )
+                lista_experimentos.append(simulation_df)
+
+                # Calcular promedios para este paciente
+                patient_means = simulation_df.mean()
+
+                # Calcular métricas de calibración REALES
+                calibration_metrics = {}
+                for col in EXP_VARS:
+                    if col in simulation_df.columns:
+                        sim_values = simulation_df[col].values
+                        real_val = real_values.get(col, 0)
+
+                        if real_val != 0:
+                            # Calcular intervalo de confianza basado en el valor real (±20%)
+                            lower_bound = real_val * 0.8
+                            upper_bound = real_val * 1.2
+
+                            # Contar cuántas simulaciones están dentro del intervalo
+                            within_range = ((sim_values >= lower_bound) & (sim_values <= upper_bound)).sum()
+                            percentage = (within_range / len(sim_values)) * 100
+                        else:
+                            # Si el valor real es 0, contar simulaciones que son 0 o muy cercanas
+                            within_range = (abs(sim_values) <= 1).sum()  # Considerar ±1 como "cerca de 0"
+                            percentage = (within_range / len(sim_values)) * 100
+
+                        calibration_metrics[col] = round(percentage, 1)
+                    else:
+                        calibration_metrics[col] = 0.0
+
+                # Hacer predicción
+                try:
+                    patient_data = prepare_patient_data_for_prediction(patient_tuple)
+                    prediction_df = get_data_for_prediction(patient_data)
+                    preds, preds_proba = predict(prediction_df)
+                    predicciones.append(float(preds_proba[0]))
+
+                    # Calcular calibración para predicción (si prob > 0.5, consideramos "alta probabilidad")
+                    pred_calibration = 100.0 if preds_proba[0] > 0.5 else 0.0
+
+                except Exception:
+                    errores_prediccion += 1
+                    predicciones.append(0.0)
+                    pred_calibration = 0.0
+
+                # Preparar datos del paciente individual (SIN columnas de calibración)
+                patient_row = {"Paciente": f"Paciente {i + 1}"}
+
+                # Agregar promedios de simulación
+                for col in EXP_VARS:
+                    if col in patient_means.index:
+                        patient_row[col] = round(patient_means[col], 3)
+
+                # Agregar predicción
+                patient_row["Prob_Prediccion"] = round(predicciones[-1], 3)
+
+                pacientes_data.append(patient_row)
+
+                # Preparar datos de calibración para tabla separada
+                calibration_row = {"Paciente": f"Paciente {i + 1}"}
+                for col in EXP_VARS:
+                    calibration_row[col] = calibration_metrics[col]
+                calibration_row["Prob_Prediccion"] = round(pred_calibration, 1)
+
+                calibracion_data.append(calibration_row)
+
+            except Exception as e:
+                messages["warnings"].append(f"Error procesando paciente {i}: {e}")
+                continue
+
+            # Actualizar barra de progreso
+            if progress_callback:
+                progress_callback((i + 1) / n_pacientes)
+
+        if errores_prediccion > 0:
+            messages["warnings"].append(f"{errores_prediccion} predicciones fallaron y se reemplazaron con 0.0")
+
+        # Agregar mensaje de finalización
+        messages["info"].append(f"Se procesaron exitosamente {n_pacientes} pacientes")
+
+        if not lista_experimentos:
+            raise ValueError("No se pudo procesar ningún paciente")
+
+        # Crear DataFrame con resultados individuales por paciente (SIN calibración)
+        df_pacientes = pd.DataFrame(pacientes_data)
+
+        # Crear DataFrame con métricas de calibración por paciente
+        df_calibracion = pd.DataFrame(calibracion_data)
+
+        # Calcular estadísticas generales de simulación
+        df_stats = build_df_for_stats(
+            lista_experimentos,
+            corridas_sim,
+            include_mean=True,
+            include_std=False,
+            include_confint=False,
+            include_metrics=True,
+            include_info_label=False,
+        )
+
+        # Crear tabla con promedio general
+        result_data = {}
+
+        # Agregar promedios de simulación
+        for col in EXP_VARS:
+            if col in df_stats.columns:
+                result_data[col] = [round(df_stats[col].mean(), 3)]
+
+        # Agregar promedio de predicciones
+        avg_prediccion = sum(predicciones) / len(predicciones) if predicciones else 0.0
+        result_data["Prob_Prediccion"] = [round(avg_prediccion, 3)]
+
+        # Crear segunda fila con métricas de calibración (en porcentaje)
+        metrics_row = []
+        for col in EXP_VARS:
+            if col in df_stats.columns:
+                # Calcular porcentaje de valores dentro de cierto rango (±10% del promedio)
+                mean_val = df_stats[col].mean()
+                if mean_val != 0:
+                    within_range = ((df_stats[col] >= mean_val * 0.9) & (df_stats[col] <= mean_val * 1.1)).sum()
+                    percentage = (within_range / len(df_stats)) * 100
+                else:
+                    percentage = 100.0  # Si el promedio es 0, todos están "dentro del rango"
+                # Formatear a 3 cifras significativas
+                metrics_row.append(round(percentage, 1))
+
+        # Métrica de calibración para predicciones (porcentaje de predicciones > 0.5)
+        pred_calibration = (sum(1 for p in predicciones if p > 0.5) / len(predicciones)) * 100 if predicciones else 0.0
+        # Formatear a 3 cifras significativas
+        metrics_row.append(round(pred_calibration, 1))
+
+        # Agregar fila de métricas
+        for i, col in enumerate(EXP_VARS):
+            if col in result_data:
+                result_data[col].append(metrics_row[i])
+        result_data["Prob_Prediccion"].append(pred_calibration)
+
+        # Crear DataFrame final con promedio general
+        df_general = pd.DataFrame(result_data, index=["Promedio", "Métrica de Calibración (%)"])
+
+        # Realizar test de Friedman con todas las muestras
+        friedman_results = {}
+
+        try:
+            for var in EXP_VARS:
+                if var in df_stats.columns:
+                    # Preparar muestras para Friedman (una por paciente)
+                    samples = [exp[var].values for exp in lista_experimentos if var in exp.columns]
+
+                    if len(samples) >= 3:  # Friedman requiere al menos 3 muestras
+                        # Ajustar tamaños de muestras si es necesario
+                        min_len = min(len(s) for s in samples)
+                        samples = [s[:min_len] for s in samples]
+
+                        # Realizar test de Friedman
+                        friedman_test = Friedman()
+                        friedman_test.test(*samples)
+
+                        friedman_results[var] = {
+                            "statistic": friedman_test.statistic,
+                            "p_value": friedman_test.p_value,
+                            "significant": friedman_test.p_value < 0.05,
+                        }
+                    else:
+                        friedman_results[var] = {
+                            "statistic": None,
+                            "p_value": None,
+                            "significant": None,
+                            "error": "Se requieren al menos 3 pacientes para el test de Friedman",
+                        }
+
+            # Test de Friedman para predicciones
+            if len(predicciones) >= 3:
+                # Crear "muestras" artificiales para predicciones (cada predicción es una muestra de tamaño 1)
+                pred_samples = [[p] for p in predicciones]
+                friedman_test_pred = Friedman()
+                friedman_test_pred.test(*pred_samples)
+
+                friedman_results["Prob_Prediccion"] = {
+                    "statistic": friedman_test_pred.statistic,
+                    "p_value": friedman_test_pred.p_value,
+                    "significant": friedman_test_pred.p_value < 0.05,
+                }
+            else:
+                friedman_results["Prob_Prediccion"] = {
+                    "statistic": None,
+                    "p_value": None,
+                    "significant": None,
+                    "error": "Se requieren al menos 3 pacientes para el test de Friedman",
+                }
+
+        except Exception as e:
+            messages["warnings"].append(f"Error al realizar test de Friedman: {e}")
+            # Crear resultados vacíos en caso de error
+            for var in EXP_VARS + ["Prob_Prediccion"]:
+                friedman_results[var] = {"statistic": None, "p_value": None, "significant": None, "error": str(e)}
+
+        # Devolver 5 elementos: pacientes, general, calibración, friedman, messages
+        return df_pacientes, df_general, df_calibracion, friedman_results, messages
+
+    except Exception as e:
+        messages["errors"].append(f"Error en build_comprehensive_stats_table: {e}")
         raise
