@@ -5,39 +5,22 @@
 # Python virtual environments
 .venv/
 
-# Dev containers
-.devcontainer/
-
 # Python cache and compiled files
 **/__pycache__/*
 *.py[cod]
 *.pyo
 *.pyd
 
-# Jupyter Notebooks checkpoints
-# *.ipynb_checkpoints/
-
-# Joblib/model files
-# *.joblib
-
 # Local Experiments and Outputs
-experiments/
-
-# System files
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
+experiments/*
 
 # Streamlit config
 .streamlit/*.toml
 
-# Ignore by default, but allow tracked files
-!README.md
-!requirements.txt
-!app.py
-
 # Pytest and test artifacts
 .pytest_cache/
 .coverage
+
+# System files
+.DS_Store
+Thumbs.db
