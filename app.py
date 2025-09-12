@@ -68,9 +68,7 @@ from uci.stats import Wilcoxon, Friedman
 
 
 # Configuración inicial de la página
-st.set_page_config(
-    page_title="Simulación UCI - Análisis de Pacientes", page_icon="🏥", layout="wide", initial_sidebar_state="expanded"
-)
+st.set_page_config(page_title="SimUci", page_icon="🏥", layout="wide", initial_sidebar_state="expanded")
 
 if "theme" not in st.session_state:
     st.session_state.theme = "light"
@@ -629,7 +627,7 @@ with datos_reales_tab:
         except Exception as e:
             st.warning(f"No se pudo realizar la predicción: {e}")
 
-    st.divider()
+#    st.divider()
 
     # Simular todos los datos en la tabla.
     if st.button(
@@ -740,7 +738,7 @@ with datos_reales_tab:
             "📈 **Interpretación:** La primera tabla muestra resultados individuales por paciente. La segunda tabla muestra métricas de calibración. La tercera tabla muestra el promedio general de todos los pacientes."
         )
 
-        csv_sim_datos_reales = st.session_state.df_sim_datos_reales.to_csv(index=True).encode("UTF-8")
+        csv_sim_datos_reales = st.sessionles.to_csv(index=True).encode("UTF-8")
 
         # st.download_button(
         #     label="💾 Guardar resultados comprehensivos",

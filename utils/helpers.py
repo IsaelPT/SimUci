@@ -834,12 +834,12 @@ def get_data_for_prediction(data: dict[str:int] | pd.DataFrame) -> pd.DataFrame:
             return data[required_cols]
 
         elif isinstance(data, dict):
-            diag_ing2 = data.get("Diag.Ing2", 1)
-            diag_egr2 = data.get("Diag.Egr2", 2)
-            diag_ing1 = data.get("Diag.Ing1", 3)
-            tiempo_vam = data.get("TiempoVAM", 4)
-            edad = data.get("Edad", 6)
-            apache = data.get("APACHE", 5)
+            diag_ing2 = data.get("Diag.Ing2", 0)
+            diag_egr2 = data.get("Diag.Egr2", 0)
+            diag_ing1 = data.get("Diag.Ing1", 0)
+            tiempo_vam = data.get("TiempoVAM", 0)
+            edad = data.get("Edad", 20)
+            apache = data.get("APACHE", 0)
             return pd.DataFrame(
                 {
                     "Edad": [edad],
@@ -954,6 +954,7 @@ def build_comprehensive_stats_table(
     Returns:
         Tuple con (DataFrame pacientes individuales, DataFrame promedio general, dict con resultados de Friedman, dict con mensajes)
     """
+
     messages = {"info": [], "warnings": [], "errors": []}
 
     try:
@@ -1021,16 +1022,14 @@ def build_comprehensive_stats_table(
                             upper_bound = real_val * 1.2
 
                             # Contar cuántas simulaciones están dentro del intervalo
-                            within_range = ((sim_values >= lower_bound) & (sim_values <= upper_bound)).sum()
-                            percentage = (within_range / len(sim_values)) * 100
+                            within_range = int(((sim_values >= lower_bound) & (sim_values <= upper_bound)).sum())
                         else:
                             # Si el valor real es 0, contar simulaciones que son 0 o muy cercanas
-                            within_range = (abs(sim_values) <= 1).sum()  # Considerar ±1 como "cerca de 0"
-                            percentage = (within_range / len(sim_values)) * 100
+                            within_range = int((abs(sim_values) <= 1).sum())  # Considerar ±1 como "cerca de 0"
 
-                        calibration_metrics[col] = round(percentage, 1)
+                        calibration_metrics[col] = within_range
                     else:
-                        calibration_metrics[col] = 0.0
+                        calibration_metrics[col] = 0
 
                 # Hacer predicción
                 try:
@@ -1146,37 +1145,43 @@ def build_comprehensive_stats_table(
         friedman_results = {}
 
         try:
+            # Test de Friedman para las métricas de calibración de cada variable
             for var in EXP_VARS:
-                if var in df_stats.columns:
-                    # Preparar muestras para Friedman (una por paciente)
-                    samples = [exp[var].values for exp in lista_experimentos if var in exp.columns]
+                # Tomar los valores de calibración de TODOS los pacientes para esta variable
+                calibration_values = [
+                    calibracion_data[i][var] for i in range(len(calibracion_data)) if var in calibracion_data[i]
+                ]
 
-                    if len(samples) >= 3:  # Friedman requiere al menos 3 muestras
-                        # Ajustar tamaños de muestras si es necesario
-                        min_len = min(len(s) for s in samples)
-                        samples = [s[:min_len] for s in samples]
+                if len(calibration_values) >= 3:  # Friedman requiere al menos 3 muestras
+                    # Crear muestras para Friedman (cada paciente es una muestra con su valor de calibración)
+                    samples = [[val] for val in calibration_values]
 
-                        # Realizar test de Friedman
-                        friedman_test = Friedman()
-                        friedman_test.test(*samples)
+                    # Realizar test de Friedman
+                    friedman_test = Friedman()
+                    friedman_test.test(*samples)
 
-                        friedman_results[var] = {
-                            "statistic": friedman_test.statistic,
-                            "p_value": friedman_test.p_value,
-                            "significant": friedman_test.p_value < 0.05,
-                        }
-                    else:
-                        friedman_results[var] = {
-                            "statistic": None,
-                            "p_value": None,
-                            "significant": None,
-                            "error": "Se requieren al menos 3 pacientes para el test de Friedman",
-                        }
+                    friedman_results[var] = {
+                        "statistic": friedman_test.statistic,
+                        "p_value": friedman_test.p_value,
+                        "significant": friedman_test.p_value < 0.05,
+                    }
+                else:
+                    friedman_results[var] = {
+                        "statistic": None,
+                        "p_value": None,
+                        "significant": None,
+                        "error": f"Se requieren al menos 3 pacientes para el test de Friedman (actualmente {len(calibration_values)})",
+                    }
 
-            # Test de Friedman para predicciones
-            if len(predicciones) >= 3:
-                # Crear "muestras" artificiales para predicciones (cada predicción es una muestra de tamaño 1)
-                pred_samples = [[p] for p in predicciones]
+            # Test de Friedman para las predicciones
+            if len(calibracion_data) >= 3:
+                # Tomar los valores de calibración de predicción de todos los pacientes
+                pred_calibration_values = [row["Prob_Prediccion"] for row in calibracion_data]
+
+                # Crear muestras para Friedman
+                pred_samples = [[val] for val in pred_calibration_values]
+
+                # Realizar test de Friedman
                 friedman_test_pred = Friedman()
                 friedman_test_pred.test(*pred_samples)
 
@@ -1190,7 +1195,7 @@ def build_comprehensive_stats_table(
                     "statistic": None,
                     "p_value": None,
                     "significant": None,
-                    "error": "Se requieren al menos 3 pacientes para el test de Friedman",
+                    "error": f"Se requieren al menos 3 pacientes para el test de Friedman (actualmente {len(calibracion_data)})",
                 }
 
         except Exception as e:
@@ -1209,6 +1214,7 @@ def build_comprehensive_stats_table(
 
 def apply_theme(theme_name):
     """Aplica el tema seleccionado a la aplicación"""
+
     if theme_name == "dark":
         st._config.set_option("theme.base", "dark")
         st._config.set_option("theme.primaryColor", "#66C5A0")
