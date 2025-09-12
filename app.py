@@ -627,11 +627,11 @@ with datos_reales_tab:
         except Exception as e:
             st.warning(f"No se pudo realizar la predicción: {e}")
 
-#    st.divider()
+        # st.divider()
 
-    # Simular todos los datos en la tabla.
+    # SIMULAR TODOS LOS DATOS EN LA TABLA.
     if st.button(
-        "Simular y evaluar todos los datos en la tabla",
+        "Simular todos los datos en la tabla",
         type="primary",
         use_container_width=True,
         key="simular_tabla",
@@ -641,7 +641,6 @@ with datos_reales_tab:
             show_time=True,
         ):
             try:
-                # Crear barra de progreso
                 progress_bar = st.progress(0)
 
                 # Función callback para actualizar progreso
@@ -700,148 +699,30 @@ with datos_reales_tab:
         and hasattr(st.session_state.df_calibracion, "empty")
         and not st.session_state.df_calibracion.empty
     ):
-        st.subheader("📊 Estadísticas Comprehensivas de Simulación y Predicción")
+        st.divider()
 
-        # Mostrar tabla de pacientes individuales
-        if "df_pacientes_individuales" in st.session_state:
-            st.subheader("📋 Resultados Individuales por Paciente")
-            st.dataframe(
-                st.session_state.df_pacientes_individuales,
-                hide_index=True,
-                use_container_width=True,
-            )
-            st.info("Esta tabla muestra el promedio de simulación para cada paciente individual.")
+        st.subheader("📊 Estadísticas de Simulación y Predicción")
 
-        # Mostrar tabla de calibración
-        if "df_calibracion" in st.session_state:
-            st.subheader("🎯 Métricas de Calibración por Paciente")
-            st.dataframe(
-                st.session_state.df_calibracion,
-                hide_index=True,
-                use_container_width=True,
-            )
-            st.info(
-                "Esta tabla muestra qué porcentaje de las simulaciones de cada paciente están dentro del intervalo de confianza basado en sus valores reales."
-            )
+        with st.expander(expanded=True, label="Resultados Individuales por Paciente", icon="📋"):
+            if "df_pacientes_individuales" in st.session_state:
+                st.dataframe(
+                    st.session_state.df_pacientes_individuales,
+                    hide_index=True,
+                    use_container_width=True,
+                )
+                st.info("Esta tabla muestra el promedio de simulación para cada paciente individual.")
 
-        # Mostrar tabla de promedio general
-        st.subheader("📈 Promedio General de Todos los Pacientes")
-        display_df_reales = st.session_state.df_sim_datos_reales.copy()
-
-        st.dataframe(
-            display_df_reales,
-            hide_index=False,
-            use_container_width=True,
-        )
-
-        st.info(
-            "📈 **Interpretación:** La primera tabla muestra resultados individuales por paciente. La segunda tabla muestra métricas de calibración. La tercera tabla muestra el promedio general de todos los pacientes."
-        )
-
-        csv_sim_datos_reales = st.sessionles.to_csv(index=True).encode("UTF-8")
-
-        # st.download_button(
-        #     label="💾 Guardar resultados comprehensivos",
-        #     data=csv_sim_datos_reales,
-        #     file_name="Estadisticas_Comprehensivas_Simulacion_Prediccion.csv",
-        #     mime="text/csv",
-        #     use_container_width=True,
-        #     key="guardar_sim_datos_reales",
-        # )
-
-        # csv_pacientes_individuales = st.session_state.df_pacientes_individuales.to_csv(index=False).encode("UTF-8")
-
-        # st.download_button(
-        #     label="💾 Guardar resultados individuales por paciente",
-        #     data=csv_pacientes_individuales,
-        #     file_name="Resultados_Individuales_Pacientes.csv",
-        #     mime="text/csv",
-        #     use_container_width=True,
-        #     key="guardar_pacientes_individuales",
-        # )
-
-        # csv_calibracion = st.session_state.df_calibracion.to_csv(index=False).encode("UTF-8")
-
-        # st.download_button(
-        #     label="💾 Guardar métricas de calibración",
-        #     data=csv_calibracion,
-        #     file_name="Metricas_Calibracion_Pacientes.csv",
-        #     mime="text/csv",
-        #     use_container_width=True,
-        #     key="guardar_calibracion",
-        # )
-
-        # Mostrar resultados del test de Friedman
-        if "friedman_results" in st.session_state and st.session_state.friedman_results:
-            st.subheader("🧪 Test de Friedman - Comparación entre Pacientes")
-
-            st.markdown("""
-            **Interpretación del Test de Friedman:**
-            - **Estadístico F:** Valor del test estadístico
-            - **Valor p:** Probabilidad de que las diferencias sean aleatorias
-            - **Significativo:** Si p < 0.05, hay diferencias significativas entre los pacientes
-            """)
-
-            # Crear tabla con resultados de Friedman
-            friedman_data = []
-            for var, results in st.session_state.friedman_results.items():
-                if results.get("error"):
-                    friedman_data.append(
-                        {
-                            "Variable": var,
-                            "Estadístico F": "N/A",
-                            "Valor p": "N/A",
-                            "Significativo": "Error",
-                        }
-                    )
-                else:
-                    friedman_data.append(
-                        {
-                            "Variable": var,
-                            "Estadístico F": f"{results.get('statistic', 'N/A'):.4f}"
-                            if results.get("statistic") is not None
-                            else "N/A",
-                            "Valor p": f"{results.get('p_value', 'N/A'):.4f}"
-                            if results.get("p_value") is not None
-                            else "N/A",
-                            "Significativo": "Sí" if results.get("significant") else "No",
-                        }
-                    )
-
-            friedman_df = pd.DataFrame(friedman_data)
-            st.dataframe(
-                friedman_df,
-                hide_index=True,
-                use_container_width=True,
-                column_config={
-                    "Variable": st.column_config.TextColumn("Variable", width="medium"),
-                    "Estadístico F": st.column_config.TextColumn("Estadístico F", width="small"),
-                    "Valor p": st.column_config.TextColumn("Valor p", width="small"),
-                    "Significativo": st.column_config.TextColumn("Significativo", width="small"),
-                },
-            )
-
-            # Resumen de resultados significativos
-            significant_vars = [
-                var
-                for var, results in st.session_state.friedman_results.items()
-                if results.get("significant") and not results.get("error")
-            ]
-
-            if significant_vars:
-                st.success(f"📈 **Variables con diferencias significativas:** {', '.join(significant_vars)}")
-            else:
+        with st.expander(expanded=True, label="Métricas de Calibración por Paciente", icon="🎯"):
+            if "df_calibracion" in st.session_state:
+                st.dataframe(
+                    st.session_state.df_calibracion,
+                    hide_index=True,
+                    use_container_width=True,
+                )
                 st.info(
-                    "📊 **No se encontraron diferencias significativas entre los pacientes para ninguna variable.**"
+                    "Esta tabla muestra qué porcentaje de las simulaciones de cada paciente están dentro del intervalo de confianza basado en sus valores reales."
                 )
 
-            # Información adicional
-            st.info("""
-            **¿Qué significa esto?**
-            - Si una variable tiene p < 0.05, significa que hay diferencias estadísticamente significativas entre los pacientes
-            - Esto indica que los pacientes responden de manera diferente a las simulaciones
-            - Las predicciones también pueden variar significativamente entre pacientes
-            """)
 
 #################
 # COMPARACIONES #
