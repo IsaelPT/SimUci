@@ -114,6 +114,7 @@ def format_df_time(df: DataFrame, rows_to_format: list[int] = None) -> DataFrame
     Returns:
         DataFrame con los valores numéricos originales.
     """
+
     # Hacer una copia del DataFrame para no modificar el original
     result_df = df.copy()
 

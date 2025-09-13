@@ -79,7 +79,9 @@ with st.sidebar:
     st.title("Controles")
 
     theme_toggle = st.toggle(
-        "Modo Oscuro", value=st.session_state.theme == "dark", help="Cambiar entre modo claro y oscuro"
+        label="Modo Oscuro",
+        value=st.session_state.theme == "dark",
+        help="Cambiar entre modo claro y oscuro",
     )
 
     # Actualizar tema si cambió
@@ -122,7 +124,6 @@ with simulacion_tab:
     ############
     # Paciente #
     ############
-    st.header("Paciente")
 
     # ID Paciente
     # NOTE: EL ID DEL PACIENTE ESTÁ ALMACENADO DENTRO DEL SESSION_STATE!
@@ -131,33 +132,29 @@ with simulacion_tab:
     if "semilla_simulacion" not in st.session_state:
         st.session_state.semilla_simulacion = 0
 
-    col1_nuevo_paciente, col2_nuevo_paciente = st.columns([1, 1])
-    with col1_nuevo_paciente:
-        nuevo_paciente = st.button("Nuevo paciente")
-        if nuevo_paciente:
-            st.session_state.id_paciente = generate_id()
-    with col2_nuevo_paciente:
-        st.session_state.id_paciente = st.text_input(
-            label="ID Paciente",
-            value=st.session_state.id_paciente,
-            max_chars=10,
-            placeholder="ID Paciente",
-            label_visibility="collapsed",
-        )
+    pac_col1, pac_col2 = st.columns(spec=2, gap="small", border=False, vertical_alignment="bottom")
+    with pac_col1:
+        st.header("Paciente")
+    with pac_col2:
+        col1, col2 = st.columns(spec=[1, 2], gap="small", border=False)
+        with col1:
+            nuevo_paciente = st.button("Nuevo paciente", use_container_width=True)
+            if nuevo_paciente:
+                st.session_state.id_paciente = generate_id()
+        with col2:
+            st.session_state.id_paciente = st.text_input(
+                label="ID Paciente",
+                value=st.session_state.id_paciente,
+                max_chars=10,
+                placeholder="ID Paciente",
+                label_visibility="collapsed",
+            )
 
-    # Ingresar Datos Paciente
-    col1_paciente, col2_paciente = st.columns(2)
+    col1_paciente, col2_paciente = st.columns(spec=2, border=False, gap="small")
     with col1_paciente:
-        col1a_paciente, col1b_paciente = st.columns(2)
+        col1a_paciente, col1b_paciente, col1c_paciente = st.columns(spec=3, gap="small", border=False)
         with col1a_paciente:
             opcion_edad: int = st.number_input(label="Edad", min_value=EDAD_MIN, max_value=EDAD_MAX, value=EDAD_DEFAULT)
-            opcion_tiempo_vam: int = st.number_input(
-                label="Tiempo VA",
-                min_value=T_VAM_MIN,
-                max_value=T_VAM_MAX,
-                value=T_VAM_DEFAULT,
-                help=HELP_MSG_TIEMPO_VAM,
-            )
             opcion_estad_preuti: int = st.number_input(
                 label="Tiempo Pre-UCI",
                 min_value=ESTAD_PREUTI_MIN,
@@ -166,6 +163,21 @@ with simulacion_tab:
                 help=HELP_MSG_ESTAD_PREUTI,
             )
         with col1b_paciente:
+            opcion_tiempo_vam: int = st.number_input(
+                label="Tiempo VA",
+                min_value=T_VAM_MIN,
+                max_value=T_VAM_MAX,
+                value=T_VAM_DEFAULT,
+                help=HELP_MSG_TIEMPO_VAM,
+            )
+            input_porciento = st.number_input(
+                label="Porciento Tiempo UCI",
+                min_value=PORCIENTO_SIM_MIN,
+                max_value=PORCIENTO_SIM_MAX,
+                value=PORCIENTO_SIM_DEFAULT,
+                help=HELP_MSG_PORCIENTO_SIM,
+            )
+        with col1c_paciente:
             opcion_apache: int = st.number_input(
                 label="Apache",
                 min_value=APACHE_MIN,
@@ -180,78 +192,70 @@ with simulacion_tab:
                 value=ESTAD_UTI_DEFAULT,
                 help=HELP_MSG_ESTAD_UTI,
             )
-            input_porciento = st.number_input(
-                label="Porciento Tiempo UCI",
-                min_value=PORCIENTO_SIM_MIN,
-                max_value=PORCIENTO_SIM_MAX,
-                value=PORCIENTO_SIM_DEFAULT,
-                help=HELP_MSG_PORCIENTO_SIM,
+        col1x_paciente, col1y_paciente = st.columns(spec=2, gap="small", border=False)
+        with col1x_paciente:
+            opcion_insuf_resp: str = st.selectbox(
+                label="Tipo de Insuficiencia Respiratoria",
+                options=tuple(INSUF_RESP.values()),
+                index=1,
+            )
+        with col1y_paciente:
+            opcion_tipo_vam: str = st.selectbox(
+                label="Tipo de Ventilación Artificial",
+                options=tuple(TIPO_VENT.values()),
             )
     with col2_paciente:
-        opcion_insuf_resp: str = st.selectbox(
-            label="Tipo de Insuficiencia Respiratoria",
-            options=tuple(INSUF_RESP.values()),
-            index=1,
+        # opcion_diag_egreso1: str = st.selectbox(
+        #     label="Diagnóstico 1",
+        #     options=tuple(DIAG_PREUCI.values()),
+        #     index=0,
+        #     key="diag-egreso-1",
+        # )
+        opcion_diag_egreso2: str = st.selectbox(
+            label="Diagnóstico Egreso 2",
+            options=tuple(DIAG_PREUCI.values()),
+            index=0,
+            key="diag-egreso-2",
         )
-        opcion_tipo_vam: str = st.selectbox(
-            label="Tipo de Ventilación Artificial",
-            options=tuple(TIPO_VENT.values()),
-        )
-        col1_diag, col2_diagn = st.columns(2)
-        with col1_diag:
-            with st.popover("Diagnósticos Ingreso"):
-                st.markdown("Seleccione los Diagnósticos de Ingreso del paciente:")
-                opcion_diag_ing1: str = st.selectbox(
-                    label="Diagnóstico 1",
-                    options=tuple(DIAG_PREUCI.values()),
-                    index=0,
-                    key="diag-ing-1",
-                )
-                opcion_diag_ing2: str = st.selectbox(
-                    label="Diagnóstico 2",
-                    options=tuple(DIAG_PREUCI.values()),
-                    index=0,
-                    key="diag-ing-2",
-                )
-                opcion_diag_ing3: str = st.selectbox(
-                    label="Diagnóstico 3",
-                    options=tuple(DIAG_PREUCI.values()),
-                    index=0,
-                    key="diag-ing-3",
-                )
-                opcion_diag_ing4: str = st.selectbox(
-                    label="Diagnóstico 4",
-                    options=tuple(DIAG_PREUCI.values()),
-                    index=0,
-                    key="diag-ing-4",
-                )
-        with col2_diagn:
-            with st.popover("Diagnósticos Egreso"):
-                st.markdown("Seleccione los Diagnósticos de Egreso del paciente:")
-                # opcion_diag_egreso1: str = st.selectbox(
-                #     label="Diagnóstico 1",
-                #     options=tuple(DIAG_PREUCI.values()),
-                #     index=0,
-                #     key="diag-egreso-1",
-                # )
-                opcion_diag_egreso2: str = st.selectbox(
-                    label="Diagnóstico 2",
-                    options=tuple(DIAG_PREUCI.values()),
-                    index=0,
-                    key="diag-egreso-2",
-                )
-                # opcion_diag_egreso3: str = st.selectbox(
-                #     label="Diagnóstico 3",
-                #     options=tuple(DIAG_PREUCI.values()),
-                #     index=0,
-                #     key="diag-egreso-3",
-                # )
-                # opcion_diag_egreso4: str = st.selectbox(
-                #     label="Diagnóstico 4",
-                #     options=tuple(DIAG_PREUCI.values()),
-                #     index=0,
-                #     key="diag-egreso-4",
-                # )
+        # opcion_diag_egreso3: str = st.selectbox(
+        #     label="Diagnóstico 3",
+        #     options=tuple(DIAG_PREUCI.values()),
+        #     index=0,
+        #     key="diag-egreso-3",
+        # )
+        # opcion_diag_egreso4: str = st.selectbox(
+        #     label="Diagnóstico 4",
+        #     options=tuple(DIAG_PREUCI.values()),
+        #     index=0,
+        #     key="diag-egreso-4",
+        # )
+        subcol1, subcol2 = st.columns(2)
+        with subcol1:
+            opcion_diag_ing1: str = st.selectbox(
+                label="Diagnóstico Ing. 1",
+                options=tuple(DIAG_PREUCI.values()),
+                index=0,
+                key="diag-ing-1",
+            )
+            opcion_diag_ing3: str = st.selectbox(
+                label="Diagnóstico Ing. 3",
+                options=tuple(DIAG_PREUCI.values()),
+                index=0,
+                key="diag-ing-3",
+            )
+        with subcol2:
+            opcion_diag_ing2: str = st.selectbox(
+                label="Diagnóstico Ing. 2",
+                options=tuple(DIAG_PREUCI.values()),
+                index=0,
+                key="diag-ing-2",
+            )
+            opcion_diag_ing4: str = st.selectbox(
+                label="Diagnóstico Ing. 4",
+                options=tuple(DIAG_PREUCI.values()),
+                index=0,
+                key="diag-ing-4",
+            )
 
         # Datos Paciente Recolectados (Son los datos de entrada para ser procesados).
         edad: int = opcion_edad
@@ -299,7 +303,7 @@ with simulacion_tab:
     if not st.session_state.df_resultado.empty:
         toggle_format = st.toggle(
             label=LABEL_TIME_FORMAT,
-            value=True,
+            value=False,
             help=HELP_MSG_TIME_FORMAT,
             key="formato-tiempo-simulacion",
         )
