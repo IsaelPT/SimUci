@@ -1057,7 +1057,7 @@ def build_comprehensive_stats_table(
                         patient_row[col] = round(patient_means[col], 3)
 
                 # Agregar predicción
-                patient_row["Prob_Prediccion"] = round(predicciones[-1], 3)
+                patient_row["Prob Prediccion"] = round(predicciones[-1], 3)
 
                 pacientes_data.append(patient_row)
 
@@ -1065,7 +1065,7 @@ def build_comprehensive_stats_table(
                 calibration_row = {"Paciente": f"Paciente {i + 1}"}
                 for col in EXP_VARS:
                     calibration_row[col] = calibration_metrics[col]
-                calibration_row["Prob_Prediccion"] = round(pred_calibration, 1)
+                calibration_row["Prob Prediccion"] = round(pred_calibration, 1)
 
                 calibracion_data.append(calibration_row)
 
@@ -1113,7 +1113,7 @@ def build_comprehensive_stats_table(
 
         # Agregar promedio de predicciones
         avg_prediccion = sum(predicciones) / len(predicciones) if predicciones else 0.0
-        result_data["Prob_Prediccion"] = [round(avg_prediccion, 3)]
+        result_data["Prob Prediccion"] = [round(avg_prediccion, 3)]
 
         # Crear segunda fila con métricas de calibración (en porcentaje)
         metrics_row = []
@@ -1138,7 +1138,7 @@ def build_comprehensive_stats_table(
         for i, col in enumerate(EXP_VARS):
             if col in result_data:
                 result_data[col].append(metrics_row[i])
-        result_data["Prob_Prediccion"].append(pred_calibration)
+        result_data["Prob Prediccion"].append(pred_calibration)
 
         # Crear DataFrame final con promedio general
         df_general = pd.DataFrame(result_data, index=["Promedio", "Métrica de Calibración (%)"])
@@ -1178,7 +1178,7 @@ def build_comprehensive_stats_table(
             # Test de Friedman para las predicciones
             if len(calibracion_data) >= 3:
                 # Tomar los valores de calibración de predicción de todos los pacientes
-                pred_calibration_values = [row["Prob_Prediccion"] for row in calibracion_data]
+                pred_calibration_values = [row["Prob Prediccion"] for row in calibracion_data]
 
                 # Crear muestras para Friedman
                 pred_samples = [[val] for val in pred_calibration_values]
@@ -1187,13 +1187,13 @@ def build_comprehensive_stats_table(
                 friedman_test_pred = Friedman()
                 friedman_test_pred.test(*pred_samples)
 
-                friedman_results["Prob_Prediccion"] = {
+                friedman_results["Prob Prediccion"] = {
                     "statistic": friedman_test_pred.statistic,
                     "p_value": friedman_test_pred.p_value,
                     "significant": friedman_test_pred.p_value < 0.05,
                 }
             else:
-                friedman_results["Prob_Prediccion"] = {
+                friedman_results["Prob Prediccion"] = {
                     "statistic": None,
                     "p_value": None,
                     "significant": None,
@@ -1203,7 +1203,7 @@ def build_comprehensive_stats_table(
         except Exception as e:
             messages["warnings"].append(f"Error al realizar test de Friedman: {e}")
             # Crear resultados vacíos en caso de error
-            for var in EXP_VARS + ["Prob_Prediccion"]:
+            for var in EXP_VARS + ["Prob Prediccion"]:
                 friedman_results[var] = {"statistic": None, "p_value": None, "significant": None, "error": str(e)}
 
         # Devolver 5 elementos: pacientes, general, calibración, friedman, messages
