@@ -20,7 +20,6 @@ from utils.helpers import (
     value_is_zero,
     prepare_patient_data_for_prediction,
     extract_real_data,
-    build_comprehensive_stats_table,
     apply_theme,
 )
 from utils.constants import (
@@ -636,97 +635,7 @@ with datos_reales_tab:
         except Exception as e:
             st.warning(f"No se pudo realizar la predicción: {e}")
 
-    # # SIMULAR TODOS LOS DATOS EN LA TABLA.
-    # if st.button(
-    #     "Simular todos los datos en la tabla",
-    #     type="primary",
-    #     use_container_width=True,
-    #     key="simular_tabla",
-    # ):
-    #     with st.spinner(
-    #         text="Simulando todos los datos en la tabla y calculando predicciones. Esto puede tardar varios minutos...",
-    #         show_time=True,
-    #     ):
-    #         try:
-    #             progress_bar = st.progress(0)
-
-    #             # Función callback para actualizar progreso
-    #             def update_progress(progress):
-    #                 progress_bar.progress(progress)
-
-    #             # Usar la nueva función para tabla comprehensiva
-    #             df_pacientes, df_general, df_calibracion, friedman_results, messages = build_comprehensive_stats_table(
-    #                 RUTA_FICHERODEDATOS_CSV, corridas_sim, progress_callback=update_progress
-    #             )
-
-    #             # Limpiar barra de progreso
-    #             progress_bar.empty()
-
-    #             if not df_general.empty:
-    #                 # Almacenar en session_state
-    #                 st.session_state.df_pacientes_individuales = df_pacientes
-    #                 st.session_state.df_sim_datos_reales = df_general
-    #                 st.session_state.df_calibracion = df_calibracion
-    #                 st.session_state.friedman_results = friedman_results
-
-    #                 # Mostrar mensajes informativos
-    #                 for msg in messages["info"]:
-    #                     st.info(msg)
-
-    #                 # Mostrar warnings si los hay
-    #                 for warning in messages["warnings"]:
-    #                     st.warning(warning)
-
-    #                 # Mostrar errores si los hay
-    #                 for error in messages["errors"]:
-    #                     st.error(error)
-
-    #                 st.toast(
-    #                     f"Se ha completado la simulación y predicción para {len(pd.read_csv(RUTA_FICHERODEDATOS_CSV))} pacientes. Se muestran resultados individuales y promedios generales.",
-    #                     icon="✅",
-    #                 )
-    #             else:
-    #                 st.error("No se pudo generar la tabla de resultados.")
-
-    #         except Exception as e:
-    #             st.toast(
-    #                 f"Se ha producido un error al realizar la simulación: {e}",
-    #                 icon="⚠️",
-    #             )
-
-    # # Mostrar simulación con datos reales.
-    # if (
-    #     "df_sim_datos_reales" in st.session_state
-    #     and hasattr(st.session_state.df_sim_datos_reales, "empty")
-    #     and not st.session_state.df_sim_datos_reales.empty
-    #     and "df_pacientes_individuales" in st.session_state
-    #     and hasattr(st.session_state.df_pacientes_individuales, "empty")
-    #     and not st.session_state.df_pacientes_individuales.empty
-    #     and "df_calibracion" in st.session_state
-    #     and hasattr(st.session_state.df_calibracion, "empty")
-    #     and not st.session_state.df_calibracion.empty
-    # ):
-    #     st.header("Estadísticas de Simulación y Predicción")
-
-    #     with st.expander(expanded=True, label="Resultados Individuales por Paciente", icon="📋"):
-    #         if "df_pacientes_individuales" in st.session_state:
-    #             st.dataframe(
-    #                 st.session_state.df_pacientes_individuales,
-    #                 hide_index=True,
-    #                 use_container_width=True,
-    #             )
-    #             st.info("Esta tabla muestra el promedio de simulación para cada paciente individual.")
-
-    #     with st.expander(expanded=True, label="Métricas de Calibración por Paciente", icon="🎯"):
-    #         if "df_calibracion" in st.session_state:
-    #             st.dataframe(
-    #                 st.session_state.df_calibracion,
-    #                 hide_index=True,
-    #                 use_container_width=True,
-    #             )
-    #             st.info(
-    #                 "Esta tabla muestra qué porcentaje de las simulaciones de cada paciente están dentro del intervalo de confianza basado en sus valores reales."
-    #             )
+    # SIMULAR TODOS LOS DATOS EN LA TABLA.
 
 
 #################
