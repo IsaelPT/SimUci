@@ -10,6 +10,7 @@ from utils.helpers import (
     bin_to_df,
     build_df_for_stats,
     build_df_test_result,
+    fix_seed,
     format_time_columns,
     generate_id,
     get_data_for_prediction,
@@ -75,7 +76,15 @@ if "theme" not in st.session_state:
 apply_theme(st.session_state.theme)
 
 with st.sidebar:
-    st.markdown("### 📊 Sobre la App")
+    #
+    # TITLE
+    #
+    st.header(body="SimUci", anchor=False, width="stretch", divider="gray")
+
+    #
+    # APP INFORMATION
+    #
+    st.subheader("Sobre la App")
     st.markdown("""
     Esta aplicación permite:
     - Simular pacientes UCI
@@ -84,20 +93,56 @@ with st.sidebar:
     - Comparar resultados estadísticos
     """)
 
+    st.divider()
+
+    #
+    # GLOBAL SEED CONFIG
+    #
+    st.subheader("Semilla Global de Simulación")
+    with st.expander(label="Explicación", expanded=False):
+        st.caption(
+            body="Valor global de la semilla aleatoria utilizada para realizar las simulaciones. Esta determina que los resultados de las simulaciones resulten predecibles o no.",
+            width="stretch",
+        )
+    if "global_sim_seed" not in st.session_state:
+        st.session_state.global_sim_seed = 0
+    st.session_state.global_sim_seed = st.number_input(
+        label="Semilla",
+        value=st.session_state.global_sim_seed,
+        min_value=0,
+        max_value=999_999,
+    )
+    if st.button(
+        icon="🔄️",
+        label="Restablecer",
+        disabled=True if st.session_state.global_sim_seed == 0 else False,
+        type="secondary",
+        use_container_width=True,
+    ):
+        st.session_state.global_sim_seed = 0
+
+    st.divider()
+
+    #
+    # THEME CONFIG
+    #
+    st.subheader("Tema")
     theme_toggle = st.toggle(
         label="Modo Oscuro",
     )
-
-    # Actualizar tema si cambió
     new_theme = "dark" if theme_toggle else "light"
     if new_theme != st.session_state.theme:
         st.session_state.theme = new_theme
         apply_theme(new_theme)
         st.rerun()
 
-    # Versión
-    st.markdown("---")
-    st.caption("Versión beta 0.2 - Septiembre 2025")
+    st.divider()
+
+    #
+    # VERSION INFO
+    #
+    st.header("Versión")
+    st.caption("Beta 0.2 - Septiembre 2025")
 
 ########
 # TABS #
@@ -286,6 +331,7 @@ with simulacion_tab:
             "Corridas de la Simulación",
             min_value=CORRIDAS_SIM_MIN,
             max_value=CORRIDAS_SIM_MAX,
+            step=50,
             value=CORRIDAS_SIM_DEFAULT,
             help=HELP_MSG_CORRIDA_SIM,
         )
@@ -486,15 +532,6 @@ with datos_reales_tab:
     ##############
     st.header("Validación con Datos Reales")
 
-    # fijar_semilla_toggle = st.toggle(
-    #     "Fijar semilla",
-    #     value=False,
-    #     help="Al fijar una semilla, se usará una sola semilla para las simulaciones. Los resultados se vuelve reproducibles."
-    # )
-
-    # if fijar_semilla_toggle:
-    #     fix_seed(1)
-
     html_text = f'<p style="color:{PRIMARY_COLOR};">Puede seleccionar una fila para realizar una simulación al paciente seleccionado.</p>'
     st.markdown(html_text, unsafe_allow_html=True)
 
@@ -521,17 +558,38 @@ with datos_reales_tab:
     # }
     #
 
-    label: str = "Cantidad de Simulaciones por paciente"
-    with st.popover(label=label, use_container_width=True, help=HELP_MSG_CORRIDA_SIM):
-        corridas_sim = st.number_input(
-            label=label,
-            min_value=CORRIDAS_SIM_MIN,
-            max_value=CORRIDAS_SIM_MAX,
-            value=CORRIDAS_SIM_DEFAULT,
-            help=HELP_MSG_CORRIDA_SIM,
+    with st.popover(label="Configuraciones de Simulación", use_container_width=True):
+        col1sim_config, col2sim_config, col3sim_config = st.columns(
+            spec=[2, 1, 1], gap="small", vertical_alignment="center", border=False, width="stretch"
         )
 
+        with col1sim_config:
+            corridas_sim = st.number_input(
+                label="Cantidad de Simulaciones por paciente",
+                min_value=CORRIDAS_SIM_MIN,
+                max_value=CORRIDAS_SIM_MAX,
+                step=50,
+                value=CORRIDAS_SIM_DEFAULT,
+                help=HELP_MSG_CORRIDA_SIM,
+            )
+        with col2sim_config:
+            fijar_semilla_toggle = st.toggle(
+                label="Fijar semilla de simulación",
+                value=False,
+                help="Al fijar una semilla los resultados se vuelve reproducibles.",
+            )
+        with col3sim_config:
+            if fijar_semilla_toggle:
+                st.info(f"Semilla fijada con valor: **`{st.session_state.global_sim_seed}`**")
+            else:
+                st.info("Semilla desfijada")
+
+    if fijar_semilla_toggle:
+        fix_seed(st.session_state.global_sim_seed)
+
     corridas_sim = CORRIDAS_SIM_DEFAULT
+
+    rerun_sim_btn = st.button(label="Correr de nuevo la simulación", type="primary", use_container_width=True)
 
     if "df_sim_datos_reales" not in st.session_state:
         st.session_state.df_sim_datos_reales = pd.DataFrame()
@@ -547,7 +605,7 @@ with datos_reales_tab:
         # print(f"prev >> {st.session_state.prev_selection}")
         # print(f"curr >> {current_selection}")
 
-        if st.session_state.prev_selection != current_selection:
+        if (st.session_state.prev_selection != current_selection) and rerun_sim_btn:
             # Simulation
             data = simulate_real_data(ruta_fichero_csv=RUTA_FICHERODEDATOS_CSV, df_selection=current_selection)
 
@@ -583,7 +641,7 @@ with datos_reales_tab:
             label=LABEL_TIME_FORMAT, value=False, help=HELP_MSG_TIME_FORMAT, key="formato-tiempo-datos-reales"
         )
 
-        # Simulation Dataframe
+        # Simulation render Dataframe
         if not toggle_format:
             st.dataframe(
                 st.session_state.df_sim_datos_reales,
