@@ -329,6 +329,7 @@ def build_df_for_stats(
     metrics_as_percentage: bool = False,
     metrics_reference: pd.Series | dict | None = None,
     patient_data: dict | None = None,
+    precise_values=True,
 ) -> DataFrame:
     """
     Resumen rápido: construye un DataFrame con estadísticas (media, std, intervalos y métricas)
@@ -520,7 +521,7 @@ def bin_to_df(files: UploadedFile | list[UploadedFile]) -> DataFrame | list[Data
         return [pd.read_csv(f) for f in files]
 
 
-def _extract_real_data(ruta_archivo_csv: str, index: int, return_type: str = "df") -> DataFrame | tuple[float]:
+def extract_real_data(ruta_archivo_csv: str, index: int, return_type: str = "df") -> DataFrame | tuple[float]:
     data = pd.read_csv(ruta_archivo_csv)
 
     def build_row(data_index: int):
@@ -727,7 +728,7 @@ def simulate_real_data(ruta_fichero_csv: str, df_selection: int) -> DataFrame | 
         return e
 
     if df_selection != -1:
-        t: tuple[float] = _extract_real_data(ruta_fichero_csv, index=df_selection, return_type="tuple")
+        t: tuple[float] = extract_real_data(ruta_fichero_csv, index=df_selection, return_type="tuple")
 
         # Se retorna un DataFrame con los resultados de la simulación
         return experiment_helper(t)
@@ -737,7 +738,7 @@ def simulate_real_data(ruta_fichero_csv: str, df_selection: int) -> DataFrame | 
         # Se retorna una lista de DataFrames con los resultados de simulación para todos los pacientes
         return [
             experiment_helper(t)
-            for t in [_extract_real_data(ruta_fichero_csv, index=i, return_type="tuple") for i in range(datalen)]
+            for t in [extract_real_data(ruta_fichero_csv, index=i, return_type="tuple") for i in range(datalen)]
         ]
     else:
         raise ValueError("El parámetro df_selection debe ser -1 o un entero positivo.")
@@ -870,7 +871,7 @@ def simulate_and_predict_patient(ruta_fichero_csv: str, df_selection: int) -> tu
     """
 
     # Extraer datos del paciente.
-    patient_tuple = _extract_real_data(ruta_fichero_csv, index=df_selection, return_type="tuple")
+    patient_tuple = extract_real_data(ruta_fichero_csv, index=df_selection, return_type="tuple")
 
     # Simulación.
     simulation_df = start_experiment(
@@ -978,7 +979,7 @@ def build_comprehensive_stats_table(
         for i in range(n_pacientes):
             try:
                 # Obtener datos reales del paciente
-                patient_tuple = _extract_real_data(ruta_fichero_csv, i, "tuple")
+                patient_tuple = extract_real_data(ruta_fichero_csv, i, "tuple")
 
                 # Extraer valores reales para calibración
                 real_values = {

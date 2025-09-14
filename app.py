@@ -19,7 +19,7 @@ from utils.helpers import (
     start_experiment,
     value_is_zero,
     prepare_patient_data_for_prediction,
-    _extract_real_data,
+    extract_real_data,
     build_comprehensive_stats_table,
     apply_theme,
 )
@@ -76,24 +76,6 @@ if "theme" not in st.session_state:
 apply_theme(st.session_state.theme)
 
 with st.sidebar:
-    st.title("Controles")
-
-    theme_toggle = st.toggle(
-        label="Modo Oscuro",
-        value=st.session_state.theme == "dark",
-        help="Cambiar entre modo claro y oscuro",
-    )
-
-    # Actualizar tema si cambió
-    new_theme = "dark" if theme_toggle else "light"
-    if new_theme != st.session_state.theme:
-        st.session_state.theme = new_theme
-        apply_theme(new_theme)
-        st.rerun()
-
-    st.divider()
-
-    # Información adicional sobre la app
     st.markdown("### 📊 Sobre la App")
     st.markdown("""
     Esta aplicación permite:
@@ -103,9 +85,20 @@ with st.sidebar:
     - Comparar resultados estadísticos
     """)
 
+    theme_toggle = st.toggle(
+        label="Modo Oscuro",
+    )
+
+    # Actualizar tema si cambió
+    new_theme = "dark" if theme_toggle else "light"
+    if new_theme != st.session_state.theme:
+        st.session_state.theme = new_theme
+        apply_theme(new_theme)
+        st.rerun()
+
     # Versión
     st.markdown("---")
-    st.caption("Versión 2.0 - Septiembre 2025")
+    st.caption("Versión beta 0.2 - Septiembre 2025")
 
 ########
 # TABS #
@@ -205,30 +198,6 @@ with simulacion_tab:
                 options=tuple(TIPO_VENT.values()),
             )
     with col2_paciente:
-        # opcion_diag_egreso1: str = st.selectbox(
-        #     label="Diagnóstico 1",
-        #     options=tuple(DIAG_PREUCI.values()),
-        #     index=0,
-        #     key="diag-egreso-1",
-        # )
-        opcion_diag_egreso2: str = st.selectbox(
-            label="Diagnóstico Egreso 2",
-            options=tuple(DIAG_PREUCI.values()),
-            index=0,
-            key="diag-egreso-2",
-        )
-        # opcion_diag_egreso3: str = st.selectbox(
-        #     label="Diagnóstico 3",
-        #     options=tuple(DIAG_PREUCI.values()),
-        #     index=0,
-        #     key="diag-egreso-3",
-        # )
-        # opcion_diag_egreso4: str = st.selectbox(
-        #     label="Diagnóstico 4",
-        #     options=tuple(DIAG_PREUCI.values()),
-        #     index=0,
-        #     key="diag-egreso-4",
-        # )
         subcol1, subcol2 = st.columns(2)
         with subcol1:
             opcion_diag_ing1: str = st.selectbox(
@@ -256,6 +225,30 @@ with simulacion_tab:
                 index=0,
                 key="diag-ing-4",
             )
+        # opcion_diag_egreso1: str = st.selectbox(
+        #     label="Diagnóstico 1",
+        #     options=tuple(DIAG_PREUCI.values()),
+        #     index=0,
+        #     key="diag-egreso-1",
+        # )
+        opcion_diag_egreso2: str = st.selectbox(
+            label="Diagnóstico Egreso 2",
+            options=tuple(DIAG_PREUCI.values()),
+            index=0,
+            key="diag-egreso-2",
+        )
+        # opcion_diag_egreso3: str = st.selectbox(
+        #     label="Diagnóstico 3",
+        #     options=tuple(DIAG_PREUCI.values()),
+        #     index=0,
+        #     key="diag-egreso-3",
+        # )
+        # opcion_diag_egreso4: str = st.selectbox(
+        #     label="Diagnóstico 4",
+        #     options=tuple(DIAG_PREUCI.values()),
+        #     index=0,
+        #     key="diag-egreso-4",
+        # )
 
         # Datos Paciente Recolectados (Son los datos de entrada para ser procesados).
         edad: int = opcion_edad
@@ -503,13 +496,13 @@ with datos_reales_tab:
     # if fijar_semilla_toggle:
     #     fix_seed(1)
 
-    df_data = pd.read_csv(RUTA_FICHERODEDATOS_CSV)
-    df_data.index.name = "Paciente"
-
     html_text = f'<p style="color:{PRIMARY_COLOR};">Puede seleccionar una fila para realizar una simulación al paciente seleccionado.</p>'
     st.markdown(html_text, unsafe_allow_html=True)
 
-    df_selection: int = st.dataframe(
+    df_data = pd.read_csv(RUTA_FICHERODEDATOS_CSV)
+    df_data.index.name = "Paciente"
+
+    df_selection = st.dataframe(
         df_data,
         key="data",
         on_select="rerun",
@@ -518,86 +511,99 @@ with datos_reales_tab:
         height=300,
     )["selection"]["rows"]
 
-    # El `df_selection` devuelve un dict de la forma:
-    # {
-    #     "selection": {
-    #         "rows": [0, 1, 2, ...],
-    #         "columns": [0, 1, 2, ...]
-    #     }
+    # INFORMACIÓN SOBRE SELECCIÓN
+    # ------------------------------------------
+    #
+    # df_selection devuelve un dict de la forma:
+    #
+    # "df_selection": {
+    #     "rows": [0, 1, 2, ...],
+    #     "columns": [0, 1, 2, ...]
     # }
+    #
 
-    # Si se seleccionó alguna fila, se asigna a esta variable. De no seleccionarse nada es None.
-    selection = df_selection[0] if df_selection else None
+    label: str = "Cantidad de Simulaciones por paciente"
+    with st.popover(label=label, use_container_width=True, help=HELP_MSG_CORRIDA_SIM):
+        corridas_sim = st.number_input(
+            label=label,
+            min_value=CORRIDAS_SIM_MIN,
+            max_value=CORRIDAS_SIM_MAX,
+            value=CORRIDAS_SIM_DEFAULT,
+            help=HELP_MSG_CORRIDA_SIM,
+        )
+
+    corridas_sim = CORRIDAS_SIM_DEFAULT
 
     if "df_sim_datos_reales" not in st.session_state:
         st.session_state.df_sim_datos_reales = pd.DataFrame()
+    if "prev_selection" not in st.session_state:
+        st.session_state.prev_selection = None
+    if "patient_data" not in st.session_state:
+        st.session_state.patient_data = None
+
+    # Si se seleccionó alguna fila, se asigna a esta variable. De no seleccionarse nada es None.
+    current_selection = df_selection[0] if df_selection else None
 
     # DataFrame se encuentra con resultado de experimento con datos reales
-    if selection == 0 or selection is not None:
-        corridas_sim = CORRIDAS_SIM_DEFAULT
+    if current_selection is not None or current_selection == 0:
+        print(f"prev >> {st.session_state.prev_selection}")
+        print(f"curr >> {current_selection}")
 
-        col1, col2 = st.columns(2)
+        if st.session_state.prev_selection != current_selection:
+            # Simulation
+            data = simulate_real_data(ruta_fichero_csv=RUTA_FICHERODEDATOS_CSV, df_selection=current_selection)
 
-        # with st.expander(expanded=True, width="stretch", label="Resultados de simulación con paciente seleccionado"):
-        # with st.popover(label="Resultados de simulación con paciente seleccionado"):
-
-        with col1:
-            toggle_format = st.toggle(
-                label=LABEL_TIME_FORMAT, value=False, help=HELP_MSG_TIME_FORMAT, key="formato-tiempo-datos-reales"
-            )
-        with col2:
-            label: str = "Cantidad de Simulaciones por paciente"
-
-            with st.popover(
-                label=label,
-                use_container_width=True,
-                help=HELP_MSG_CORRIDA_SIM,
-            ):
-                corridas_sim = st.number_input(
-                    label=label,
-                    min_value=CORRIDAS_SIM_MIN,
-                    max_value=CORRIDAS_SIM_MAX,
-                    value=CORRIDAS_SIM_DEFAULT,
-                    help=HELP_MSG_CORRIDA_SIM,
+            # Data for prediction
+            st.session_state.patient_data = prepare_patient_data_for_prediction(
+                extract_real_data(
+                    ruta_archivo_csv=RUTA_FICHERODEDATOS_CSV, index=current_selection, return_type="tuple"
                 )
+            )
 
-        data: tuple[float] = simulate_real_data(ruta_fichero_csv=RUTA_FICHERODEDATOS_CSV, df_selection=selection)
+            # Build new DataFrame with Simulation - Prediction result
+            # Assing to -session_state
+            st.session_state.df_sim_datos_reales = build_df_for_stats(
+                data,
+                corridas_sim,
+                patient_data=st.session_state.patient_data,
+                include_mean=True,
+                include_std=True,
+                include_confint=True,
+                include_metrics=True,
+                include_prediction_mean=True,
+                metrics_as_percentage=True,
+                include_info_label=True,
+            )
 
-        patient_tuple = _extract_real_data(RUTA_FICHERODEDATOS_CSV, selection, "tuple")
-        patient_data = prepare_patient_data_for_prediction(patient_tuple)
+        st.session_state.prev_selection = current_selection
 
-        df_sim_datos_reales = build_df_for_stats(
-            data,
-            corridas_sim,
-            include_mean=True,
-            include_std=True,
-            include_confint=True,
-            include_metrics=True,
-            include_prediction_mean=True,
-            metrics_as_percentage=True,
-            patient_data=patient_data,
-            include_info_label=True,
+    # print(st.session_state.df_sim_datos_reales)
+
+    # If Simulation & Prediction
+    if not (st.session_state.df_sim_datos_reales.empty and st.session_state.patient_data is None):
+        toggle_format = st.toggle(
+            label=LABEL_TIME_FORMAT, value=False, help=HELP_MSG_TIME_FORMAT, key="formato-tiempo-datos-reales"
         )
 
-        if toggle_format:
+        # Simulation Dataframe
+        if not toggle_format:
             st.dataframe(
-                format_time_columns(df_sim_datos_reales, exclude_rows=["Métrica de Calibración"]),
+                st.session_state.df_sim_datos_reales,
                 hide_index=True,
                 use_container_width=True,
             )
         else:
             st.dataframe(
-                df_sim_datos_reales,
+                format_time_columns(st.session_state.df_sim_datos_reales, exclude_rows=["Métrica de Calibración"]),
                 hide_index=True,
                 use_container_width=True,
             )
 
-        # Mostrar predicción del paciente seleccionado
+        # Prediction metric
         try:
-            prediction_df = get_data_for_prediction(patient_data)
+            prediction_df = get_data_for_prediction(data=st.session_state.patient_data)
             preds, preds_proba = predict(prediction_df)
 
-            # Almacenar predicción en session_state
             if "prediccion_datos_reales_clases" not in st.session_state:
                 st.session_state.prediccion_datos_reales_clases = 0
             if "prediccion_datos_reales_porcentaje" not in st.session_state:
@@ -630,8 +636,6 @@ with datos_reales_tab:
 
         except Exception as e:
             st.warning(f"No se pudo realizar la predicción: {e}")
-
-        # st.divider()
 
     # SIMULAR TODOS LOS DATOS EN LA TABLA.
     if st.button(
