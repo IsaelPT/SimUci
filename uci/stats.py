@@ -2,6 +2,7 @@ import numpy as np
 from numpy import ndarray
 import pandas as pd
 from scipy.stats import wilcoxon, friedmanchisquare, norm
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 
 class Wilcoxon:
@@ -152,3 +153,79 @@ class StatsUtils:
 
             case _:
                 raise TypeError(f"Tipo no soportado para y_true: {type(y_true)}")
+
+    ###########################
+    # MÉTRICAS DE CALIBRACIÓN #
+    ###########################
+    def calibration_metrics(
+        n_patients: int,
+        n_replics: int,
+        entire_replics: list,
+        real_data: list,
+        confidence_level: int = 0.95,
+    ):
+        if not 0.80 <= confidence_level <= 0.95:
+            print("NOTE: it's recommended to have confidence_level value in range 0.80 to 0.95")
+
+        import scipy.stats as stats
+
+        freedown_grades = n_replics - 1
+        t_value = stats.t.ppf(1 - (1 - confidence_level) / 2, freedown_grades)
+        confidence_intervals = []
+        cobertura = 0
+
+        # Checking which values are inside the confidence interval
+        for i in range(n_patients):
+            mean = np.mean(entire_replics[i])
+            std_error = np.std(entire_replics[i], ddof=1) / np.sqrt(n_replics)
+            margen_error = t_value * std_error
+
+            ci_lower = mean - margen_error
+            ci_upper = mean + margen_error
+
+            confidence_intervals.append((ci_lower, ci_upper))
+
+            if ci_lower <= real_data[i] <= ci_upper:
+                cobertura += 1
+
+        porcentaje_cobertura = (cobertura / n_patients) * 100
+        print(f"Porcentaje de cobertura de IC ({confidence_level * 100}%): {porcentaje_cobertura:.2f}%")
+
+        return porcentaje_cobertura
+
+    def error_metrics(real_data, prediction_means):
+        rmse = np.sqrt(mean_squared_error(real_data, prediction_means))
+        mae = mean_absolute_error(real_data, prediction_means)
+        mape = np.mean(np.abs((real_data - prediction_means) / real_data)) * 100
+
+        print(f"RMSE: {rmse:.2f}")
+        print(f"MAE: {mae:.2f}")
+        print(f"MAPE: {mape:.2f}%")
+
+        return rmse, mae, mape
+
+    def ks_test(true_data, complete_replics):
+        from scipy.stats import ks_2samp
+
+        datos_simulados_completos = complete_replics.flatten()
+        ks_statistic, ks_pvalue = ks_2samp(true_data, datos_simulados_completos)
+
+        print(f"Estadístico KS: {ks_statistic:.4f}")
+        print(f"Valor p de KS: {ks_pvalue:.4f}")
+
+        return ks_statistic, ks_pvalue
+
+    def ad_test(true_sample, simulation_sample):
+        from scipy.stats import anderson_ksamp
+
+        anderson_result = anderson_ksamp([true_sample, simulation_sample])
+
+        print(f"Estadístico de Anderson-Darling: {anderson_result.statistic:.4f}")
+        print(f"Valor p crítico aproximado: {anderson_result.significance_level:.3f}")
+
+        return anderson_result
+
+    ########################
+    # MEDICIÓN DE ROBUSTÉS #
+    ########################
+    # TODO <<<<<
