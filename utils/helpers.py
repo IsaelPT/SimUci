@@ -744,8 +744,8 @@ def simulate_real_data(ruta_fichero_csv: str, df_selection: int) -> DataFrame | 
         raise ValueError("El parámetro df_selection debe ser -1 o un entero positivo.")
 
 
-def fix_seed(seed: int = None):
-    """Fija la semilla de numpy. Esto es útil para las simulaciones que utilizan una semilla aleatoria basada en el sistema. Al fijar la semilla se pueden obtener resultados con comportamientos específicos. Si la semilla es None, restaura el valor de la semilla aleatoria.
+def fix_seed(seed: int | None = None):
+    """Fija la semilla de numpy. Esto es útil para las simulaciones que utilizan una semilla aleatoria basada en el sistema. Al fijar la semilla se pueden obtener resultados con comportamientos específicos. Si la semilla es None, restaura el valor de la semilla aleatoria. Tambien se fija la semilla aleatoria por defecto de Python.
 
     Args:
         seed (int): Valor máximo 2^32 - 1 (numpy)
@@ -757,16 +757,20 @@ def fix_seed(seed: int = None):
     """
 
     try:
+        import random
+
         if seed is not None:
             if seed > np.iinfo(np.int32).max:
                 raise ValueError("Se excedió el tamaño de semilla permisible (2^32 - 1)")
             if seed < 0:
                 raise ValueError("Semilla debe ser un número entero positivo (uint32)")
+            random.seed(seed)
             np.random.seed(seed)
         else:
+            random.seed(None)
             np.random.seed(None)
     except Exception as e:
-        print(e)
+        print(f"Error while setting the seed: {e}")
 
 
 def predict(df: DataFrame) -> tuple[np.ndarray, np.ndarray]:

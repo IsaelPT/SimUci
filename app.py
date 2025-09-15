@@ -101,25 +101,19 @@ with st.sidebar:
     st.subheader("Semilla Global de Simulación")
     with st.expander(label="Explicación", expanded=False):
         st.caption(
-            body="Valor global de la semilla aleatoria utilizada para realizar las simulaciones. Esta determina que los resultados de las simulaciones resulten predecibles o no.",
+            body="Valor global de la semilla aleatoria utilizada para realizar las simulaciones. Es el punto de partida del generador de números aleatorios. Este valor garantiza que las simulaciones puedan replicarse exactamente, obteniendo los mismos resultados en cada ejecución",
             width="stretch",
         )
     if "global_sim_seed" not in st.session_state:
         st.session_state.global_sim_seed = 0
     st.session_state.global_sim_seed = st.number_input(
         label="Semilla",
-        value=st.session_state.global_sim_seed,
         min_value=0,
         max_value=999_999,
     )
-    if st.button(
-        icon="🔄️",
-        label="Restablecer",
-        disabled=True if st.session_state.global_sim_seed == 0 else False,
-        type="secondary",
-        use_container_width=True,
-    ):
-        st.session_state.global_sim_seed = 0
+    toggle_global_seed = st.toggle(label="Fijar **semilla**", value=False, width="stretch")
+    if toggle_global_seed:
+        fix_seed(st.session_state.global_sim_seed)
 
     st.divider()
 
@@ -322,12 +316,13 @@ with simulacion_tab:
     insuf_ok = False
     resultado_experimento = pd.DataFrame()
 
-    # session_state para visualizar datos simulación.
     if "df_resultado" not in st.session_state:
         st.session_state.df_resultado = pd.DataFrame()
+    if "sim_sample_size" not in st.session_state:
+        st.session_state.sim_sample_size = CORRIDAS_SIM_DEFAULT
 
     with st.container():
-        corridas_sim = st.number_input(
+        corridas_sim_input = st.number_input(
             "Corridas de la Simulación",
             min_value=CORRIDAS_SIM_MIN,
             max_value=CORRIDAS_SIM_MAX,
@@ -335,7 +330,13 @@ with simulacion_tab:
             value=CORRIDAS_SIM_DEFAULT,
             help=HELP_MSG_CORRIDA_SIM,
         )
-        boton_comenzar_simulacion = st.button("Comenzar Simulación", type="primary", use_container_width=True)
+        boton_comenzar_simulacion = st.button("Realizar Simulación", type="primary", use_container_width=True)
+
+    if boton_comenzar_simulacion:
+        try:
+            st.session_state.sim_sample_size = corridas_sim_input
+        except Exception as e:
+            print(f"Unable to get simulation sample size {corridas_sim_input}: {e}")
 
     # Mostrar DataFrame con resultado de la simulación para ese paciente.
     if not st.session_state.df_resultado.empty:
@@ -345,9 +346,10 @@ with simulacion_tab:
             help=HELP_MSG_TIME_FORMAT,
             key="formato-tiempo-simulacion",
         )
+
         df_simulacion = build_df_for_stats(
             data=st.session_state.df_resultado,
-            sample_size=corridas_sim,
+            sample_size=st.session_state.sim_sample_size,
             include_mean=True,
             include_std=True,
             include_confint=True,
@@ -361,7 +363,6 @@ with simulacion_tab:
             },
         )
 
-        # Aplicar formato si está habilitado
         if toggle_format:
             display_df = format_time_columns(df_simulacion, exclude_rows=["Métrica de Calibración"])
         else:
@@ -443,10 +444,8 @@ with simulacion_tab:
             key="guardar_simulacion",
         )
 
-        st.success(f"Concluyó la **simulación** tras {corridas_sim} corridas.")
-
     if boton_comenzar_simulacion:
-        # Validación de campos para realizar simulación.
+        # Verificación de campos para realizar simulación.
         if not value_is_zero([diag_ing1, diag_ing2, diag_ing3, diag_ing4]):  # campos de Diagnósticos OK?
             diag_ok = True
         else:
@@ -459,12 +458,14 @@ with simulacion_tab:
         else:
             st.warning("Seleccione un tipo de Insuficiencia Respiratoria.")
 
+        #
         # Desarrollo de la SIMULACIÓN.
+        #
         if diag_ok and insuf_ok:
             try:
                 # Experimento / Simulación.
                 resultado_experimento = start_experiment(
-                    corridas_sim,
+                    st.session_state.sim_sample_size,
                     edad,
                     diag_ing1,
                     diag_ing2,
@@ -479,7 +480,9 @@ with simulacion_tab:
                     input_porciento,
                 )
 
+                #
                 # Predicción de clases y porcentaje.
+                #
                 try:
                     if "prediccion_clases" not in st.session_state:
                         st.session_state.prediccion_clases = 0
@@ -504,20 +507,26 @@ with simulacion_tab:
                     else:
                         raise ValueError("No se pudo realizar la predicción de clases y porcentaje.")
 
-                    print(
-                        f"Predicción: {st.session_state.prediccion_clases}, Porcentaje: {st.session_state.prediccion_porcentaje}"
-                    )
+                    # print(
+                    #     f"Predicción: {st.session_state.prediccion_clases}, Porcentaje: {st.session_state.prediccion_porcentaje}"
+                    # )
                 except Exception as e:
                     st.error(f"No se pudo realizar la predicción de clases y porcentaje. Error asociado: {e}")
 
+                #
                 # Guardar resultados (forma local del proyecto).
+                #
                 path_base = f"experiments\\paciente-id-{st.session_state.id_paciente}"
                 if not os.path.exists(path_base):
                     os.makedirs(path_base)
                 fecha: str = datetime.now().strftime("%d-%m-%Y")
-                path: str = f"{path_base}\\experimento-id {generate_id(5)} fecha {fecha} corridas {corridas_sim}.csv"
+                path: str = f"{path_base}\\experimento-id {generate_id(5)} fecha {fecha} corridas {st.session_state.sim_sample_size}.csv"
                 resultado_experimento.to_csv(path, index=False)
                 st.session_state.df_resultado = resultado_experimento
+
+                # st.toast(
+                #     body=f"Concluyó la **simulación** tras {st.session_state.sim_sample_size} corridas.", icon="🔬"
+                # )
 
                 st.rerun()
             except Exception as data:
@@ -558,38 +567,16 @@ with datos_reales_tab:
     # }
     #
 
-    with st.popover(label="Configuraciones de Simulación", use_container_width=True):
-        col1sim_config, col2sim_config, col3sim_config = st.columns(
-            spec=[2, 1, 1], gap="small", vertical_alignment="center", border=False, width="stretch"
-        )
+    corridas_sim_input = st.number_input(
+        label="Cantidad de Simulaciones por paciente",
+        min_value=CORRIDAS_SIM_MIN,
+        max_value=CORRIDAS_SIM_MAX,
+        step=50,
+        value=CORRIDAS_SIM_DEFAULT,
+        help=HELP_MSG_CORRIDA_SIM,
+    )
 
-        with col1sim_config:
-            corridas_sim = st.number_input(
-                label="Cantidad de Simulaciones por paciente",
-                min_value=CORRIDAS_SIM_MIN,
-                max_value=CORRIDAS_SIM_MAX,
-                step=50,
-                value=CORRIDAS_SIM_DEFAULT,
-                help=HELP_MSG_CORRIDA_SIM,
-            )
-        with col2sim_config:
-            fijar_semilla_toggle = st.toggle(
-                label="Fijar semilla de simulación",
-                value=False,
-                help="Al fijar una semilla los resultados se vuelve reproducibles.",
-            )
-        with col3sim_config:
-            if fijar_semilla_toggle:
-                st.info(f"Semilla fijada con valor: **`{st.session_state.global_sim_seed}`**")
-            else:
-                st.info("Semilla desfijada")
-
-    if fijar_semilla_toggle:
-        fix_seed(st.session_state.global_sim_seed)
-
-    corridas_sim = CORRIDAS_SIM_DEFAULT
-
-    rerun_sim_btn = st.button(label="Correr de nuevo la simulación", type="primary", use_container_width=True)
+    corridas_sim_input = CORRIDAS_SIM_DEFAULT
 
     if "df_sim_datos_reales" not in st.session_state:
         st.session_state.df_sim_datos_reales = pd.DataFrame()
@@ -600,12 +587,20 @@ with datos_reales_tab:
 
     current_selection = df_selection[0] if df_selection else None
 
+    disable_rerun_btn = True if (st.session_state.df_sim_datos_reales.empty) else False
+    rerun_sim_btn = st.button(
+        label="Correr de nuevo la simulación",
+        type="primary",
+        use_container_width=True,
+        disabled=disable_rerun_btn,
+    )
+
     # Simulation and Prediction of selection
     if current_selection is not None or current_selection == 0:
         # print(f"prev >> {st.session_state.prev_selection}")
         # print(f"curr >> {current_selection}")
 
-        if (st.session_state.prev_selection != current_selection) and rerun_sim_btn:
+        if (st.session_state.prev_selection != current_selection) or rerun_sim_btn:
             # Simulation
             data = simulate_real_data(ruta_fichero_csv=RUTA_FICHERODEDATOS_CSV, df_selection=current_selection)
 
@@ -619,8 +614,8 @@ with datos_reales_tab:
             # Build new DataFrame with Simulation - Prediction result
             # Assing to -session_state
             st.session_state.df_sim_datos_reales = build_df_for_stats(
-                data,
-                corridas_sim,
+                data=data,
+                sample_size=corridas_sim_input,
                 patient_data=st.session_state.patient_data,
                 include_mean=True,
                 include_std=True,
@@ -636,7 +631,7 @@ with datos_reales_tab:
     # print(st.session_state.df_sim_datos_reales)
 
     # If Simulation & Prediction
-    if not (st.session_state.df_sim_datos_reales.empty and st.session_state.patient_data is None):
+    if not (st.session_state.df_sim_datos_reales.empty and st.session_state.patient_data is None) or rerun_sim_btn:
         toggle_format = st.toggle(
             label=LABEL_TIME_FORMAT, value=False, help=HELP_MSG_TIME_FORMAT, key="formato-tiempo-datos-reales"
         )
