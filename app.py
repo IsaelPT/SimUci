@@ -24,50 +24,50 @@ from utils.helpers import (
     apply_theme,
 )
 from utils.constants import (
-    EDAD_MIN,
-    EDAD_MAX,
-    EDAD_DEFAULT,
+    AGE_MIN,
+    AGE_MAX,
+    AGE_DEFAULT,
     APACHE_MIN,
     APACHE_MAX,
     APACHE_DEFAULT,
     HELP_MSG_APACHE,
-    HELP_MSG_PREDICCION_METRIC,
-    HELP_MSG_TIEMPO_VAM,
+    HELP_MSG_PREDICTION_METRIC,
+    HELP_MSG_VAM_TIME,
     HELP_MSG_TIME_FORMAT,
     LABEL_PREDICTION_METRIC,
     LABEL_TIME_FORMAT,
-    T_VAM_MIN,
-    T_VAM_MAX,
-    T_VAM_DEFAULT,
-    ESTAD_UTI_MIN,
-    ESTAD_UTI_MAX,
-    ESTAD_UTI_DEFAULT,
-    HELP_MSG_ESTAD_UTI,
-    INSUF_RESP,
-    TIPO_VENT,
-    ESTAD_PREUTI_MIN,
-    ESTAD_PREUTI_MAX,
-    ESTAD_PREUTI_DEFAULT,
-    HELP_MSG_ESTAD_PREUTI,
-    PORCIENTO_SIM_MIN,
-    PORCIENTO_SIM_MAX,
-    PORCIENTO_SIM_DEFAULT,
-    HELP_MSG_PORCIENTO_SIM,
-    DIAG_PREUCI,
-    RUTA_FICHERODEDATOS_CSV,
+    VAM_T_MIN,
+    VAM_T_MAX,
+    VAM_T_DEFAULT,
+    UTI_STAY_MIN,
+    UTI_STAY_MAX,
+    UTI_STAY_DEFAULT,
+    HELP_MSG_UTI_STAY,
+    RESP_INSUF,
+    VENTILATION_TYPE,
+    PREUTI_STAY_MIN,
+    PREUTI_STAY_MAX,
+    PREUTI_STAY_DEFAULT,
+    HELP_MSG_PREUTI_STAY,
+    SIM_PERCENT_MIN,
+    SIM_PERCENT_MAX,
+    SIM_PERCENT_DEFAULT,
+    HELP_MSG_SIM_PERCENT,
+    PREUCI_DIAG,
+    FICHERODEDATOS_CSV_PATH,
     PRIMARY_COLOR,
     EXPERIMENT_VARIABLES as EXP_VARIABLES,
-    CORRIDAS_SIM_MIN,
-    CORRIDAS_SIM_MAX,
-    CORRIDAS_SIM_DEFAULT,
-    HELP_MSG_CORRIDA_SIM,
+    SIM_RUNS_MIN,
+    SIM_RUNS_MAX,
+    SIM_RUNS_DEFAULT,
+    HELP_MSG_SIM_RUNS,
     INFO_STATISTIC,
     INFO_P_VALUE,
 )
 from uci.stats import Wilcoxon, Friedman
 
 
-# Configuración inicial de la página
+# Initial page configuration
 st.set_page_config(page_title="SimUci", page_icon="🏥", layout="wide", initial_sidebar_state="expanded")
 
 if "theme" not in st.session_state:
@@ -110,6 +110,8 @@ with st.sidebar:
         label="Semilla",
         min_value=0,
         max_value=999_999,
+        step=1,
+        format="%d",
     )
     toggle_global_seed = st.toggle(label="Fijar **semilla**", value=False, width="stretch")
     if toggle_global_seed:
@@ -141,27 +143,32 @@ with st.sidebar:
 ########
 # TABS #
 ########
-simulacion_tab, datos_reales_tab, comparaciones_tab = st.tabs(("Simulación", "Datos reales", "Comparaciones"))
+simulation_tab, real_data_tab, comparisons_tab = st.tabs(
+    tabs=("Simulación", "Validaciones", "Comparaciones"), width="stretch"
+)
 
-# Inicializar session_state para datos reales
-if "df_sim_datos_reales" not in st.session_state:
-    st.session_state.df_sim_datos_reales = pd.DataFrame()
-if "df_pacientes_individuales" not in st.session_state:
-    st.session_state.df_pacientes_individuales = pd.DataFrame()
+# Initialize session_state for real data
+if "df_sim_real_data" not in st.session_state:
+    st.session_state.df_sim_real_data = pd.DataFrame()
+if "df_individual_patients" not in st.session_state:
+    st.session_state.df_individual_patients = pd.DataFrame()
 if "friedman_results" not in st.session_state:
     st.session_state.friedman_results = {}
 
-with simulacion_tab:
+###############
+# SIMULALTION #
+###############
+with simulation_tab:
     ############
-    # Paciente #
+    # Patient #
     ############
 
-    # ID Paciente
-    # NOTE: EL ID DEL PACIENTE ESTÁ ALMACENADO DENTRO DEL SESSION_STATE!
-    if "id_paciente" not in st.session_state:
-        st.session_state.id_paciente = generate_id()
-    if "semilla_simulacion" not in st.session_state:
-        st.session_state.semilla_simulacion = 0
+    # Patient ID
+    # NOTE: The patient ID is stored inside session_state!
+    if "patient_id" not in st.session_state:
+        st.session_state.patient_id = generate_id()
+    if "simulation_seed" not in st.session_state:
+        st.session_state.simulation_seed = 0
 
     pac_col1, pac_col2 = st.columns(spec=2, gap="small", border=False, vertical_alignment="bottom")
     with pac_col1:
@@ -171,11 +178,11 @@ with simulacion_tab:
         with col1:
             nuevo_paciente = st.button("Nuevo paciente", use_container_width=True)
             if nuevo_paciente:
-                st.session_state.id_paciente = generate_id()
+                st.session_state.patient_id = generate_id()
         with col2:
-            st.session_state.id_paciente = st.text_input(
+            st.session_state.patient_id = st.text_input(
                 label="ID Paciente",
-                value=st.session_state.id_paciente,
+                value=st.session_state.patient_id,
                 max_chars=10,
                 placeholder="ID Paciente",
                 label_visibility="collapsed",
@@ -185,81 +192,82 @@ with simulacion_tab:
     with col1_paciente:
         col1a_paciente, col1b_paciente, col1c_paciente = st.columns(spec=3, gap="small", border=False)
         with col1a_paciente:
-            opcion_edad: int = st.number_input(label="Edad", min_value=EDAD_MIN, max_value=EDAD_MAX, value=EDAD_DEFAULT)
-            opcion_estad_preuti: int = st.number_input(
+            age_input: int = st.number_input(label="Edad", min_value=AGE_MIN, max_value=AGE_MAX, value=AGE_DEFAULT)
+            preuti_stay_option: int = st.number_input(
                 label="Tiempo Pre-UCI",
-                min_value=ESTAD_PREUTI_MIN,
-                max_value=ESTAD_PREUTI_MAX,
-                value=ESTAD_PREUTI_DEFAULT,
-                help=HELP_MSG_ESTAD_PREUTI,
+                min_value=PREUTI_STAY_MIN,
+                max_value=PREUTI_STAY_MAX,
+                value=PREUTI_STAY_DEFAULT,
+                help=HELP_MSG_PREUTI_STAY,
             )
         with col1b_paciente:
-            opcion_tiempo_vam: int = st.number_input(
+            vam_time_option: int = st.number_input(
                 label="Tiempo VA",
-                min_value=T_VAM_MIN,
-                max_value=T_VAM_MAX,
-                value=T_VAM_DEFAULT,
-                help=HELP_MSG_TIEMPO_VAM,
+                min_value=VAM_T_MIN,
+                max_value=VAM_T_MAX,
+                value=VAM_T_DEFAULT,
+                help=HELP_MSG_VAM_TIME,
             )
             input_porciento = st.number_input(
                 label="Porciento Tiempo UCI",
-                min_value=PORCIENTO_SIM_MIN,
-                max_value=PORCIENTO_SIM_MAX,
-                value=PORCIENTO_SIM_DEFAULT,
-                help=HELP_MSG_PORCIENTO_SIM,
+                min_value=SIM_PERCENT_MIN,
+                max_value=SIM_PERCENT_MAX,
+                value=SIM_PERCENT_DEFAULT,
+                help=HELP_MSG_SIM_PERCENT,
             )
         with col1c_paciente:
-            opcion_apache: int = st.number_input(
+            apache_input: int = st.number_input(
                 label="Apache",
                 min_value=APACHE_MIN,
                 max_value=APACHE_MAX,
                 value=APACHE_DEFAULT,
                 help=HELP_MSG_APACHE,
             )
-            opcion_estad_uti: int = st.number_input(
+            estad_uti_option: int = st.number_input(
                 label="Tiempo UCI",
-                min_value=ESTAD_UTI_MIN,
-                max_value=ESTAD_UTI_MAX,
-                value=ESTAD_UTI_DEFAULT,
-                help=HELP_MSG_ESTAD_UTI,
+                min_value=UTI_STAY_MIN,
+                max_value=UTI_STAY_MAX,
+                value=UTI_STAY_DEFAULT,
+                help=HELP_MSG_UTI_STAY,
             )
-        col1x_paciente, col1y_paciente = st.columns(spec=2, gap="small", border=False)
-        with col1x_paciente:
-            opcion_insuf_resp: str = st.selectbox(
+
+        col1x_pacient, col1y_pacient = st.columns(spec=2, gap="small", border=False)
+        with col1x_pacient:
+            resp_insuf_option: str = st.selectbox(
                 label="Tipo de Insuficiencia Respiratoria",
-                options=tuple(INSUF_RESP.values()),
+                options=tuple(RESP_INSUF.values()),
                 index=1,
             )
-        with col1y_paciente:
-            opcion_tipo_vam: str = st.selectbox(
+        with col1y_pacient:
+            vent_type_option: str = st.selectbox(
                 label="Tipo de Ventilación Artificial",
-                options=tuple(TIPO_VENT.values()),
+                options=tuple(VENTILATION_TYPE.values()),
             )
     with col2_paciente:
         subcol1, subcol2 = st.columns(2)
         with subcol1:
-            opcion_diag_ing1: str = st.selectbox(
+            diag_ing1_input: str = st.selectbox(
                 label="Diagnóstico Ing. 1",
-                options=tuple(DIAG_PREUCI.values()),
+                options=tuple(PREUCI_DIAG.values()),
                 index=0,
                 key="diag-ing-1",
             )
-            opcion_diag_ing3: str = st.selectbox(
+            diag_ing3_input: str = st.selectbox(
                 label="Diagnóstico Ing. 3",
-                options=tuple(DIAG_PREUCI.values()),
+                options=tuple(PREUCI_DIAG.values()),
                 index=0,
                 key="diag-ing-3",
             )
         with subcol2:
-            opcion_diag_ing2: str = st.selectbox(
+            diag_ing2_input: str = st.selectbox(
                 label="Diagnóstico Ing. 2",
-                options=tuple(DIAG_PREUCI.values()),
+                options=tuple(PREUCI_DIAG.values()),
                 index=0,
                 key="diag-ing-2",
             )
-            opcion_diag_ing4: str = st.selectbox(
+            diag_ing4_input: str = st.selectbox(
                 label="Diagnóstico Ing. 4",
-                options=tuple(DIAG_PREUCI.values()),
+                options=tuple(PREUCI_DIAG.values()),
                 index=0,
                 key="diag-ing-4",
             )
@@ -269,9 +277,9 @@ with simulacion_tab:
         #     index=0,
         #     key="diag-egreso-1",
         # )
-        opcion_diag_egreso2: str = st.selectbox(
+        diag_egreso2_input: str = st.selectbox(
             label="Diagnóstico Egreso 2",
-            options=tuple(DIAG_PREUCI.values()),
+            options=tuple(PREUCI_DIAG.values()),
             index=0,
             key="diag-egreso-2",
         )
@@ -288,47 +296,47 @@ with simulacion_tab:
         #     key="diag-egreso-4",
         # )
 
-        # Datos Paciente Recolectados (Son los datos de entrada para ser procesados).
-        edad: int = opcion_edad
-        apache: int = opcion_apache
-        diag_ing1: int = key_categ("diag", opcion_diag_ing1)
-        diag_ing2: int = key_categ("diag", opcion_diag_ing2)
-        diag_ing3: int = key_categ("diag", opcion_diag_ing3)
-        diag_ing4: int = key_categ("diag", opcion_diag_ing4)
+        # Collected patient data (these are the input values to be processed).
+        edad: int = age_input
+        apache: int = apache_input
+        diag_ing1: int = key_categ("diag", diag_ing1_input)
+        diag_ing2: int = key_categ("diag", diag_ing2_input)
+        diag_ing3: int = key_categ("diag", diag_ing3_input)
+        diag_ing4: int = key_categ("diag", diag_ing4_input)
         # diag_egreso1: int = key_categ("diag", opcion_diag_egreso1)
-        diag_egreso2: int = key_categ("diag", opcion_diag_egreso2)
+        diag_egreso2: int = key_categ("diag", diag_egreso2_input)
         # diag_egreso3: int = key_categ("diag", opcion_diag_egreso3)
         # diag_egreso4: int = key_categ("diag", opcion_diag_egreso4)
-        tipo_vam: int = key_categ("va", opcion_tipo_vam)
-        tiempo_vam: int = opcion_tiempo_vam
-        estadia_uti: int = opcion_estad_uti
-        estadia_preuti: int = opcion_estad_preuti
-        insuf_resp: int = key_categ("insuf", opcion_insuf_resp)
+        vent_type: int = key_categ("vt", vent_type_option)
+        vam_time: int = vam_time_option
+        uti_stay: int = estad_uti_option
+        preuti_stay: int = preuti_stay_option
+        resp_insuf: int = key_categ("insuf", resp_insuf_option)
 
     st.divider()
 
     ##############
-    # Simulación #
+    # Simulation #
     ##############
     st.header("Simulación")
 
     diag_ok = False
     insuf_ok = False
-    resultado_experimento = pd.DataFrame()
+    experiment_result = pd.DataFrame()
 
-    if "df_resultado" not in st.session_state:
-        st.session_state.df_resultado = pd.DataFrame()
+    if "df_result" not in st.session_state:
+        st.session_state.df_result = pd.DataFrame()
     if "sim_sample_size" not in st.session_state:
-        st.session_state.sim_sample_size = CORRIDAS_SIM_DEFAULT
+        st.session_state.sim_sample_size = SIM_RUNS_DEFAULT
 
     with st.container():
         corridas_sim_input = st.number_input(
             "Corridas de la Simulación",
-            min_value=CORRIDAS_SIM_MIN,
-            max_value=CORRIDAS_SIM_MAX,
+            min_value=SIM_RUNS_MIN,
+            max_value=SIM_RUNS_MAX,
             step=50,
-            value=CORRIDAS_SIM_DEFAULT,
-            help=HELP_MSG_CORRIDA_SIM,
+            value=SIM_RUNS_DEFAULT,
+            help=HELP_MSG_SIM_RUNS,
         )
         boton_comenzar_simulacion = st.button("Realizar Simulación", type="primary", use_container_width=True)
 
@@ -338,8 +346,8 @@ with simulacion_tab:
         except Exception as e:
             print(f"Unable to get simulation sample size {corridas_sim_input}: {e}")
 
-    # Mostrar DataFrame con resultado de la simulación para ese paciente.
-    if not st.session_state.df_resultado.empty:
+    # Display the DataFrame with the simulation result for this patient.
+    if not st.session_state.df_result.empty:
         toggle_format = st.toggle(
             label=LABEL_TIME_FORMAT,
             value=False,
@@ -348,7 +356,7 @@ with simulacion_tab:
         )
 
         df_simulacion = build_df_for_stats(
-            data=st.session_state.df_resultado,
+            data=st.session_state.df_result,
             sample_size=st.session_state.sim_sample_size,
             include_mean=True,
             include_std=True,
@@ -374,18 +382,16 @@ with simulacion_tab:
             use_container_width=True,
         )
 
-        # Mostrar predicción de clases y porcentaje.
-        if "prediccion_clases" in st.session_state and "prediccion_porcentaje" in st.session_state:
-            # METRIC PREVIEW
-            prev_pred = st.session_state.get("prev_prediccion_porcentaje", None)
+        # METRIC PREVIEW
+        if "prediction_classes" in st.session_state and "prediction_percentage" in st.session_state:
+            prev_pred = st.session_state.get("prev_prediction_percentage", None)
 
-            # Asegurar que el valor actual sea un float
-            current_pred = float(st.session_state.prediccion_porcentaje)
+            current_pred = float(st.session_state.prediction_percentage)
 
             delta_label = ""
             delta_color = "normal"
 
-            # Lógica del valor anterior
+            # Logic for previous value
             if prev_pred is not None:
                 try:
                     prev_val = float(prev_pred)
@@ -398,14 +404,14 @@ with simulacion_tab:
 
                     if change > 0:
                         how_chaged = "Incremento"
-                        delta_color = "inverse"  # Flecha verde hacia arriba
+                        delta_color = "inverse"  # Green up arrow
                     if change < 0:
                         how_chaged = "Disminución"
-                        delta_color = "normal"  # Flecha roja hacia abajo
+                        delta_color = "normal"  # Red down arrow
 
                     if change == 0:
                         delta_label = "Sin cambio"
-                        delta_color = "off"  # Sin flecha
+                        delta_color = "off"  # No arrow
                     else:
                         delta_label = f"{how_chaged} de un {abs(percent_change):.0f}% de la probabilidad de fallecer del paciente respecto a la predicción anterior"
 
@@ -417,8 +423,8 @@ with simulacion_tab:
             else:
                 delta_color = "normal"
 
-            # Variable clasificación binaria (0, 1) <-> (False, True)
-            paciente_vive: bool = True if st.session_state.prediccion_clases == 0 else False
+            # Binary classification variable (0, 1) <-> (False, True)
+            paciente_vive: bool = True if st.session_state.prediction_classes == 0 else False
             metric_display_value: str = f"{'Paciente no fallece' if paciente_vive else 'Paciente fallece'} (predicción de {(current_pred * 100):.0f}% )"
 
             st.metric(
@@ -428,66 +434,66 @@ with simulacion_tab:
                 delta_color=delta_color,
                 width="stretch",
                 border=True,
-                help=HELP_MSG_PREDICCION_METRIC,
+                help=HELP_MSG_PREDICTION_METRIC,
             )
 
-            st.session_state.prev_prediccion_porcentaje = current_pred
+            st.session_state.prev_prediction_percentage = current_pred
 
-        # Lógica para guardar resultados localmente.
-        csv = st.session_state.df_resultado.to_csv(index=False).encode("UTF-8")
+        # Logic to save results locally.
+        csv = st.session_state.df_result.to_csv(index=False).encode("UTF-8")
         boton_guardar = st.download_button(
             label="Guardar resultados",
             data=csv,
-            file_name=f"Experimento-Paciente-ID-{st.session_state.id_paciente}.csv",
+            file_name=f"Experimento-Paciente-ID-{st.session_state.patient_id}.csv",
             mime="text/csv",
             use_container_width=True,
             key="guardar_simulacion",
         )
 
     if boton_comenzar_simulacion:
-        # Verificación de campos para realizar simulación.
-        if not value_is_zero([diag_ing1, diag_ing2, diag_ing3, diag_ing4]):  # campos de Diagnósticos OK?
+        # Field validation before running simulation.
+        if not value_is_zero([diag_ing1, diag_ing2, diag_ing3, diag_ing4]):  # diagnostic fields OK?
             diag_ok = True
         else:
             st.warning(
                 "Todos los diagnósticos están vacíos. Se debe incluir mínimo un diagnóstico para realizar la simulación."
             )
 
-        if not value_is_zero(insuf_resp):  # campo de Insuficiencia Respiratoria OK?
+        if not value_is_zero(resp_insuf):  # respiratory insufficiency field OK?
             insuf_ok = True
         else:
             st.warning("Seleccione un tipo de Insuficiencia Respiratoria.")
 
         #
-        # Desarrollo de la SIMULACIÓN.
+        # Run the SIMULATION.
         #
         if diag_ok and insuf_ok:
             try:
-                # Experimento / Simulación.
-                resultado_experimento = start_experiment(
-                    st.session_state.sim_sample_size,
-                    edad,
-                    diag_ing1,
-                    diag_ing2,
-                    diag_ing3,
-                    diag_ing4,
-                    apache,
-                    insuf_resp,
-                    insuf_resp,
-                    estadia_uti,
-                    tiempo_vam,
-                    estadia_preuti,
-                    input_porciento,
+                # Experiment / Simulation.
+                experiment_result = start_experiment(
+                    n_runs=st.session_state.sim_sample_size,
+                    age=edad,
+                    d1=diag_ing1,
+                    d2=diag_ing2,
+                    d3=diag_ing3,
+                    d4=diag_ing4,
+                    apache=apache,
+                    artif_vent=vent_type,
+                    resp_insuf=resp_insuf,
+                    uti_stay=uti_stay,
+                    vam_time=vam_time,
+                    preuti_stay=preuti_stay,
+                    percent=input_porciento,
                 )
 
                 #
-                # Predicción de clases y porcentaje.
+                # Class prediction and probability.
                 #
                 try:
-                    if "prediccion_clases" not in st.session_state:
-                        st.session_state.prediccion_clases = 0
-                    if "prediccion_porcentaje" not in st.session_state:
-                        st.session_state.prediccion_porcentaje = 0.0
+                    if "prediction_classes" not in st.session_state:
+                        st.session_state.prediction_classes = 0
+                    if "prediction_percentage" not in st.session_state:
+                        st.session_state.prediction_percentage = 0.0
 
                     df_to_predict = get_data_for_prediction(
                         {
@@ -495,206 +501,210 @@ with simulacion_tab:
                             "Diag.Ing1": diag_ing1,
                             "Diag.Ing2": diag_ing2,
                             "Diag.Egr2": diag_egreso2,
-                            "TiempoVAM": tiempo_vam,
+                            "TiempoVAM": vam_time,
                             "APACHE": apache,
                         }
                     )
                     prediction = predict(df_to_predict)
 
                     if prediction is not None:
-                        st.session_state.prediccion_clases = prediction[0][0]
-                        st.session_state.prediccion_porcentaje = prediction[1][0]
+                        st.session_state.prediction_classes = prediction[0][0]
+                        st.session_state.prediction_percentage = prediction[1][0]
                     else:
-                        raise ValueError("No se pudo realizar la predicción de clases y porcentaje.")
+                        raise ValueError("No se pudo realizar el cálculo de predicción de clase y probabilidad.")
 
                     # print(
-                    #     f"Predicción: {st.session_state.prediccion_clases}, Porcentaje: {st.session_state.prediccion_porcentaje}"
+                    #     f"Prediction: {st.session_state.prediction_classes}, Percentage: {st.session_state.prediction_percentage}"
                     # )
                 except Exception as e:
-                    st.error(f"No se pudo realizar la predicción de clases y porcentaje. Error asociado: {e}")
+                    st.error(f"Could not perform class prediction and probability calculation. Error: {e}")
 
                 #
-                # Guardar resultados (forma local del proyecto).
+                # Save results (local project storage).
                 #
-                path_base = f"experiments\\paciente-id-{st.session_state.id_paciente}"
+                path_base = f"experiments\\paciente-id-{st.session_state.patient_id}"
                 if not os.path.exists(path_base):
                     os.makedirs(path_base)
                 fecha: str = datetime.now().strftime("%d-%m-%Y")
                 path: str = f"{path_base}\\experimento-id {generate_id(5)} fecha {fecha} corridas {st.session_state.sim_sample_size}.csv"
-                resultado_experimento.to_csv(path, index=False)
-                st.session_state.df_resultado = resultado_experimento
+                experiment_result.to_csv(path, index=False)
+                st.session_state.df_result = experiment_result
 
                 # st.toast(
-                #     body=f"Concluyó la **simulación** tras {st.session_state.sim_sample_size} corridas.", icon="🔬"
+                #     body=f"Simulation concluded after {st.session_state.sim_sample_size} runs.", icon="🔬"
                 # )
 
                 st.rerun()
             except Exception as data:
-                st.exception(f"No se pudo efectuar la simulación. Error asociado: \n{data}")
+                st.exception(f"No se pudo ejecutar la simulación. Error asociado: \n{data}")
 
 ###############################
-# SIMULACION CON DATOS REALES #
+# SIMULATION WITH REAL DATA #
 ###############################
-with datos_reales_tab:
+with real_data_tab:
     ##############
-    # Validación #
+    # Validation #
     ##############
-    st.header("Validación con Datos Reales")
-
-    html_text = f'<p style="color:{PRIMARY_COLOR};">Puede seleccionar una fila para realizar una simulación al paciente seleccionado.</p>'
-    st.markdown(html_text, unsafe_allow_html=True)
-
-    df_data = pd.read_csv(RUTA_FICHERODEDATOS_CSV)
-    df_data.index.name = "Paciente"
-
-    df_selection = st.dataframe(
-        df_data,
-        key="data",
-        on_select="rerun",
-        selection_mode=["single-row"],
-        hide_index=False,
-        height=300,
-    )["selection"]["rows"]
-
-    # INFORMACIÓN SOBRE SELECCIÓN
-    # ------------------------------------------
-    #
-    # df_selection devuelve un dict de la forma:
-    #
-    # "df_selection": {
-    #     "rows": [0, 1, 2, ...],
-    #     "columns": [0, 1, 2, ...]
-    # }
-    #
-
-    corridas_sim_input = st.number_input(
-        label="Cantidad de Simulaciones por paciente",
-        min_value=CORRIDAS_SIM_MIN,
-        max_value=CORRIDAS_SIM_MAX,
-        step=50,
-        value=CORRIDAS_SIM_DEFAULT,
-        help=HELP_MSG_CORRIDA_SIM,
+    one_patient_data_validation_tab, sim_model_validation_tab = st.tabs(
+        tabs=("Datos Reales", "Métricas del Modelo"), width="stretch"
     )
+    with one_patient_data_validation_tab:
+        st.header("Validación con Datos Reales")
 
-    corridas_sim_input = CORRIDAS_SIM_DEFAULT
+        html_text = f'<p style="color:{PRIMARY_COLOR};">Puede seleccionar una fila para realizar una simulación al paciente seleccionado.</p>'
+        st.markdown(html_text, unsafe_allow_html=True)
 
-    if "df_sim_datos_reales" not in st.session_state:
-        st.session_state.df_sim_datos_reales = pd.DataFrame()
-    if "prev_selection" not in st.session_state:
-        st.session_state.prev_selection = None
-    if "patient_data" not in st.session_state:
-        st.session_state.patient_data = None
+        df_data = pd.read_csv(FICHERODEDATOS_CSV_PATH)
+        df_data.index.name = "Paciente"
 
-    current_selection = df_selection[0] if df_selection else None
+        df_selection = st.dataframe(
+            df_data,
+            key="data",
+            on_select="rerun",
+            selection_mode=["single-row"],
+            hide_index=False,
+            height=300,
+        )["selection"]["rows"]
 
-    disable_rerun_btn = True if (st.session_state.df_sim_datos_reales.empty) else False
-    rerun_sim_btn = st.button(
-        label="Correr de nuevo la simulación",
-        type="primary",
-        use_container_width=True,
-        disabled=disable_rerun_btn,
-    )
+        # INFORMATION ABOUT SELECTION
+        # ------------------------------------------
+        #
+        # df_selection returns a dict shaped like:
+        #
+        # "df_selection": {
+        #     "rows": [0, 1, 2, ...],
+        #     "columns": [0, 1, 2, ...]
+        # }
+        #
 
-    # Simulation and Prediction of selection
-    if current_selection is not None or current_selection == 0:
-        # print(f"prev >> {st.session_state.prev_selection}")
-        # print(f"curr >> {current_selection}")
-
-        if (st.session_state.prev_selection != current_selection) or rerun_sim_btn:
-            # Simulation
-            data = simulate_real_data(ruta_fichero_csv=RUTA_FICHERODEDATOS_CSV, df_selection=current_selection)
-
-            # Data for prediction
-            st.session_state.patient_data = prepare_patient_data_for_prediction(
-                extract_real_data(
-                    ruta_archivo_csv=RUTA_FICHERODEDATOS_CSV, index=current_selection, return_type="tuple"
-                )
-            )
-
-            # Build new DataFrame with Simulation - Prediction result
-            # Assing to -session_state
-            st.session_state.df_sim_datos_reales = build_df_for_stats(
-                data=data,
-                sample_size=corridas_sim_input,
-                patient_data=st.session_state.patient_data,
-                include_mean=True,
-                include_std=True,
-                include_confint=True,
-                include_metrics=True,
-                include_prediction_mean=True,
-                metrics_as_percentage=True,
-                include_info_label=True,
-            )
-
-        st.session_state.prev_selection = current_selection
-
-    # print(st.session_state.df_sim_datos_reales)
-
-    # If Simulation & Prediction
-    if not (st.session_state.df_sim_datos_reales.empty and st.session_state.patient_data is None) or rerun_sim_btn:
-        toggle_format = st.toggle(
-            label=LABEL_TIME_FORMAT, value=False, help=HELP_MSG_TIME_FORMAT, key="formato-tiempo-datos-reales"
+        corridas_sim_input = st.number_input(
+            label="Cantidad de Simulaciones por paciente",
+            min_value=SIM_RUNS_MIN,
+            max_value=SIM_RUNS_MAX,
+            step=50,
+            value=SIM_RUNS_DEFAULT,
+            help=HELP_MSG_SIM_RUNS,
         )
 
-        # Simulation render Dataframe
-        if not toggle_format:
-            st.dataframe(
-                st.session_state.df_sim_datos_reales,
-                hide_index=True,
-                use_container_width=True,
+        corridas_sim_input = SIM_RUNS_DEFAULT
+
+        if "df_sim_real_data" not in st.session_state:
+            st.session_state.df_sim_real_data = pd.DataFrame()
+        if "prev_selection" not in st.session_state:
+            st.session_state.prev_selection = None
+        if "patient_data" not in st.session_state:
+            st.session_state.patient_data = None
+
+        current_selection = df_selection[0] if df_selection else None
+
+        disable_rerun_btn = True if (st.session_state.df_sim_real_data.empty) else False
+        rerun_sim_btn = st.button(
+            label="Correr de nuevo la simulación",
+            type="primary",
+            use_container_width=True,
+            disabled=disable_rerun_btn,
+        )
+
+        # Simulation and Prediction of the selected patient
+        if current_selection is not None or current_selection == 0:
+            # print(f"prev >> {st.session_state.prev_selection}")
+            # print(f"curr >> {current_selection}")
+
+            if (st.session_state.prev_selection != current_selection) or rerun_sim_btn:
+                # Simulation
+                data = simulate_real_data(csv_path=FICHERODEDATOS_CSV_PATH, selection=current_selection)
+
+                # Data for prediction
+                st.session_state.patient_data = prepare_patient_data_for_prediction(
+                    extract_real_data(csv_path=FICHERODEDATOS_CSV_PATH, index=current_selection, return_type="tuple")
+                )
+
+                # Build new DataFrame with Simulation - Prediction result
+                # Assign to session_state
+                st.session_state.df_sim_real_data = build_df_for_stats(
+                    data=data,
+                    sample_size=corridas_sim_input,
+                    patient_data=st.session_state.patient_data,
+                    include_mean=True,
+                    include_std=True,
+                    include_confint=True,
+                    include_metrics=True,
+                    include_prediction_mean=True,
+                    metrics_as_percentage=True,
+                    include_info_label=True,
+                )
+
+            st.session_state.prev_selection = current_selection
+
+        # print(st.session_state.df_sim_real_data)
+
+        # If Simulation & Prediction results are available
+        if not (st.session_state.df_sim_real_data.empty and st.session_state.patient_data is None) or rerun_sim_btn:
+            toggle_format = st.toggle(
+                label=LABEL_TIME_FORMAT, value=False, help=HELP_MSG_TIME_FORMAT, key="formato-tiempo-datos-reales"
             )
-        else:
-            st.dataframe(
-                format_time_columns(df=st.session_state.df_sim_datos_reales, exclude_rows=["Métrica de Calibración"]),
-                hide_index=True,
-                use_container_width=True,
-            )
 
-        # Prediction metric
-        try:
-            prediction_df = get_data_for_prediction(data=st.session_state.patient_data)
-            preds, preds_proba = predict(prediction_df)
+            # Render simulation DataFrame
+            if not toggle_format:
+                st.dataframe(
+                    st.session_state.df_sim_real_data,
+                    hide_index=True,
+                    use_container_width=True,
+                )
+            else:
+                st.dataframe(
+                    format_time_columns(df=st.session_state.df_sim_real_data, exclude_rows=["Métrica de Calibración"]),
+                    hide_index=True,
+                    use_container_width=True,
+                )
 
-            if "prediccion_datos_reales_clases" not in st.session_state:
-                st.session_state.prediccion_datos_reales_clases = 0
-            if "prediccion_datos_reales_porcentaje" not in st.session_state:
-                st.session_state.prediccion_datos_reales_porcentaje = 0.0
+            # Prediction metric
+            try:
+                prediction_df = get_data_for_prediction(data=st.session_state.patient_data)
+                preds, preds_proba = predict(prediction_df)
 
-            st.session_state.prediccion_datos_reales_clases = preds[0]
-            st.session_state.prediccion_datos_reales_porcentaje = preds_proba[0]
+                if "prediction_real_data_classes" not in st.session_state:
+                    st.session_state.prediction_real_data_classes = 0
+                if "prediction_real_data_percentage" not in st.session_state:
+                    st.session_state.prediction_real_data_percentage = 0.0
 
-            current_pred = float(st.session_state.prediccion_datos_reales_porcentaje)
+                st.session_state.prediction_real_data_classes = preds[0]
+                st.session_state.prediction_real_data_percentage = preds_proba[0]
 
-            delta_label = ""
-            delta_color = "normal"
+                current_pred = float(st.session_state.prediction_real_data_percentage)
 
-            paciente_vive = st.session_state.prediccion_datos_reales_clases == 0
-            metric_display_value = (
-                f"{'Paciente no fallece' if paciente_vive else 'Paciente fallece'} ({(current_pred * 100):.0f}%)"
-            )
+                delta_label = ""
+                delta_color = "normal"
 
-            st.metric(
-                label=LABEL_PREDICTION_METRIC,
-                value=metric_display_value,
-                delta=delta_label,
-                delta_color=delta_color,
-                border=True,
-                width="stretch",
-                help="Predicción basada en el modelo de machine learning entrenado con datos históricos",
-            )
+                paciente_vive = st.session_state.prediction_real_data_classes == 0
+                metric_display_value = (
+                    f"{'Paciente no fallece' if paciente_vive else 'Paciente fallece'} ({(current_pred * 100):.0f}%)"
+                )
 
-            st.session_state.prev_prediccion_datos_reales_porcentaje = current_pred
+                st.metric(
+                    label=LABEL_PREDICTION_METRIC,
+                    value=metric_display_value,
+                    delta=delta_label,
+                    delta_color=delta_color,
+                    border=True,
+                    width="stretch",
+                    help="Predicción basada en el modelo de machine learning entrenado con datos históricos",
+                )
 
-        except Exception as e:
-            st.warning(f"No se pudo realizar la predicción: {e}")
+                st.session_state.prev_prediction_real_data_percentage = current_pred
 
-    # SIMULAR TODOS LOS DATOS EN LA TABLA.
+            except Exception as e:
+                st.warning(f"No se pudo completar la predicción: {e}")
+    with sim_model_validation_tab:
+        # TODO >> SIMULATE ALL DATA IN THE TABLE.
+
+        st.markdown(text="### 🎈 Work in Progress :)")
 
 
 #################
-# COMPARACIONES #
+# COMPARISONS #
 #################
-with comparaciones_tab:
+with comparisons_tab:
     wilcoxon_tab, friedman_tab = st.tabs(("Wilcoxon", "Friedman"))
 
     with wilcoxon_tab:
@@ -702,8 +712,8 @@ with comparaciones_tab:
 
         file_upl1: UploadedFile
         file_upl2: UploadedFile
-        df_experimento1 = pd.DataFrame()
-        df_experimento2 = pd.DataFrame()
+        df_experiment1 = pd.DataFrame()
+        df_experiment2 = pd.DataFrame()
 
         with st.container():
             col1, col2 = st.columns(2)
@@ -714,56 +724,55 @@ with comparaciones_tab:
 
             with st.expander("Previsualización", expanded=False):
                 if file_upl1:
-                    df_experimento1 = bin_to_df(file_upl1)
-                    if not df_experimento1.empty:
+                    df_experiment1 = bin_to_df(file_upl1)
+                    if not df_experiment1.empty:
                         st.dataframe(
-                            df_experimento1,
+                            df_experiment1,
                             height=200,
                             use_container_width=True,
                             hide_index=True,
                         )
                 if file_upl2:
-                    df_experimento2 = bin_to_df(file_upl2)
-                    if not df_experimento2.empty:
+                    df_experiment2 = bin_to_df(file_upl2)
+                    if not df_experiment2.empty:
                         st.dataframe(
-                            df_experimento2,
+                            df_experiment2,
                             height=200,
                             use_container_width=True,
                             hide_index=True,
                         )
 
-        # Columna a comparar.
-        opcion_col_comparacion = st.selectbox(
+        col_comparison_selectbox = st.selectbox(
             "Seleccione una columna para comparar",
             EXP_VARIABLES,
-            key="col-comparacion-wilcoxon",
+            key="col-comparison-wilcoxon",
         )
-        boton_comparacion = st.button(
+        comparison_btn = st.button(
             "Realizar prueba de Wilcoxon",
             type="primary",
             use_container_width=True,
-            key="boton-comparacion-wilcoxon",
+            key="btn-comparison-wilcoxon",
         )
 
-        # Comparación Wilcoxon.
+        # Wilcoxon comparison.
         with st.container():
-            if boton_comparacion:
-                if df_experimento1.empty or df_experimento2.empty:
+            if comparison_btn:
+                if df_experiment1.empty or df_experiment2.empty:
                     st.warning(
-                        "No se puede realizar la comparación. Se detectan datos vacíos o falta de datos en los experimentos."
+                        "No se puede realizar la comparación: se detectaron datos de experimento vacíos o faltantes."
                     )
                 else:
-                    x: DataFrame = df_experimento1[opcion_col_comparacion]
-                    y: DataFrame = df_experimento2[opcion_col_comparacion]
+                    x: DataFrame = df_experiment1[col_comparison_selectbox]
+                    y: DataFrame = df_experiment2[col_comparison_selectbox]
                     if x.equals(y):
                         st.error(
                             'Imposible realizar prueba de Wilcoxon cuando la diferencia entre los elementos de "x" y "y" es cero para todos los elementos. Verifique que no cargó el mismo experimento dos veces.'
                         )
                     else:
-                        # Corrección de que existen la misma cantidad de filas en ambas tablas.
+                        # Correction to ensure both tables have the same number of rows.
                         len_dif = abs(len(x) - len(y))
 
-                        # Ajustar el tamaño de las muestras si es necesario
+                        # Adjust sample sizes if necessary
                         if x.shape[0] > y.shape[0]:  # X mayor que Y
                             x = x.head(y.shape[0])
                             st.info(
@@ -781,11 +790,11 @@ with comparaciones_tab:
                             wilcoxon_data.test(x, y)
 
                             # Mostrar Resultado
-                            df_mostrar = build_df_test_result(
+                            df_to_show = build_df_test_result(
                                 statistic=wilcoxon_data.statistic,
                                 p_value=wilcoxon_data.p_value,
                             )
-                            st.dataframe(df_mostrar, hide_index=True, use_container_width=True)
+                            st.dataframe(df_to_show, hide_index=True, use_container_width=True)
                             st.markdown(INFO_STATISTIC)
                             st.markdown(INFO_P_VALUE)
                         except Exception as data:
@@ -793,32 +802,33 @@ with comparaciones_tab:
     with friedman_tab:
         st.markdown("### Friedman")
 
-        file_upl_experimentos: list[UploadedFile]
-        dataframes_experimentos: list[DataFrame]
+        experiments_file_upl: list[UploadedFile]
+        experiment_dataframes: list[DataFrame]
 
         # File Uploader.
         with st.container():
-            file_upl_experimentos = st.file_uploader(label="Experimentos", type=[".csv"], accept_multiple_files=True)
-            dataframes_experimentos = bin_to_df(file_upl_experimentos)
+            experiments_file_upl = st.file_uploader(label="Experimentos", type=[".csv"], accept_multiple_files=True)
+            experiment_dataframes = bin_to_df(experiments_file_upl)
 
-        # Columna a comparar.
-        opcion_col_comparacion = st.selectbox("Seleccione una columna para comparar", EXP_VARIABLES, key=3)
-        boton_comparacion = st.button(
+        col_comparison_selectbox = st.selectbox(
+            "Seleccione una columna para comparar", EXP_VARIABLES, key="col-comparison-friedman"
+        )
+        comparison_btn = st.button(
             "Realizar prueba de Friedman",
             type="primary",
             use_container_width=True,
-            key=4,
+            key="btn-comparison-friedman",
         )
 
         with st.container():
-            if boton_comparacion:
-                if len(file_upl_experimentos) == 0:
-                    st.warning("No se han cargado datos de resultados de experimentos para realizar esta prueba.")
-                elif not len(file_upl_experimentos) >= 3:
+            if comparison_btn:
+                if len(experiments_file_upl) == 0:
+                    st.warning("No se han cargado datos de resultados de experimentos para esta prueba.")
+                elif not len(experiments_file_upl) >= 3:
                     st.warning("Debe cargar más de 3 muestras para realizar esta prueba.")
                 else:
                     adjusted_sample_tuple = adjust_df_sizes(
-                        [df[opcion_col_comparacion] for df in dataframes_experimentos]
+                        [df[col_comparison_selectbox] for df in experiment_dataframes]
                     )
 
                     samples_selection = adjusted_sample_tuple[0]
@@ -829,16 +839,16 @@ with comparaciones_tab:
                         )
 
                     try:
-                        # Test de Friedman.
+                        # Friedman test.
                         friedman_result = Friedman()
                         friedman_result.test(*samples_selection)
 
-                        # Mostrar Resultado.
-                        df_mostrar = build_df_test_result(
+                        # Show result.
+                        df_to_show = build_df_test_result(
                             statistic=friedman_result.statistic,
                             p_value=friedman_result.p_value,
                         )
-                        st.dataframe(df_mostrar, hide_index=True, use_container_width=True)
+                        st.dataframe(df_to_show, hide_index=True, use_container_width=True)
                         st.markdown(INFO_STATISTIC)
                         st.markdown(INFO_P_VALUE)
                     except Exception as data:

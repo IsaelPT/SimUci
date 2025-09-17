@@ -31,19 +31,19 @@ class StatsUtils:
     @staticmethod
     def confidenceinterval(mean, std, n, coef=0.95) -> tuple[ndarray[float], ndarray[float]]:
         """
-        Calcula el intervalo de confianza para una media dada, desviación estándar y tamaño de muestra.
+        Compute confidence interval for a given mean, standard deviation and sample size.
 
         Args:
-            mean (ndarray): Media de los datos.
-            std (ndarray): Desviación estándar de los datos.
-            n (int): Tamaño de la muestra.
-            coef (float, opcional): Nivel de confianza (por defecto 0.95).
+            mean (ndarray): Mean of the data.
+            std (ndarray): Standard deviation of the data.
+            n (int): Sample size.
+            coef (float, optional): Confidence level (default 0.95).
 
         Returns:
-            tuple[ndarray, ndarray]: Límite inferior y superior del intervalo de confianza.
+            tuple[ndarray, ndarray]: Lower and upper bounds of the confidence interval.
         """
 
-        # Si la desviación estándar es 0, el intervalo de confianza es simplemente la media.
+        # If the standard deviation is zero, the confidence interval is the mean.
         if np.all(std == 0):
             return mean, mean
 
@@ -61,26 +61,22 @@ class StatsUtils:
     @staticmethod
     def calibration_metric_predict(y_true: ndarray, y_pred: ndarray, intervals: list[float]) -> ndarray[tuple[int]]:
         """
-        Calcula la cantidad de valores verdaderos (`y_true`) que caen dentro de los intervalos de confianza
-        definidos por los niveles especificados (`intervals`) para las probabilidades predichas (`y_pred`).
+        Count how many true values (`y_true`) fall inside confidence intervals defined by levels in `intervals` for
+        predicted probabilities (`y_pred`).
 
-        Este método evalúa cuántos de los valores verdaderos están dentro de los intervalos de confianza
-        generados para cada nivel en `intervals`. Los intervalos de confianza se calculan en base a los
-        percentiles de las probabilidades predichas.
+        This method evaluates how many true values lie within the confidence intervals generated for each level in
+        `intervals`. Confidence intervals are computed from percentiles of the predicted probabilities.
 
         Args:
-            y_true (np.ndarray):
-                Los valores verdaderos a evaluar. Debe ser un array de NumPy.
-            y_pred (np.ndarray):
-                Las probabilidades predichas. Debe ser un array de NumPy.
-            intervals (list[float]):
-                Una lista de niveles de confianza (por ejemplo, [0.8, 0.9, 0.95]) para calcular los intervalos.
+            y_true (np.ndarray): True values to evaluate. Must be a NumPy array.
+            y_pred (np.ndarray): Predicted probabilities. Must be a NumPy array.
+            intervals (list[float]): A list of confidence levels (e.g., [0.8, 0.9, 0.95]) to build intervals.
 
         Returns:
-            np.ndarray: Un array donde cada elemento representa la cantidad de valores verdaderos que caen dentro
-            del intervalo de confianza correspondiente al nivel en `intervals`.
+            np.ndarray: An array where each element is the count of true values that fall inside the respective
+            confidence interval for the corresponding level in `intervals`.
 
-        Ejemplos:
+        Examples:
             >>> y_true = np.array([0.1, 0.5, 0.9])
             >>> y_pred = np.array([0.2, 0.6, 0.8])
             >>> intervals = [0.8, 0.9]
@@ -100,29 +96,25 @@ class StatsUtils:
     @staticmethod
     def calibration_metric_simulation(y_true: float | int | ndarray[float | int], lower: int, upper: int) -> int:
         """
-        Calcula la cantidad de valores verdaderos (`y_true`) que caen dentro del intervalo especificado
-        por los límites inferior (`lower`) y superior (`upper`).
+        Count how many true values (`y_true`) fall inside the interval defined by `lower` and `upper`.
 
-        Este método soporta tanto valores individuales (e.g., un solo número) como colecciones de valores
-        (e.g., listas, arrays de NumPy, Series o DataFrames de pandas). Determina cuántos de los valores
-        proporcionados están dentro del intervalo [lower, upper].
+        This method supports both single scalar values (e.g., a single number) and collections (lists, NumPy arrays,
+        pandas Series or DataFrames). It returns how many provided values fall inside [lower, upper].
 
         Args:
-            y_true (float | int | list | np.ndarray | pd.Series | pd.DataFrame):
-                Los valores verdaderos a verificar. Puede ser un único valor o una colección de valores.
-            lower (float):
-                El límite inferior del intervalo.
-            upper (float):
-                El límite superior del intervalo.
+            y_true (float | int | list | np.ndarray | pd.Series | pd.DataFrame): True values to check. Can be a single
+                value or a collection.
+            lower (float): Lower bound of the interval.
+            upper (float): Upper bound of the interval.
 
         Returns:
-            int: La cantidad de valores en `y_true` que caen dentro del intervalo [lower, upper].
+            int: The count of values in `y_true` that fall inside [lower, upper].
 
         Raises:
-            TypeError: Si `y_true` no es un tipo soportado.
+            TypeError: If `y_true` is not a supported type.
 
-        Ejemplos:
-            Para un único valor:
+        Examples:
+            For a single value:
 
             >>> y_true = 3.5
             >>> lower = 2.0
@@ -130,7 +122,7 @@ class StatsUtils:
             >>> StatsUtils.calibration_metric_simulation(y_true, lower, upper)
             1
 
-            Para una colección de valores:
+            For a collection of values:
 
             >>> y_true = [1.5, 2.0, 3.5, 4.0]
             >>> lower = 2.0
@@ -144,7 +136,7 @@ class StatsUtils:
             case float() | int():
                 return int(lower <= y_true <= upper)
 
-            # Verificar que es una colección de valores.
+            # Check if it's a collection of values.
             case list() | np.ndarray() | pd.Series() | pd.DataFrame():
                 y_true = np.array(y_true)
                 within_interval = int(np.sum((y_true >= lower) & (y_true <= upper)))
@@ -152,20 +144,25 @@ class StatsUtils:
                 return within_interval
 
             case _:
-                raise TypeError(f"Tipo no soportado para y_true: {type(y_true)}")
+                raise TypeError(f"Unsupported type for y_true: {type(y_true)}")
 
-    ###########################
-    # MÉTRICAS DE CALIBRACIÓN #
-    ###########################
-    def calibration_metrics(
+    ##########################
+    # MODEL CALIBRATION #
+    ##########################
+
+    @staticmethod
+    def simulation_model_calibration(true_data: pd.DataFrame, predict_data: pd.DataFrame) -> None:
+        pass
+
+    def __calibration_metrics(
         n_patients: int,
         n_replics: int,
-        entire_replics: list,
-        real_data: list,
+        full_replics: list,
+        true_data: list,
         confidence_level: int = 0.95,
     ):
         if not 0.80 <= confidence_level <= 0.95:
-            print("NOTE: it's recommended to have confidence_level value in range 0.80 to 0.95")
+            print("NOTE: it's recommended to have a confidence_level in the range 0.80 to 0.95")
 
         import scipy.stats as stats
 
@@ -176,22 +173,22 @@ class StatsUtils:
 
         # Checking which values are inside the confidence interval
         for i in range(n_patients):
-            mean = np.mean(entire_replics[i])
-            std_error = np.std(entire_replics[i], ddof=1) / np.sqrt(n_replics)
-            margen_error = t_value * std_error
+            mean = np.mean(full_replics[i])
+            std_error = np.std(full_replics[i], ddof=1) / np.sqrt(n_replics)
+            margin_error = t_value * std_error
 
-            ci_lower = mean - margen_error
-            ci_upper = mean + margen_error
+            ci_lower = mean - margin_error
+            ci_upper = mean + margin_error
 
             confidence_intervals.append((ci_lower, ci_upper))
 
-            if ci_lower <= real_data[i] <= ci_upper:
+            if ci_lower <= true_data[i] <= ci_upper:
                 cobertura += 1
 
-        porcentaje_cobertura = (cobertura / n_patients) * 100
-        print(f"Porcentaje de cobertura de IC ({confidence_level * 100}%): {porcentaje_cobertura:.2f}%")
+        coverage_percentage = (cobertura / n_patients) * 100
+        print(f"Confidence interval coverage percentage ({confidence_level * 100}%): {coverage_percentage:.2f}%")
 
-        return porcentaje_cobertura
+        return coverage_percentage
 
     def error_metrics(real_data, prediction_means):
         rmse = np.sqrt(mean_squared_error(real_data, prediction_means))
@@ -210,8 +207,8 @@ class StatsUtils:
         datos_simulados_completos = complete_replics.flatten()
         ks_statistic, ks_pvalue = ks_2samp(true_data, datos_simulados_completos)
 
-        print(f"Estadístico KS: {ks_statistic:.4f}")
-        print(f"Valor p de KS: {ks_pvalue:.4f}")
+        print(f"KS statistic: {ks_statistic:.4f}")
+        print(f"KS p-value: {ks_pvalue:.4f}")
 
         return ks_statistic, ks_pvalue
 
@@ -220,12 +217,12 @@ class StatsUtils:
 
         anderson_result = anderson_ksamp([true_sample, simulation_sample])
 
-        print(f"Estadístico de Anderson-Darling: {anderson_result.statistic:.4f}")
-        print(f"Valor p crítico aproximado: {anderson_result.significance_level:.3f}")
+        print(f"Anderson-Darling statistic: {anderson_result.statistic:.4f}")
+        print(f"Approximate critical p-value: {anderson_result.significance_level:.3f}")
 
         return anderson_result
 
     ########################
-    # MEDICIÓN DE ROBUSTÉS #
+    # ROBUSTNESS MEASUREMENT #
     ########################
-    # TODO <<<<<
+    # TODO later

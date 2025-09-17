@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import scipy.stats as stats
 
-from utils.constants import RUTA_DFCENTROIDES_CSV
+from utils.constants import DFCENTROIDES_CSV_PATH
 
 
 # Distribuciones para las variables del cluster 0
@@ -103,7 +103,7 @@ def clustering(
     if va == 2 or va == 3:
         va_g = 2
 
-    df_centroid = pd.read_csv(RUTA_DFCENTROIDES_CSV)
+    df_centroid = pd.read_csv(DFCENTROIDES_CSV_PATH)
     nueva_instancia = np.array(
         [
             Edad,

@@ -24,3 +24,6 @@ experiments/*
 # System files
 .DS_Store
 Thumbs.db
+
+# Misc.
+todo.todo

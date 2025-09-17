@@ -3,7 +3,7 @@ import simpy
 from uci import distribuciones
 
 
-class Simulacion:
+class Simulation:
     def __init__(self, experiment, cluster) -> None:
         self.experiment = experiment
         self.cluster = cluster
