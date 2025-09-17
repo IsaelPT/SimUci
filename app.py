@@ -698,7 +698,7 @@ with real_data_tab:
     with sim_model_validation_tab:
         # TODO >> SIMULATE ALL DATA IN THE TABLE.
 
-        st.markdown(text="### 🎈 Work in Progress :)")
+        st.markdown("### 🎈 Work in Progress :)")
 
 
 #################
