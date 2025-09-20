@@ -1,14 +1,18 @@
+from dataclasses import dataclass
+from typing import TypeAlias
 import numpy as np
-from numpy import ndarray
-import pandas as pd
-from scipy.stats import wilcoxon, friedmanchisquare, norm
+from scipy.stats import wilcoxon, friedmanchisquare
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+from utils.constants import EXPERIMENT_VARIABLES
+
+# Types
+_METRIC: TypeAlias = tuple[float, ...] | dict[str, float]
 
 
 class Wilcoxon:
     def __init__(self):
-        self.statistic: float = 0
-        self.p_value: float = 0
+        self.statistic: float = 0.0
+        self.p_value: float = 0.0
 
     def test(self, x, y) -> None:
         res = wilcoxon(x, y)
@@ -18,8 +22,8 @@ class Wilcoxon:
 
 class Friedman:
     def __init__(self):
-        self.statistic: float = 0
-        self.p_value: float = 0
+        self.statistic: float = 0.0
+        self.p_value: float = 0.0
 
     def test(self, *samples) -> None:
         res = friedmanchisquare(*samples)
@@ -27,202 +31,172 @@ class Friedman:
         self.p_value = res[1]
 
 
-class StatsUtils:
-    @staticmethod
-    def confidenceinterval(mean, std, n, coef=0.95) -> tuple[ndarray[float], ndarray[float]]:
-        """
-        Compute confidence interval for a given mean, standard deviation and sample size.
+@dataclass
+class SimulationMetrics:
+    true_data: np.ndarray
+    simulation_data: np.ndarray
 
-        Args:
-            mean (ndarray): Mean of the data.
-            std (ndarray): Standard deviation of the data.
-            n (int): Sample size.
-            coef (float, optional): Confidence level (default 0.95).
+    coverage_percentage: _METRIC = None
+    error_margin: _METRIC = None
+    kolmogorov_smirnov_result: _METRIC = None
+    anderson_darling_result: _METRIC = None
 
-        Returns:
-            tuple[ndarray, ndarray]: Lower and upper bounds of the confidence interval.
-        """
+    def evaluate(
+        self,
+        confidence_level: float = 0.95,
+        random_state: int | None = None,
+        result_as_dict=False,
+    ) -> None:
+        np.random.seed(random_state)
 
-        # If the standard deviation is zero, the confidence interval is the mean.
-        if np.all(std == 0):
-            return mean, mean
-
-        sem = std / np.sqrt(n)
-        conf_int = norm.interval(confidence=coef, loc=mean, scale=sem)
-        arr_limite_inferior: ndarray[float] = conf_int[0]
-        arr_limite_superior: ndarray[float] = conf_int[1]
-
-        # print("conf_int: ", conf_int)
-        # print("arr_l_inferior: ", arr_limite_inferior)
-        # print("arr_l_superior: ", arr_limite_superior)
-
-        return arr_limite_inferior, arr_limite_superior
-
-    @staticmethod
-    def calibration_metric_predict(y_true: ndarray, y_pred: ndarray, intervals: list[float]) -> ndarray[tuple[int]]:
-        """
-        Count how many true values (`y_true`) fall inside confidence intervals defined by levels in `intervals` for
-        predicted probabilities (`y_pred`).
-
-        This method evaluates how many true values lie within the confidence intervals generated for each level in
-        `intervals`. Confidence intervals are computed from percentiles of the predicted probabilities.
-
-        Args:
-            y_true (np.ndarray): True values to evaluate. Must be a NumPy array.
-            y_pred (np.ndarray): Predicted probabilities. Must be a NumPy array.
-            intervals (list[float]): A list of confidence levels (e.g., [0.8, 0.9, 0.95]) to build intervals.
-
-        Returns:
-            np.ndarray: An array where each element is the count of true values that fall inside the respective
-            confidence interval for the corresponding level in `intervals`.
-
-        Examples:
-            >>> y_true = np.array([0.1, 0.5, 0.9])
-            >>> y_pred = np.array([0.2, 0.6, 0.8])
-            >>> intervals = [0.8, 0.9]
-            >>> StatsUtils.calibration_metric_predict(y_true, y_pred, intervals)
-            array([2, 1])
-        """
-
-        within_interval = np.zeros(len(intervals), dtype=int)  # [0, 0, 0]
-
-        for i, alpha in enumerate(intervals):
-            lower = np.percentile(y_pred, (1 - alpha) / 2 * 100, axis=0)
-            upper = np.percentile(y_pred, (1 + alpha) / 2 * 100, axis=0)
-            within_interval[i] = int(np.sum((y_true >= lower) & (y_true <= upper)))
-
-        return within_interval
-
-    @staticmethod
-    def calibration_metric_simulation(y_true: float | int | ndarray[float | int], lower: int, upper: int) -> int:
-        """
-        Count how many true values (`y_true`) fall inside the interval defined by `lower` and `upper`.
-
-        This method supports both single scalar values (e.g., a single number) and collections (lists, NumPy arrays,
-        pandas Series or DataFrames). It returns how many provided values fall inside [lower, upper].
-
-        Args:
-            y_true (float | int | list | np.ndarray | pd.Series | pd.DataFrame): True values to check. Can be a single
-                value or a collection.
-            lower (float): Lower bound of the interval.
-            upper (float): Upper bound of the interval.
-
-        Returns:
-            int: The count of values in `y_true` that fall inside [lower, upper].
-
-        Raises:
-            TypeError: If `y_true` is not a supported type.
-
-        Examples:
-            For a single value:
-
-            >>> y_true = 3.5
-            >>> lower = 2.0
-            >>> upper = 4.0
-            >>> StatsUtils.calibration_metric_simulation(y_true, lower, upper)
-            1
-
-            For a collection of values:
-
-            >>> y_true = [1.5, 2.0, 3.5, 4.0]
-            >>> lower = 2.0
-            >>> upper = 4.0
-            >>> StatsUtils.calibration_metric_simulation(y_true, lower, upper)
-            3
-        """
-
-        match y_true:
-            # De ser un solo valor, verificar su tipo.
-            case float() | int():
-                return int(lower <= y_true <= upper)
-
-            # Check if it's a collection of values.
-            case list() | np.ndarray() | pd.Series() | pd.DataFrame():
-                y_true = np.array(y_true)
-                within_interval = int(np.sum((y_true >= lower) & (y_true <= upper)))
-
-                return within_interval
-
-            case _:
-                raise TypeError(f"Unsupported type for y_true: {type(y_true)}")
-
-    ##########################
-    # MODEL CALIBRATION #
-    ##########################
-
-    @staticmethod
-    def simulation_model_calibration(true_data: pd.DataFrame, predict_data: pd.DataFrame) -> None:
-        pass
-
-    def __calibration_metrics(
-        n_patients: int,
-        n_replics: int,
-        full_replics: list,
-        true_data: list,
-        confidence_level: int = 0.95,
-    ):
         if not 0.80 <= confidence_level <= 0.95:
-            print("NOTE: it's recommended to have a confidence_level in the range 0.80 to 0.95")
+            print("NOTE: it's recommended to specify a confidence level on range 0.80 - 0.95")
 
-        import scipy.stats as stats
+        try:
+            self.coverage_percentage = self.__calculate_coverage_percentage(confidence_level=confidence_level)
+            self.error_margin = self.__calculate_error_margin(as_dict=result_as_dict)
+            self.kolmogorov_smirnov_result = self.__kolmogorov_smirnov_test(as_dict=result_as_dict)
+            self.anderson_darling_result = self.__anderson_darling_test(as_dict=result_as_dict)
+        except Exception:
+            import traceback
 
-        freedown_grades = n_replics - 1
-        t_value = stats.t.ppf(1 - (1 - confidence_level) / 2, freedown_grades)
-        confidence_intervals = []
-        cobertura = 0
+            traceback.print_exc()
 
-        # Checking which values are inside the confidence interval
-        for i in range(n_patients):
-            mean = np.mean(full_replics[i])
-            std_error = np.std(full_replics[i], ddof=1) / np.sqrt(n_replics)
-            margin_error = t_value * std_error
+        return None
 
-            ci_lower = mean - margin_error
-            ci_upper = mean + margin_error
+    def __calculate_coverage_percentage(self, confidence_level: float = 0.95) -> dict[str, float]:
+        """Computes the amount of patients that their confidence interval are in range for each experiment variable.
 
-            confidence_intervals.append((ci_lower, ci_upper))
+        Args:
+            confidence_level (float, optional): Statistic confidence level. Defaults to 0.95.
 
-            if ci_lower <= true_data[i] <= ci_upper:
-                cobertura += 1
+        Returns:
+            dict[str, float]: Dictionary with coverage percentages for each experiment variable
+        """
 
-        coverage_percentage = (cobertura / n_patients) * 100
-        print(f"Confidence interval coverage percentage ({confidence_level * 100}%): {coverage_percentage:.2f}%")
+        from scipy.stats import t
 
-        return coverage_percentage
+        true_data, simulation_data = self.true_data, self.simulation_data
 
-    def error_metrics(real_data, prediction_means):
-        rmse = np.sqrt(mean_squared_error(real_data, prediction_means))
-        mae = mean_absolute_error(real_data, prediction_means)
-        mape = np.mean(np.abs((real_data - prediction_means) / real_data)) * 100
+        # simulation_data: 3Darray = [n_patients * n_replicates * n_variables]
+        n_patients: int = simulation_data.shape[0]
+        n_replicates: int = simulation_data.shape[1]
+        n_variables: int = simulation_data.shape[2]
+
+        degrees_freedom = n_replicates - 1
+        t_value = t.ppf(1 - (1 - confidence_level) / 2, degrees_freedom)
+
+        coverage_percentages = {}
+
+        for var_idx in range(n_variables):
+            confidence_intervals = []
+            coverage_count = 0
+
+            for patient_idx in range(n_patients):
+                # Defining Confidence Interval from the Simulated Data for this variable
+                mean = np.mean(simulation_data[patient_idx, :, var_idx])
+                std_error = np.std(simulation_data[patient_idx, :, var_idx], ddof=1) / np.sqrt(n_replicates)
+                margin_error = t_value * std_error
+
+                ci_lower = mean - margin_error
+                ci_upper = mean + margin_error
+
+                confidence_intervals.append((ci_lower, ci_upper))
+
+                # Checking if true value is inside calculated Confidence Interval
+                if ci_lower <= true_data[patient_idx, var_idx] <= ci_upper:
+                    coverage_count += 1
+
+            coverage_percentage = (coverage_count / n_patients) * 100
+            # Use actual variable names from constants, fallback to generic name if index out of range
+            if var_idx < len(EXPERIMENT_VARIABLES):
+                var_name = EXPERIMENT_VARIABLES[var_idx]
+            else:
+                var_name = f"variable_{var_idx}"
+            coverage_percentages[var_name] = coverage_percentage
+            print(
+                f"Porcentaje de cobertura de IC para {var_name} ({confidence_level * 100}%): {coverage_percentage:.2f}%"
+            )
+
+        return coverage_percentages
+
+    def __calculate_error_margin(self, as_dict=False) -> _METRIC:
+        true_data, simulation_data = self.true_data, self.simulation_data
+
+        # simulation_data: (n_patients, n_simulations, experiment_variables(5))
+        simulation_mean = np.mean(simulation_data, axis=1)
+
+        rmse = np.sqrt(mean_squared_error(true_data, simulation_mean))
+        mae = mean_absolute_error(true_data, simulation_mean)
+        mape = np.mean(np.abs((true_data - simulation_mean) / true_data)) * 100
 
         print(f"RMSE: {rmse:.2f}")
         print(f"MAE: {mae:.2f}")
         print(f"MAPE: {mape:.2f}%")
 
-        return rmse, mae, mape
+        if as_dict:
+            return {
+                "rmse": rmse,
+                "mae": mae,
+                "mape": mape,
+            }
+        return (rmse, mae, mape)
 
-    def ks_test(true_data, complete_replics):
+    def __kolmogorov_smirnov_test(self, as_dict=False) -> _METRIC:
         from scipy.stats import ks_2samp
 
-        datos_simulados_completos = complete_replics.flatten()
-        ks_statistic, ks_pvalue = ks_2samp(true_data, datos_simulados_completos)
+        true_data, simulation_data = self.true_data, self.simulation_data
 
-        print(f"KS statistic: {ks_statistic:.4f}")
-        print(f"KS p-value: {ks_pvalue:.4f}")
+        # Handle different data shapes
+        if len(simulation_data.shape) == 3:
+            # For 3D simulation data, flatten all replicates for each variable
+            # Compare true data with mean of simulated data across replicates
+            sim_mean = np.mean(simulation_data, axis=1)  # Shape: (n_patients, n_variables)
+            statistic, p_value = ks_2samp(true_data.flatten(), sim_mean.flatten())
+        else:
+            # For 1D data (used in individual tests)
+            statistic, p_value = ks_2samp(true_data, simulation_data.flatten())
 
-        return ks_statistic, ks_pvalue
+        print(f"Estadístico KS: {statistic:.4f}")
+        print(f"Valor p de KS: {p_value:.4f}")
 
-    def ad_test(true_sample, simulation_sample):
-        from scipy.stats import anderson_ksamp
+        if as_dict:
+            return {
+                "statistic": statistic,
+                "p_value": p_value,
+            }
+        return statistic, p_value
 
-        anderson_result = anderson_ksamp([true_sample, simulation_sample])
+    def __anderson_darling_test(self, as_dict=False) -> _METRIC:
+        import scipy.stats as stats
 
-        print(f"Anderson-Darling statistic: {anderson_result.statistic:.4f}")
-        print(f"Approximate critical p-value: {anderson_result.significance_level:.3f}")
+        true_data, simulation_data = self.true_data, self.simulation_data
 
-        return anderson_result
+        # Handle different data shapes
+        if len(simulation_data.shape) == 3:
+            # For 3D simulation data, use mean across replicates for comparison
+            sim_mean = np.mean(simulation_data, axis=1)  # Shape: (n_patients, n_variables)
+            min_size = min(len(true_data.flatten()), len(sim_mean.flatten()))
+            real_sample = np.random.choice(true_data.flatten(), min_size, replace=False)
+            simulated_sample = np.random.choice(sim_mean.flatten(), min_size, replace=False)
+        else:
+            # For 1D data (used in individual tests)
+            min_size = min(len(true_data), len(simulation_data))
+            real_sample = np.random.choice(true_data, min_size, replace=False)
+            simulated_sample = np.random.choice(simulation_data, min_size, replace=False)
 
-    ########################
-    # ROBUSTNESS MEASUREMENT #
-    ########################
-    # TODO later
+        # Perform the Anderson-Darling test
+        anderson_result = stats.anderson_ksamp([real_sample, simulated_sample])
+
+        statistic = anderson_result.statistic
+        significance_level = anderson_result.significance_level
+
+        print(f"Anderson-Darling Statistic: {anderson_result.statistic:.4f}")
+        print(f"Approximate Critical p-value: {anderson_result.significance_level:.3f}")
+
+        if as_dict:
+            return {
+                "statistic": statistic,
+                "significance_level": significance_level,
+            }
+        return (statistic, significance_level)

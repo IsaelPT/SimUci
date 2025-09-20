@@ -64,7 +64,7 @@ from utils.constants import (
     INFO_STATISTIC,
     INFO_P_VALUE,
 )
-from uci.stats import Wilcoxon, Friedman
+from uci.stats import SimulationMetrics, Wilcoxon, Friedman
 
 
 # Initial page configuration
@@ -699,6 +699,9 @@ with real_data_tab:
         # TODO >> SIMULATE ALL DATA IN THE TABLE.
 
         st.markdown("### 🎈 Work in Progress :)")
+
+        simulation_metric = SimulationMetrics()
+        # simulation_metric.evaluate()
 
 
 #################
