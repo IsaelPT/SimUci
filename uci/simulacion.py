@@ -1,31 +1,69 @@
 import simpy
+import numpy as np
 
 from uci import distribuciones
+from uci.experiment import Experiment
 
 
 class Simulation:
-    def __init__(self, experiment, cluster) -> None:
+    def __init__(self, experiment: Experiment, cluster) -> None:
         self.experiment = experiment
         self.cluster = cluster
 
     def uci(self, env: simpy.Environment):
-        if self.cluster == 0:
-            post_uci = int(distribuciones.tiemp_postUCI0())
-            uci = int(distribuciones.estad_UTI0())
-            while True:
-                vam = int(distribuciones.tiemp_VAM0())
-                if vam <= uci:
-                    break
+        # Helper: convert numpy arrays/scalars or lists to a Python float safely
+        # This prevents the simulation for spitting zeros due to distribution format issues
+        def _to_scalar(x) -> float:
+            try:
+                # Fast path: plain number
+                return float(x)
+            except Exception:
+                try:
+                    # Numpy arrays / scalars
+                    arr = np.asarray(x)
+                    if arr.size == 0:
+                        return 0.0
+                    return float(arr.reshape(-1)[0])
+                except Exception:
+                    return 0.0
+
+        is_cluster_zero: bool = self.cluster == 0
+
+        post_uci = int(
+            round(
+                _to_scalar(
+                    distribuciones.tiemp_postUCI_cluster0()
+                    if is_cluster_zero
+                    else distribuciones.tiemp_postUCI_clustet1()
+                )
+            )
+        )
+        uci = int(
+            round(
+                _to_scalar(
+                    distribuciones.estad_UTI_cluster0() if is_cluster_zero else distribuciones.estad_UTI_cluster1()
+                )
+            )
+        )
+
+        # Ensure VAM does not exceed UCI; cap attempts to avoid infinite loop if distribution heavily skews
+        for _ in range(1000):
+            vam = int(
+                round(
+                    _to_scalar(
+                        distribuciones.tiemp_VAM_cluster0() if is_cluster_zero else distribuciones.tiemp_VAM_cluster1()
+                    )
+                )
+            )
+            if vam <= uci:
+                break
         else:
-            post_uci = int(distribuciones.tiemp_postUCI1())
-            uci = int(distribuciones.estad_UTI1())
-            while True:
-                vam = int(distribuciones.tiemp_VAM1())
-                if vam <= uci:
-                    break
+            # As a safety net, clamp VAM to UCI
+            vam = uci
 
         pre_vam = int((uci - vam) * self.experiment.porciento / 100)
         post_vam = uci - pre_vam - vam
+
         self.experiment.result["Tiempo Post VAM"] = post_vam
         self.experiment.result["Tiempo VAM"] = vam
         self.experiment.result["Tiempo Pre VAM"] = pre_vam

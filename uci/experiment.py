@@ -1,7 +1,7 @@
 import pandas as pd
 import simpy
 
-from utils.constants import EXPERIMENT_VARIABLES as VARIABLES_EXPERIMENTO
+from utils.constants import EXPERIMENT_VARIABLES_LABELS as VARIABLES_EXPERIMENTO
 from uci import distribuciones
 from uci.simulacion import Simulation
 
@@ -44,7 +44,9 @@ class Experiment:
 
 def single_run(experiment) -> dict[str, int]:
     env = simpy.Environment()
+
     experiment.init_results_variables()
+
     cluster = distribuciones.clustering(
         experiment.edad,
         experiment.diagn1,
@@ -58,7 +60,9 @@ def single_run(experiment) -> dict[str, int]:
         experiment.tiempo_vam,
         experiment.tiempo_pre_uti,
     )
+
     simulation = Simulation(experiment, cluster)
+
     env.process(simulation.uci(env))
     env.run()
 
@@ -66,29 +70,35 @@ def single_run(experiment) -> dict[str, int]:
     return result
 
 
-def multiple_replication(experiment: Experiment, n_reps: int = 100) -> pd.DataFrame:
-    results = []
+def multiple_replication(experiment: Experiment, n_reps: int = 100, as_int: bool = True) -> pd.DataFrame:
+    results: list[dict] = []
 
     for _ in range(n_reps):
         result = single_run(experiment)
 
         # Asegurarse de que todos los valores sean numéricos
-        numeric_result = {}
+        numeric_result: dict = {}
         for key, value in result.items():
             try:
-                numeric_result[key] = int(float(value))
+                val = float(value)
             except (ValueError, TypeError):
-                numeric_result[key] = 0
+                val = 0.0
+            numeric_result[key] = int(val) if as_int else float(val)
         results.append(numeric_result)
 
     df = pd.DataFrame(results)
 
     # Verificar que no haya valores nulos
     if df.isnull().any().any():
-        df = df.fillna(0)
+        df = df.fillna(0 if as_int else 0.0)
 
-    # Asegurar que todas las columnas sean enteras
-    for col in df.columns:
-        df[col] = df[col].astype("int64")
+    # Asegurar tipos de columnas
+    if as_int:
+        for col in df.columns:
+            df[col] = df[col].astype("int64")
+    else:
+        for col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+        df = df.fillna(0.0)
 
     return df

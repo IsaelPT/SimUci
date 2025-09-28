@@ -14,13 +14,15 @@ from utils.helpers import (
     format_time_columns,
     generate_id,
     get_data_for_prediction,
+    get_true_data_for_validation,
     key_categ,
     predict,
-    simulate_real_data,
-    start_experiment,
+    simulate_all_true_data,
+    simulate_true_data,
+    run_experiment,
     value_is_zero,
     prepare_patient_data_for_prediction,
-    extract_real_data,
+    extract_true_data_from_csv,
     apply_theme,
 )
 from utils.constants import (
@@ -56,7 +58,7 @@ from utils.constants import (
     PREUCI_DIAG,
     FICHERODEDATOS_CSV_PATH,
     PRIMARY_COLOR,
-    EXPERIMENT_VARIABLES as EXP_VARIABLES,
+    EXPERIMENT_VARIABLES_LABELS as EXP_VARIABLES,
     SIM_RUNS_MIN,
     SIM_RUNS_MAX,
     SIM_RUNS_DEFAULT,
@@ -113,7 +115,7 @@ with st.sidebar:
         step=1,
         format="%d",
     )
-    toggle_global_seed = st.toggle(label="Fijar **semilla**", value=False, width="stretch")
+    toggle_global_seed = st.toggle(label="Fijar semilla", value=False, width="stretch")
     if toggle_global_seed:
         fix_seed(st.session_state.global_sim_seed)
 
@@ -147,13 +149,21 @@ simulation_tab, real_data_tab, comparisons_tab = st.tabs(
     tabs=("Simulación", "Validaciones", "Comparaciones"), width="stretch"
 )
 
-# Initialize session_state for real data
+# DataFrame storing simulation results from a single patient
 if "df_sim_real_data" not in st.session_state:
     st.session_state.df_sim_real_data = pd.DataFrame()
-if "df_individual_patients" not in st.session_state:
-    st.session_state.df_individual_patients = pd.DataFrame()
-if "friedman_results" not in st.session_state:
-    st.session_state.friedman_results = {}
+
+# DataFrame storing all simulated patients
+if "df_sim_all_true_data" not in st.session_state:
+    st.session_state.df_sim_all_true_data = pd.DataFrame()
+
+# if "df_individual_patients" not in st.session_state:
+#     st.session_state.df_individual_patients = pd.DataFrame()
+
+if "wilcoxon_test_result" not in st.session_state:
+    st.session_state.wilcoxon_test_result = {}
+if "friedman_test_result" not in st.session_state:
+    st.session_state.friedman_test_result = {}
 
 ###############
 # SIMULALTION #
@@ -208,7 +218,7 @@ with simulation_tab:
                 value=VAM_T_DEFAULT,
                 help=HELP_MSG_VAM_TIME,
             )
-            input_porciento = st.number_input(
+            percent_input = st.number_input(
                 label="Porciento Tiempo UCI",
                 min_value=SIM_PERCENT_MIN,
                 max_value=SIM_PERCENT_MAX,
@@ -297,7 +307,7 @@ with simulation_tab:
         # )
 
         # Collected patient data (these are the input values to be processed).
-        edad: int = age_input
+        age: int = age_input
         apache: int = apache_input
         diag_ing1: int = key_categ("diag", diag_ing1_input)
         diag_ing2: int = key_categ("diag", diag_ing2_input)
@@ -470,9 +480,9 @@ with simulation_tab:
         if diag_ok and insuf_ok:
             try:
                 # Experiment / Simulation.
-                experiment_result = start_experiment(
+                experiment_result = run_experiment(
                     n_runs=st.session_state.sim_sample_size,
-                    age=edad,
+                    age=age,
                     d1=diag_ing1,
                     d2=diag_ing2,
                     d3=diag_ing3,
@@ -483,7 +493,7 @@ with simulation_tab:
                     uti_stay=uti_stay,
                     vam_time=vam_time,
                     preuti_stay=preuti_stay,
-                    percent=input_porciento,
+                    percent=percent_input,
                 )
 
                 #
@@ -497,7 +507,7 @@ with simulation_tab:
 
                     df_to_predict = get_data_for_prediction(
                         {
-                            "Edad": edad,
+                            "Edad": age,
                             "Diag.Ing1": diag_ing1,
                             "Diag.Ing2": diag_ing2,
                             "Diag.Egr2": diag_egreso2,
@@ -548,17 +558,18 @@ with real_data_tab:
     one_patient_data_validation_tab, sim_model_validation_tab = st.tabs(
         tabs=("Datos Reales", "Métricas del Modelo"), width="stretch"
     )
+
+    df_true_data = pd.read_csv(FICHERODEDATOS_CSV_PATH)
+    df_true_data.index.name = "Paciente"
+
     with one_patient_data_validation_tab:
         st.header("Validación con Datos Reales")
 
         html_text = f'<p style="color:{PRIMARY_COLOR};">Puede seleccionar una fila para realizar una simulación al paciente seleccionado.</p>'
         st.markdown(html_text, unsafe_allow_html=True)
 
-        df_data = pd.read_csv(FICHERODEDATOS_CSV_PATH)
-        df_data.index.name = "Paciente"
-
         df_selection = st.dataframe(
-            df_data,
+            df_true_data,
             key="data",
             on_select="rerun",
             selection_mode=["single-row"],
@@ -612,11 +623,15 @@ with real_data_tab:
 
             if (st.session_state.prev_selection != current_selection) or rerun_sim_btn:
                 # Simulation
-                data = simulate_real_data(csv_path=FICHERODEDATOS_CSV_PATH, selection=current_selection)
+                data = simulate_true_data(csv_path=FICHERODEDATOS_CSV_PATH, selection=current_selection)
 
                 # Data for prediction
                 st.session_state.patient_data = prepare_patient_data_for_prediction(
-                    extract_real_data(csv_path=FICHERODEDATOS_CSV_PATH, index=current_selection, return_type="tuple")
+                    extract_true_data_from_csv(
+                        csv_path=FICHERODEDATOS_CSV_PATH,
+                        index=current_selection,
+                        as_dataframe=False,
+                    )
                 )
 
                 # Build new DataFrame with Simulation - Prediction result
@@ -700,8 +715,32 @@ with real_data_tab:
 
         st.markdown("### 🎈 Work in Progress :)")
 
-        simulation_metric = SimulationMetrics()
-        # simulation_metric.evaluate()
+        if st.button(label="Comprobar modelo de simulación"):
+            simulation_data = simulate_all_true_data(true_data=df_true_data, n_runs=50)
+            true_data = get_true_data_for_validation()
+
+            print("----------------")
+            print(">>> DF_TRUE_DATA")
+            print("----------------")
+            print(df_true_data)
+
+            print("----------------")
+            print(">>> TRUE_DATA")
+            print("----------------")
+            print(true_data)
+
+            print("----------------")
+            print(">>> SIMULATION_DATA")
+            print("----------------")
+            print(simulation_data)
+
+            simulation_metric = SimulationMetrics(true_data=true_data, simulation_data=simulation_data)
+            simulation_metric.evaluate()
+
+            st.write(simulation_metric.coverage_percentage)
+            st.write(simulation_metric.error_margin)
+            st.write(simulation_metric.kolmogorov_smirnov_result)
+            st.write(simulation_metric.anderson_darling_result)
 
 
 #################
@@ -765,37 +804,38 @@ with comparisons_tab:
                         "No se puede realizar la comparación: se detectaron datos de experimento vacíos o faltantes."
                     )
                 else:
-                    x: DataFrame = df_experiment1[col_comparison_selectbox]
-                    y: DataFrame = df_experiment2[col_comparison_selectbox]
-                    if x.equals(y):
+                    experiment1: DataFrame = df_experiment1[col_comparison_selectbox]
+                    experiment2: DataFrame = df_experiment2[col_comparison_selectbox]
+                    if experiment1.equals(experiment2):
                         st.error(
                             'Imposible realizar prueba de Wilcoxon cuando la diferencia entre los elementos de "x" y "y" es cero para todos los elementos. Verifique que no cargó el mismo experimento dos veces.'
                         )
                     else:
                         # Correction to ensure both tables have the same number of rows.
-                        len_dif = abs(len(x) - len(y))
+                        len_dif = abs(len(experiment1) - len(experiment2))
 
                         # Adjust sample sizes if necessary
-                        if x.shape[0] > y.shape[0]:  # X mayor que Y
-                            x = x.head(y.shape[0])
+                        if experiment1.shape[0] > experiment2.shape[0]:  # X mayor que Y
+                            experiment1 = experiment1.head(experiment2.shape[0])
                             st.info(
                                 f"Se eliminaron filas del experimento 1 para coincidir con el experimento 2 ({len_dif} filas diferentes)."
                             )
-                        elif x.shape[0] < y.shape[0]:  # Y mayor que X
-                            y = y.head(x.shape[0])
+                        elif experiment1.shape[0] < experiment2.shape[0]:  # Y mayor que X
+                            experiment2 = experiment2.head(experiment1.shape[0])
                             st.info(
                                 f"Se eliminaron filas del experimento 2 para coincidir con el experimento 1 ({len_dif} filas diferentes)."
                             )
 
                         try:
-                            # Test de Wilcoxon
-                            wilcoxon_data = Wilcoxon()
-                            wilcoxon_data.test(x, y)
+                            # Wilcoxon test.
+                            wilcoxon_test = Wilcoxon(x=experiment1, y=experiment2)
+                            wilcoxon_test.test()
+                            st.session_statee.wilcoxon_test = wilcoxon_test
 
-                            # Mostrar Resultado
+                            # Showing results.
                             df_to_show = build_df_test_result(
-                                statistic=wilcoxon_data.statistic,
-                                p_value=wilcoxon_data.p_value,
+                                statistic=st.session_state.wilcoxon_test.statistic,
+                                p_value=st.session_state.wilcoxon_test.p_value,
                             )
                             st.dataframe(df_to_show, hide_index=True, use_container_width=True)
                             st.markdown(INFO_STATISTIC)
@@ -843,13 +883,14 @@ with comparisons_tab:
 
                     try:
                         # Friedman test.
-                        friedman_result = Friedman()
-                        friedman_result.test(*samples_selection)
+                        friedman_test = Friedman(samples=samples_selection)
+                        friedman_test.test()
+                        st.session_state.friedman_test_result = friedman_test
 
-                        # Show result.
+                        # Showing results.
                         df_to_show = build_df_test_result(
-                            statistic=friedman_result.statistic,
-                            p_value=friedman_result.p_value,
+                            statistic=st.session_state.friedman_test.statistic,
+                            p_value=st.session_state.friedman_test.p_value,
                         )
                         st.dataframe(df_to_show, hide_index=True, use_container_width=True)
                         st.markdown(INFO_STATISTIC)

@@ -8,16 +8,17 @@ from pandas import DataFrame
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 import streamlit as st
 
+from uci.stats import StatsUtils
 from utils.constants import (
+    AGE_MIN,
+    FICHERODEDATOS_CSV_PATH,
     SIM_RUNS_DEFAULT,
-    EXPERIMENT_VARIABLES as EXP_VARS,
+    EXPERIMENT_VARIABLES_LABELS as EXP_VARS,
     PREDICTION_MODEL_PATH,
     VENTILATION_TYPE,
     PREUCI_DIAG,
     RESP_INSUF,
 )
-from uci.experiment import Experiment, multiple_replication
-from uci.stats import StatsUtils
 
 import joblib
 
@@ -508,63 +509,108 @@ def bin_to_df(files: UploadedFile | list[UploadedFile]) -> DataFrame | list[Data
         return [pd.read_csv(f) for f in files]
 
 
-def extract_real_data(csv_path: str, index: int, return_type: str = "df", **kwargs) -> DataFrame | tuple[float]:
+def extract_true_data_from_csv(
+    csv_path: str,
+    index: int | None = None,
+    as_dataframe=True,
+    **kwargs,
+) -> DataFrame | tuple[float]:
     """
-    Extract the clinical data for a single patient from a CSV by row index.
+    Extract the clinical data for a single patient or all patients from a CSV by row index.
+
+    The CSV should contain columns: edad, apache, tiempo_vam, estadia_uci, diagnostico_preuci, tipo_causavam, etc.
 
     Args:
         csv_path: Path to the CSV file with the real data.
-        index: Integer row index of the patient to extract.
-        return_type: "df" to return a single-row DataFrame, or "tuple" to return a tuple of values.
+        index: Integer row index of the patient to extract. If None, extract all patients.
+        as_dataframe: If True, return DataFrame(s). If False, return dict(s).
 
     Returns:
-        A DataFrame with one row (when return_type="df") or a tuple of patient values (when return_type="tuple").
+        For single patient (index provided):
+            - DataFrame with one row (when as_dataframe=True)
+            - Dict with patient values (when as_dataframe=False)
+        For all patients (index=None):
+            - DataFrame with all patients (when as_dataframe=True)
+            - List of dicts, one per patient (when as_dataframe=False)
     """
 
     # Backwards compatibility: accept Spanish kwarg 'ruta_archivo_csv'
     if "ruta_archivo_csv" in kwargs and (csv_path is None or csv_path == ""):
         csv_path = kwargs.get("ruta_archivo_csv")
 
-    data = pd.read_csv(csv_path)
+    data: pd.DataFrame = pd.read_csv(csv_path)
 
-    def build_row(data_index: int):
-        # estuci: days -> hours
-        # tiempo_vam: horas
-        # estpreuci: days -> hours
+    # Reuse top-level builder if available
+    def build_row_local(data_index: int):
+        return build_row_from_dataframe(data, data_index)
 
-        # print(f"TYPE: {type(data_index)} --- DATA: {data_index}\n")
-
-        if isinstance(data_index, int):
-            output = {
-                "edad": int(data["Edad"].iloc[data_index]),
-                "d1": int(data["Diag.Ing1"].iloc[data_index]),
-                "d2": int(data["Diag.Ing2"].iloc[data_index]),
-                "d3": int(data["Diag.Ing3"].iloc[data_index]),
-                "d4": int(data["Diag.Ing4"].iloc[data_index]),
-                "apache": int(data["APACHE"].iloc[data_index]),
-                "insuf": int(data["InsufResp"].iloc[data_index]),
-                "va": int(data["VA"].iloc[data_index]),
-                "estuci": int(data["Est. UCI"].iloc[data_index] * 24),
-                "tiempo_vam": int(data["TiempoVAM"].iloc[data_index]),
-                "estpreuci": int(data["Est. PreUCI"].iloc[data_index] * 24),
-                "diag_egr2": int(data["Diag.Egr2"].iloc[data_index]),  # Added for prediction
-            }
-            # print(output.values())
-            return output
-        else:
-            raise ValueError("The parameter data_index must be a positive integer.")
-
-    extracted_data = build_row(index)
-
-    if return_type == "df":
-        return pd.DataFrame([extracted_data])  # Default Return Type (DataFrame)
-    elif return_type == "tuple":
-        return tuple(extracted_data.values())  # Alternative Return Type (Tuple)
+    if index is not None:
+        extracted_data = build_row_local(index)
     else:
-        raise ValueError("The parameter return_type must be 'df' or 'tuple'.")
+        # Extract data for all patients
+        extracted_data = []
+        for i in range(len(data)):
+            try:
+                row_data = build_row_local(i)
+                extracted_data.append(row_data)
+            except (IndexError, KeyError, ValueError) as e:
+                print(f"Warning: Could not extract data for patient at index {i}: {e}")
+                continue
+
+    if as_dataframe:
+        if index is not None:
+            # Single patient - return DataFrame with one row
+            return pd.DataFrame([extracted_data])
+        else:
+            # All patients - return DataFrame with multiple rows
+            return pd.DataFrame(extracted_data)
+    else:
+        if index is not None:
+            # Single patient - return dict of values
+            return extracted_data
+        else:
+            # All patients - return list of dicts
+            return extracted_data
 
 
-def start_experiment(
+def build_row_from_dataframe(data: pd.DataFrame, data_index: int) -> dict:
+    """
+    Build the standardized patient dict from a DataFrame row. This is the extracted
+    logic previously embedded inside `extract_true_data_from_csv`.
+    """
+    # estuci: days -> hours
+    # tiempo_vam: horas
+    # estpreuci: days -> hours
+
+    # Safely fetch values and provide defaults when missing
+    def _safe(col, default=0):
+        try:
+            v = data[col].iloc[data_index]
+            if pd.isna(v):
+                return default
+            return v
+        except Exception:
+            return default
+
+    diag_egr2_val = _safe("Diag.Egr2", 0)
+
+    return {
+        "edad": int(_safe("Edad", AGE_MIN)),
+        "d1": int(_safe("Diag.Ing1", 0)),
+        "d2": int(_safe("Diag.Ing2", 0)),
+        "d3": int(_safe("Diag.Ing3", 0)),
+        "d4": int(_safe("Diag.Ing4", 0)),
+        "apache": int(_safe("APACHE", 0)),
+        "insuf": int(_safe("InsufResp", 0)),
+        "va": int(_safe("VA", 0)),
+        "estuci": int(_safe("Est. UCI", 0) * 24),
+        "tiempo_vam": int(_safe("TiempoVAM", 0)),
+        "estpreuci": int(_safe("Est. PreUCI", 0) * 24),
+        "diag_egr2": int(diag_egr2_val),
+    }
+
+
+def run_experiment(
     n_runs: int,
     age: int,
     d1: int,
@@ -587,17 +633,20 @@ def start_experiment(
         age: Patient age.
         d1-d4: Admission diagnoses (diagnostic codes).
         apache: APACHE score.
-        insuf_resp: Respiratory insufficiency code.
-        va: Ventilation/artificial ventilation indicator.
-        t_vam: Ventilation type/time code.
-        est_uci: Expected ICU stay.
-        est_preuti: Pre-ICU stay.
-        porciento: Percentage parameter used by the experiment (default=10).
+        resp_insuf: Respiratory insufficiency code.
+        artif_vent: Ventilation/artificial ventilation indicator.
+        vam_time: Ventilation type/time code.
+        uti_stay: Expected ICU stay.
+        preuti_stay: Pre-ICU stay.
+        percent: Percentage parameter used by the experiment (default=10).
 
     Returns:
-        A DataFrame containing the simulation results with columns:
+        DataFrame containing the simulation results with columns:
         ["Tiempo Pre VAM", "Tiempo VAM", "Tiempo Post VAM", "Estadia UCI", "Estadia Post UCI"].
     """
+
+    # Local import to avoid circular import between uci.experiment and uci.simulacion
+    from uci.experiment import Experiment, multiple_replication
 
     e = Experiment(
         age=age,
@@ -613,6 +662,7 @@ def start_experiment(
         preuti_stay_time=preuti_stay,
         percent=percent,
     )
+
     # Run the simulation
     res = multiple_replication(e, n_runs)
 
@@ -621,12 +671,12 @@ def start_experiment(
         # Convert to numeric, forcing non-numeric values to NaN
         res[col] = pd.to_numeric(res[col], errors="coerce")
 
-        # Rellenar NaN con 0 y convertir a entero
+        # Fill NaN with 0 and convert to integer
         res[col] = res[col].fillna(0).astype("int64")
 
-    # Verificar que no haya valores NaN o None
+    # Verify there are no NaN or None values
     if res.isnull().values.any():
-        # En lugar de st.warning, simplemente rellenar con 0
+        # Instead of st.warning, simply fill with 0
         res = res.fillna(0)
 
     # Ensure the index is sequential
@@ -675,15 +725,16 @@ def build_df_test_result(statistic: float, p_value: float) -> DataFrame:
         DataFrame with the provided statistic and p-value.
     """
 
-    S = "Statistic"
+    S = "Estadístico"
     P = "Valor de P"
+
     data = {S: [statistic], P: [p_value]}
     df = pd.DataFrame(data)
 
     return df
 
 
-def simulate_real_data(csv_path: str, selection: int, **kwargs) -> DataFrame | list[DataFrame]:
+def simulate_true_data(csv_path: str, selection: int, **kwargs) -> DataFrame | list[DataFrame]:
     """
     Run simulations using real patient data from a CSV file.
 
@@ -713,7 +764,7 @@ def simulate_real_data(csv_path: str, selection: int, **kwargs) -> DataFrame | l
         # Allow callers to pass the legacy 'corridas_simulacion' kwarg to control runs
         n_runs = kwargs.get("corridas_simulacion", SIM_RUNS_DEFAULT)
 
-        e = start_experiment(
+        e = run_experiment(
             n_runs,
             age=int(t[0]),
             d1=int(t[1]),
@@ -732,7 +783,7 @@ def simulate_real_data(csv_path: str, selection: int, **kwargs) -> DataFrame | l
         return e
 
     if selection != -1:
-        t: tuple[float] = extract_real_data(csv_path, index=selection, return_type="tuple")
+        t: tuple[float] = extract_true_data_from_csv(csv_path, index=selection, return_type="tuple")
 
         # Return a DataFrame with the simulation results
         return experiment_helper(t)
@@ -740,7 +791,10 @@ def simulate_real_data(csv_path: str, selection: int, **kwargs) -> DataFrame | l
         datalen = pd.read_csv(csv_path).shape[0]
 
         # Return a list of DataFrames (one per patient)
-        return [experiment_helper(extract_real_data(csv_path, index=i, return_type="tuple")) for i in range(datalen)]
+        return [
+            experiment_helper(extract_true_data_from_csv(csv_path, index=i, return_type="tuple"))
+            for i in range(datalen)
+        ]
     else:
         raise ValueError("The parameter df_selection must be -1 or a non-negative integer.")
 
@@ -811,7 +865,7 @@ def predict(df: DataFrame) -> tuple[np.ndarray, np.ndarray]:
         raise Exception(f"Error during prediction: {e}")
 
 
-def get_data_for_prediction(data: dict[str:int] | pd.DataFrame) -> pd.DataFrame:
+def get_data_for_prediction(data: dict[str, int] | pd.DataFrame) -> pd.DataFrame:
     """
     Build a DataFrame with the fields required by the prediction model.
 
@@ -824,7 +878,7 @@ def get_data_for_prediction(data: dict[str:int] | pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame with a single row ready for prediction.
 
     Raises:
-        Exception: If an error occurs while constructing the DataFrame; traceback is printed.
+        Exception: If an error occurs while constructing the DataFrame; traceback is printed
     """
 
     # NOTE Required: {'Diag.Ing2', 'Diag.Egr2', 'Diag.Ing1', 'TiempoVAM', 'APACHE', 'Edad'}
@@ -840,7 +894,7 @@ def get_data_for_prediction(data: dict[str:int] | pd.DataFrame) -> pd.DataFrame:
                 "APACHE",
             ]
             if not all(col in data.columns for col in required_cols):
-                raise ValueError(f"El DataFrame debe contener las columnas: {', '.join(f'{required_cols}')}.")
+                raise ValueError(f"DataFrame must contain the following columns: {', '.join(f'{required_cols}')}")
             return data[required_cols]
 
         elif isinstance(data, dict):
@@ -888,12 +942,12 @@ def simulate_and_predict_patient(csv_path: str, selection: int, **kwargs) -> tup
         selection = kwargs.get("df_selection")
 
     # Extract patient data tuple
-    patient_tuple = extract_real_data(csv_path, index=selection, return_type="tuple")
+    patient_tuple = extract_true_data_from_csv(csv_path, index=selection, return_type="tuple")
 
     # Run simulation for the patient
     n_runs = kwargs.get("corridas_simulacion", SIM_RUNS_DEFAULT)
 
-    simulation_df = start_experiment(
+    simulation_df = run_experiment(
         n_runs,
         age=int(patient_tuple[0]),
         d1=int(patient_tuple[1]),
@@ -939,7 +993,7 @@ def prepare_patient_data_for_prediction(patient_tuple: tuple) -> dict:
     Args:
         patient_tuple: Tuple containing patient data in the following order:
             (edad, diag_ing1, diag_ing2, diag_ing3, diag_ing4, apache, insuf_resp, va,
-             est_uci, tiempo_vam, est_preuti, diag_egr2)
+            est_uci, tiempo_vam, est_preuti, diag_egr2)
 
     Returns:
         A dict with the keys required by the prediction model (Edad, Diag.Ing1, Diag.Ing2,
@@ -969,3 +1023,119 @@ def apply_theme(theme_name):
         st._config.set_option("theme.primaryColor", "#66C5A0")
         st._config.set_option("theme.backgroundColor", "#FFFFF8")
         st._config.set_option("theme.secondaryBackgroundColor", "#F3F6F0")
+
+
+def simulate_all_true_data(true_data: pd.DataFrame | None = None, n_runs: int | None = None) -> np.ndarray:
+    """
+    Simulate the experiment for every patient present in `true_data` (DataFrame) or in the
+    canonical CSV (`FICHERODEDATOS_CSV_PATH`) when `true_data` is None.
+
+    The function leverages the existing `extract_true_data_from_csv` helper to obtain the
+    patient-level inputs when possible. It returns a numpy ndarray shaped
+    (n_patients, n_runs, n_experiment_variables) where `n_experiment_variables == len(EXP_VARS)`.
+    """
+
+    if n_runs is None:
+        n_runs = SIM_RUNS_DEFAULT
+
+    # Prefer to use the extractor which already maps CSV rows to the expected dict structure
+    if true_data is None:
+        records = extract_true_data_from_csv(csv_path=FICHERODEDATOS_CSV_PATH, index=None, as_dataframe=False)
+    elif isinstance(true_data, pd.DataFrame):
+        # Convert provided DataFrame to the same dict structure used by extract_true_data_from_csv
+        df_tmp = true_data.reset_index(drop=True)
+        records = []
+        for i in range(len(df_tmp)):
+            try:
+                records.append(build_row_from_dataframe(df_tmp, i))
+            except Exception:
+                # Skip rows that cannot be parsed
+                continue
+    else:
+        raise ValueError("`true_data` must be a pandas DataFrame or None")
+
+    n_patients = len(records)
+    n_vars = len(EXP_VARS)
+
+    sims: list[np.ndarray] = []
+
+    for rec in records:
+        try:
+            df_sim = run_experiment(
+                n_runs,
+                age=int(rec.get("edad", 20)),
+                d1=int(rec.get("d1", 0)),
+                d2=int(rec.get("d2", 0)),
+                d3=int(rec.get("d3", 0)),
+                d4=int(rec.get("d4", 0)),
+                apache=int(rec.get("apache", 0)),
+                resp_insuf=int(rec.get("insuf", 0)),
+                artif_vent=int(rec.get("va", 0)),
+                vam_time=int(rec.get("tiempo_vam", 0)),
+                uti_stay=int(rec.get("estuci", 0)),
+                preuti_stay=int(rec.get("estpreuci", 0)),
+                percent=random.randint(0, 10),
+            )
+
+            # Keep integer hours to avoid scientific notation and preserve discreteness
+            arr = df_sim[EXP_VARS].to_numpy(dtype=np.int64)
+            if arr.ndim == 1:
+                arr = arr.reshape((1, -1))
+            sims.append(arr)
+        except Exception:
+            sims.append(np.zeros((n_runs, n_vars), dtype=np.int64))
+
+    # Stack into final ndarray
+    try:
+        simulation_array = np.stack(sims, axis=0)
+    except Exception:
+        simulation_array = np.zeros((n_patients, n_runs, n_vars), dtype=np.int64)
+
+    return simulation_array
+
+
+def get_true_data_for_validation() -> pd.DataFrame:
+    df = pd.read_csv(FICHERODEDATOS_CSV_PATH)
+
+    # Building the dataframe column by column
+    # TiempoVAM está en horas; Est. UCI y (probablemente) Est. PostUCI vienen en días → convertir a horas
+    col_vam_time: pd.Series[int] = df["TiempoVAM"].round(0).astype(int)
+    col_uci_stay_days = df["Est. UCI"].round(0)
+    col_uci_post_stay_days = df.get("Est. PostUCI", pd.Series([0] * len(df))).round(0)
+    col_uci_stay: pd.Series[int] = (col_uci_stay_days * 24).astype(int)
+    col_uci_post_stay: pd.Series[int] = (col_uci_post_stay_days * 24).astype(int)
+
+    # Calculate the remaining columns
+    rng = np.random.default_rng()
+    percent: int = rng.integers(low=0, high=10, endpoint=True)  # randomly generated percent for the following [0, 10]
+
+    print(f">>>>> Percentage: {percent}")
+
+    pre_vam: list[int] = []
+    post_vam: list[int] = []
+
+    # PreVAM = int((EstadiaUCI - TiempoVAM) * percent)
+    # PostVAM = EstadiaUCI - TiempoVAM - PreVAM
+    for pos in range(len(df)):
+        u = int(col_uci_stay.iloc[pos])  # horas
+        t = int(col_vam_time.iloc[pos])  # horas
+        diff = max(u - t, 0)
+        pre = int(diff * (percent / 100))
+        post = diff - pre
+
+        if pos < 5:
+            print(f"******* Calculation for {pos}")
+            print(f"u: {u}")
+            print(f"t: {t}")
+            print(f"pre: {pre}")
+            print(f"post: {post}")
+
+        pre_vam.append(pre)
+        post_vam.append(post)
+
+    # ["Tiempo Pre VAM", "Tiempo VAM", "Tiempo Post VAM", "Estadia UCI", "Estadia Post UCI"]
+    values = [pre_vam, col_vam_time.tolist(), post_vam, col_uci_stay.tolist(), col_uci_post_stay.tolist()]
+
+    build_true_data = pd.DataFrame({k: v for k, v in zip(EXP_VARS, values)})
+
+    return build_true_data
