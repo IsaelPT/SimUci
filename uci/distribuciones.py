@@ -108,7 +108,14 @@ def clustering(
             Est_PreUCI,
         ]
     )
-    distancias = np.linalg.norm(df_centroid.iloc[:, 0:12] - nueva_instancia)
-    cluster_predicho = np.argmin(distancias)
+
+    # Compute row-wise Euclidean distance between the new instance and each centroid.
+    # Previously the code called np.linalg.norm on the full matrix which returned a single
+    # scalar; that caused the argmin to always pick cluster 0. Use axis=1 to get per-row
+    # distances and then select the nearest centroid.
+    centroids = df_centroid.iloc[:, 0:12].to_numpy(dtype=float)
+    diff = centroids - nueva_instancia.reshape(1, -1)
+    distancias = np.linalg.norm(diff, axis=1)
+    cluster_predicho = int(np.argmin(distancias))
 
     return cluster_predicho

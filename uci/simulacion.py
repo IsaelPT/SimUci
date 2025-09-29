@@ -1,12 +1,16 @@
 import simpy
 import numpy as np
+from typing import TYPE_CHECKING
 
 from uci import distribuciones
-from uci.experiment import Experiment
+
+if TYPE_CHECKING:
+    # Import only for type checking to avoid circular runtime import
+    from uci.experiment import Experiment
 
 
 class Simulation:
-    def __init__(self, experiment: Experiment, cluster) -> None:
+    def __init__(self, experiment: "Experiment", cluster) -> None:
         self.experiment = experiment
         self.cluster = cluster
 
@@ -30,29 +34,19 @@ class Simulation:
         is_cluster_zero: bool = self.cluster == 0
 
         post_uci = int(
-            round(
-                _to_scalar(
-                    distribuciones.tiemp_postUCI_cluster0()
-                    if is_cluster_zero
-                    else distribuciones.tiemp_postUCI_clustet1()
-                )
+            _to_scalar(
+                distribuciones.tiemp_postUCI_cluster0() if is_cluster_zero else distribuciones.tiemp_postUCI_clustet1()
             )
         )
         uci = int(
-            round(
-                _to_scalar(
-                    distribuciones.estad_UTI_cluster0() if is_cluster_zero else distribuciones.estad_UTI_cluster1()
-                )
-            )
+            _to_scalar(distribuciones.estad_UTI_cluster0() if is_cluster_zero else distribuciones.estad_UTI_cluster1())
         )
 
         # Ensure VAM does not exceed UCI; cap attempts to avoid infinite loop if distribution heavily skews
         for _ in range(1000):
             vam = int(
-                round(
-                    _to_scalar(
-                        distribuciones.tiemp_VAM_cluster0() if is_cluster_zero else distribuciones.tiemp_VAM_cluster1()
-                    )
+                _to_scalar(
+                    distribuciones.tiemp_VAM_cluster0() if is_cluster_zero else distribuciones.tiemp_VAM_cluster1()
                 )
             )
             if vam <= uci:

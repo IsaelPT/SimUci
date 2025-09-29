@@ -74,6 +74,8 @@ st.set_page_config(page_title="SimUci", page_icon="🏥", layout="wide", initial
 
 if "theme" not in st.session_state:
     st.session_state.theme = "light"
+if "global_sim_seed" not in st.session_state:
+    st.session_state.global_sim_seed = 0
 
 apply_theme(st.session_state.theme)
 
@@ -106,8 +108,6 @@ with st.sidebar:
             body="Valor global de la semilla aleatoria utilizada para realizar las simulaciones. Es el punto de partida del generador de números aleatorios. Este valor garantiza que las simulaciones puedan replicarse exactamente, obteniendo los mismos resultados en cada ejecución",
             width="stretch",
         )
-    if "global_sim_seed" not in st.session_state:
-        st.session_state.global_sim_seed = 0
     st.session_state.global_sim_seed = st.number_input(
         label="Semilla",
         min_value=0,
@@ -715,32 +715,74 @@ with real_data_tab:
 
         st.markdown("### 🎈 Work in Progress :)")
 
+        n_runs_input = st.number_input(
+            label="Corridas por paciente (n_runs)",
+            min_value=SIM_RUNS_MIN,
+            max_value=SIM_RUNS_MAX,
+            step=50,
+            value=SIM_RUNS_DEFAULT,
+            help="Número de repeticiones por paciente para calcular intervalos y métricas.",
+        )
+
         if st.button(label="Comprobar modelo de simulación"):
-            simulation_data = simulate_all_true_data(true_data=df_true_data, n_runs=50)
-            true_data = get_true_data_for_validation()
+            st.warning("Iniciando simulación de todos los pacientes. Esto puede tardar...")
+            with st.spinner("Simulando todos los pacientes..."):
+                # Request debug info to build diagnostics
+                sim_debug = simulate_all_true_data(true_data=df_true_data, n_runs=int(n_runs_input), debug=True)
 
-            print("----------------")
-            print(">>> DF_TRUE_DATA")
-            print("----------------")
-            print(df_true_data)
+            st.success("Simulación finalizada.")
 
-            print("----------------")
-            print(">>> TRUE_DATA")
-            print("----------------")
-            print(true_data)
+            # sim_debug may be a dict with diagnostic info
+            if isinstance(sim_debug, dict) and "array" in sim_debug:
+                simulation_data = sim_debug["array"]
+            else:
+                simulation_data = sim_debug
 
-            print("----------------")
-            print(">>> SIMULATION_DATA")
-            print("----------------")
-            print(simulation_data)
+            true_data = get_true_data_for_validation(seed=st.session_state.global_sim_seed)
 
+            # Compute metrics
             simulation_metric = SimulationMetrics(true_data=true_data, simulation_data=simulation_data)
             simulation_metric.evaluate()
 
-            st.write(simulation_metric.coverage_percentage)
-            st.write(simulation_metric.error_margin)
-            st.write(simulation_metric.kolmogorov_smirnov_result)
-            st.write(simulation_metric.anderson_darling_result)
+            st.write(f"Coverage Percentage: {simulation_metric.coverage_percentage}")
+            st.write(f"Error margin: {simulation_metric.error_margin}")
+            st.write(f"KS Test: {simulation_metric.kolmogorov_smirnov_result}")
+            st.write(f"AD Test: {simulation_metric.anderson_darling_result}")
+
+            # Per-variable diagnostics table
+            try:
+                import numpy as _np
+
+                per_patient_means = simulation_data.mean(axis=1)
+                sim_means = per_patient_means.mean(axis=0)
+                sim_stds = per_patient_means.std(axis=0, ddof=1)
+
+                td = _np.asarray(true_data)
+                if td.ndim == 1 and td.size == simulation_data.shape[0] * simulation_data.shape[2]:
+                    td = td.reshape((simulation_data.shape[0], simulation_data.shape[2]))
+                elif td.ndim == 1 and td.size == simulation_data.shape[2]:
+                    td = _np.tile(td.reshape((1, simulation_data.shape[2])), (simulation_data.shape[0], 1))
+
+                true_means = td.mean(axis=0)
+                bias = sim_means - true_means
+                zero_prop = (_np.asarray(td) == 0).mean(axis=0)
+
+                diag_df = pd.DataFrame(
+                    {
+                        "Variable": EXP_VARIABLES,
+                        "True Mean": _np.round(true_means, 2),
+                        "Sim Mean": _np.round(sim_means, 2),
+                        "Sim SD (over patients)": _np.round(sim_stds, 2),
+                        "Bias (Sim-True)": _np.round(bias, 2),
+                        "True Zero Proportion": _np.round(zero_prop, 3),
+                        "Coverage %": [simulation_metric.coverage_percentage.get(v, None) for v in EXP_VARIABLES],
+                    }
+                )
+
+                st.markdown("### Diagnóstico por variable")
+                st.dataframe(diag_df, use_container_width=True)
+            except Exception as e:
+                print(f"Could not build diagnostics table: {e}")
 
 
 #################

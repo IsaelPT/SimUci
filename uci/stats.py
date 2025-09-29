@@ -81,59 +81,90 @@ class SimulationMetrics:
         from scipy.stats import t
 
         # Ensure we work with numpy arrays (caller may pass pandas DataFrame)
-        true_data = np.asarray(self.true_data)
         simulation_data = np.asarray(self.simulation_data)
 
-        # simulation_data: 3Darray = [n_patients * n_replicates * n_variables]
+        # Expect a 3D simulation array: (n_patients, n_replicates, n_variables)
+        if simulation_data.ndim != 3:
+            raise ValueError("simulation_data must be a 3D array of shape (n_patients, n_replicates, n_variables)")
+
         n_patients: int = simulation_data.shape[0]
         n_replicates: int = simulation_data.shape[1]
         n_variables: int = simulation_data.shape[2]
 
-        degrees_freedom = n_replicates - 1
-        t_value = t.ppf(1 - (1 - confidence_level) / 2, degrees_freedom)
+        # Coerce and validate/adjust true_data once (be permissive and deterministic)
+        td = np.asarray(self.true_data)
+        if td.ndim == 0:
+            td = np.full((n_patients, n_variables), float(td))
+        elif td.ndim == 1:
+            # If flat vector matches all values, reshape
+            if td.size == n_patients * n_variables:
+                td = td.reshape((n_patients, n_variables))
+            elif td.size == n_variables:
+                # One true value per variable -> broadcast across patients
+                td = np.tile(td.reshape((1, n_variables)), (n_patients, 1))
+            elif td.size == n_patients:
+                # One true value per patient -> broadcast across variables
+                if n_variables == 1:
+                    td = td.reshape((n_patients, 1))
+                else:
+                    print("Warning: true_data provided as length n_patients; tiling values across variables")
+                    td = np.tile(td.reshape((n_patients, 1)), (1, n_variables))
+            elif td.size > n_patients * n_variables:
+                print("Warning: true_data longer than needed; trimming to match simulation size")
+                td = td.ravel()[: n_patients * n_variables].reshape((n_patients, n_variables))
+            else:
+                # Shorter than expected: best-effort resize (repeats elements)
+                print("Warning: true_data shorter than expected; resizing by repeating elements to match simulation shape")
+                td = np.resize(td, (n_patients, n_variables))
+        elif td.ndim == 2:
+            # If there are more rows/cols than needed, trim. If fewer rows, repeat rows.
+            rows, cols = td.shape
+            if rows < n_patients or cols < n_variables:
+                print("Warning: true_data dimensions smaller than simulation; resizing by repeating elements to match shape")
+                td = np.resize(td, (n_patients, n_variables))
+            else:
+                # Trim extra rows/cols deterministically
+                td = td[:n_patients, :n_variables]
+        else:
+            # Higher dimensions are unexpected: flatten and resize
+            print("Warning: true_data has >2 dimensions; flattening and resizing to match simulation shape")
+            td = np.resize(td.ravel(), (n_patients, n_variables))
 
-        coverage_percentages = {}
+        # Compute per-patient means and standard errors
+        means = np.mean(simulation_data, axis=1)  # shape (n_patients, n_variables)
+
+        coverage_percentages: dict[str, float] = {}
+
+        # Handle case with too few replicates: degenerate CI (point estimate)
+        if n_replicates < 2:
+            print(
+                "Warning: fewer than 2 replicates; confidence intervals will be degenerate (no variance available)."
+            )
+            lower = means.copy()
+            upper = means.copy()
+        else:
+            degrees_freedom = n_replicates - 1
+            t_value = t.ppf(1 - (1 - confidence_level) / 2, degrees_freedom)
+
+            stds = np.std(simulation_data, axis=1, ddof=1)
+            sems = stds / np.sqrt(n_replicates)
+            margin_errors = t_value * sems
+
+            lower = means - margin_errors
+            upper = means + margin_errors
+
+        # Compute boolean matrix of whether true values are inside CIs
+        in_ci = (td >= lower) & (td <= upper)
+
+        # Coverage per variable (mean over patients)
+        coverage_array = in_ci.mean(axis=0) * 100
 
         for var_idx in range(n_variables):
-            confidence_intervals = []
-            coverage_count = 0
-
-            for patient_idx in range(n_patients):
-                # Defining Confidence Interval from the Simulated Data for this variable
-                mean = np.mean(simulation_data[patient_idx, :, var_idx])
-                std_error = np.std(simulation_data[patient_idx, :, var_idx], ddof=1) / np.sqrt(n_replicates)
-                margin_error = t_value * std_error
-
-                ci_lower = mean - margin_error
-                ci_upper = mean + margin_error
-
-                confidence_intervals.append((ci_lower, ci_upper))
-
-                # Checking if true value is inside calculated Confidence Interval
-                # Coerce true_data into a (n_patients, n_variables) numpy array robustly
-                td = np.asarray(self.true_data)
-                if td.ndim == 1:
-                    if td.size == n_patients * n_variables:
-                        td = td.reshape((n_patients, n_variables))
-                    else:
-                        # best-effort: repeat/trim to match shape
-                        td = np.resize(td, (n_patients, n_variables))
-                elif td.ndim == 0:
-                    td = np.full((n_patients, n_variables), float(td))
-
-                true_val = float(td[patient_idx, var_idx])
-
-                if ci_lower <= true_val <= ci_upper:
-                    coverage_count += 1
-
-            coverage_percentage = (coverage_count / n_patients) * 100
-
-            # Use actual variable names from constants, fallback to generic name if index out of range
             if var_idx < len(EXPERIMENT_VARIABLES_LABELS):
                 var_name = EXPERIMENT_VARIABLES_LABELS[var_idx]
             else:
                 var_name = f"variable_{var_idx}"
-            coverage_percentages[var_name] = coverage_percentage
+            coverage_percentages[var_name] = float(coverage_array[var_idx])
 
         return coverage_percentages
 
@@ -145,13 +176,37 @@ class SimulationMetrics:
         # simulation_data: (n_patients, n_simulations, experiment_variables(5))
         simulation_mean = np.mean(simulation_data, axis=1)
 
-        rmse = np.sqrt(mean_squared_error(true_data, simulation_mean))
-        mae = mean_absolute_error(true_data, simulation_mean)
-        mape = np.mean(np.abs((true_data - simulation_mean) / true_data)) * 100
+        # Make sure true_data has the same shape as simulation_mean for metric calculations
+        td = np.asarray(true_data)
+        if td.shape != simulation_mean.shape:
+            # If total sizes match, try to reshape; otherwise resize (best-effort)
+            if td.size == simulation_mean.size:
+                try:
+                    td = td.reshape(simulation_mean.shape)
+                except Exception:
+                    td = np.resize(td, simulation_mean.shape)
+            else:
+                td = np.resize(td, simulation_mean.shape)
+
+        # Compute RMSE and MAE
+        rmse = np.sqrt(mean_squared_error(td, simulation_mean))
+        mae = mean_absolute_error(td, simulation_mean)
+
+        # Compute MAPE safely: avoid division by zero by ignoring positions where true value is zero
+        denom = td.astype(float)
+        zero_mask = denom == 0
+        if np.all(zero_mask):
+            mape = float('nan')
+            print("MAPE: cannot compute because all true values are zero (division by zero). Returning NaN.")
+        else:
+            with np.errstate(divide='ignore', invalid='ignore'):
+                mape_vec = np.abs((td - simulation_mean) / denom)
+                # ignore entries where denom == 0
+                mape = np.nanmean(np.where(zero_mask, np.nan, mape_vec)) * 100
 
         print(f"RMSE: {rmse:.2f}")
         print(f"MAE: {mae:.2f}")
-        print(f"MAPE: {mape:.2f}%")
+        print(f"MAPE: {mape if not np.isnan(mape) else 'nan'}%")
 
         if as_dict:
             return {
@@ -208,8 +263,16 @@ class SimulationMetrics:
             real_sample = np.random.choice(true_data, min_size, replace=False)
             simulated_sample = np.random.choice(simulation_data, min_size, replace=False)
 
-        # Perform the Anderson-Darling test
-        anderson_result = stats.anderson_ksamp([real_sample, simulated_sample])
+        # Perform the Anderson-Darling k-sample test.
+        # Recent scipy versions allow specifying a permutation method to compute p-values
+        try:
+            # Prefer explicit permutation method when available to avoid p-value capping warnings
+            anderson_result = stats.anderson_ksamp(
+                [real_sample, simulated_sample], method=getattr(stats, "PermutationMethod", None)()
+            )
+        except Exception:
+            # Fallback to default behavior if method is not available in this scipy
+            anderson_result = stats.anderson_ksamp([real_sample, simulated_sample])
 
         statistic = anderson_result.statistic
         significance_level = anderson_result.significance_level

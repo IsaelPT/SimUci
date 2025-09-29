@@ -557,6 +557,35 @@ def extract_true_data_from_csv(
                 print(f"Warning: Could not extract data for patient at index {i}: {e}")
                 continue
 
+    # Backwards-compatible support for callers that request a tuple
+    # via return_type='tuple' (legacy behavior expected by some helpers).
+    return_type = kwargs.get("return_type", None)
+
+    if return_type == "tuple":
+        # Map the dict produced by build_row_from_dataframe into the expected
+        # tuple order used across the codebase:
+        # (edad, d1, d2, d3, d4, apache, insuf, va, est_uci, tiempo_vam, est_preuti, diag_egr2)
+        def dict_to_tuple(d: dict) -> tuple:
+            return (
+                int(d.get("edad", AGE_MIN)),
+                int(d.get("d1", 0)),
+                int(d.get("d2", 0)),
+                int(d.get("d3", 0)),
+                int(d.get("d4", 0)),
+                int(d.get("apache", 0)),
+                int(d.get("insuf", 0)),
+                int(d.get("va", 0)),
+                int(d.get("estuci", 0)),
+                int(d.get("tiempo_vam", 0)),
+                int(d.get("estpreuci", 0)),
+                int(d.get("diag_egr2", 0)),
+            )
+
+        if index is not None:
+            return dict_to_tuple(extracted_data)
+        else:
+            return [dict_to_tuple(d) for d in extracted_data]
+
     if as_dataframe:
         if index is not None:
             # Single patient - return DataFrame with one row
@@ -709,8 +738,8 @@ def adjust_df_sizes(dataframes: List[DataFrame]) -> Tuple[List[DataFrame], int]:
         else:
             min_len = min(df_sizes)
             return [df.head(min_len) for df in dataframes], min_len
-    except Exception() as e:
-        print(e)
+    except Exception as e:
+        print(f"Error adjusting DF sizes: {e}")
 
 
 def build_df_test_result(statistic: float, p_value: float) -> DataFrame:
@@ -1025,7 +1054,9 @@ def apply_theme(theme_name):
         st._config.set_option("theme.secondaryBackgroundColor", "#F3F6F0")
 
 
-def simulate_all_true_data(true_data: pd.DataFrame | None = None, n_runs: int | None = None) -> np.ndarray:
+def simulate_all_true_data(
+    true_data: pd.DataFrame | None = None, n_runs: int | None = None, debug: bool = False, seed: int | None = None
+) -> np.ndarray:
     """
     Simulate the experiment for every patient present in `true_data` (DataFrame) or in the
     canonical CSV (`FICHERODEDATOS_CSV_PATH`) when `true_data` is None.
@@ -1059,6 +1090,14 @@ def simulate_all_true_data(true_data: pd.DataFrame | None = None, n_runs: int | 
 
     sims: list[np.ndarray] = []
 
+    # If seed provided, build a numpy RNG and sample a global percent to match get_true_data_for_validation
+    rng = None
+    global_percent = None
+    if seed is not None:
+        rng = np.random.default_rng(seed)
+        # replicate get_true_data_for_validation's behavior: integer in [0,10] inclusive
+        global_percent = int(rng.integers(low=0, high=10, endpoint=True))
+
     for rec in records:
         try:
             df_sim = run_experiment(
@@ -1074,7 +1113,7 @@ def simulate_all_true_data(true_data: pd.DataFrame | None = None, n_runs: int | 
                 vam_time=int(rec.get("tiempo_vam", 0)),
                 uti_stay=int(rec.get("estuci", 0)),
                 preuti_stay=int(rec.get("estpreuci", 0)),
-                percent=random.randint(0, 10),
+                percent=(global_percent if global_percent is not None else random.randint(0, 10)),
             )
 
             # Keep integer hours to avoid scientific notation and preserve discreteness
@@ -1082,34 +1121,87 @@ def simulate_all_true_data(true_data: pd.DataFrame | None = None, n_runs: int | 
             if arr.ndim == 1:
                 arr = arr.reshape((1, -1))
             sims.append(arr)
-        except Exception:
+        except Exception as e:
+            # Log the problematic record so the user can inspect input data
+            print(f"Simulation failed for record {rec}. Error: {e}")
             sims.append(np.zeros((n_runs, n_vars), dtype=np.int64))
+
+    try:
+        simulation_array = np.stack(sims, axis=0)
+    except Exception as e:
+        # If stacking fails, log the shapes of individual arrays for debugging
+        try:
+            shapes = [s.shape for s in sims]
+        except Exception:
+            shapes = None
+        print(f"Error stacking simulation arrays: {e}. Individual shapes: {shapes}")
+        simulation_array = np.zeros((n_patients, n_runs, n_vars), dtype=np.int64)
 
     # Stack into final ndarray
     try:
         simulation_array = np.stack(sims, axis=0)
-    except Exception:
+    except Exception as e:
+        # If stacking fails, log the shapes of individual arrays for debugging
+        try:
+            shapes = [s.shape for s in sims]
+        except Exception:
+            shapes = None
+        print(f"Error stacking simulation arrays: {e}. Individual shapes: {shapes}")
         simulation_array = np.zeros((n_patients, n_runs, n_vars), dtype=np.int64)
+
+    # When debug requested, return additional diagnostic info
+    if debug:
+        # Compute per-patient means and simple stats
+        try:
+            sim_means_per_patient = simulation_array.mean(axis=1)
+            sim_mean = sim_means_per_patient.mean(axis=0)
+            sim_std = sim_means_per_patient.std(axis=0, ddof=1)
+        except Exception:
+            sim_means_per_patient = None
+            sim_mean = None
+            sim_std = None
+
+        debug_info = {
+            "array": simulation_array,
+            "records": records,
+            "sim_means_per_patient": sim_means_per_patient,
+            "sim_mean": sim_mean,
+            "sim_std": sim_std,
+        }
+        return debug_info
 
     return simulation_array
 
 
-def get_true_data_for_validation() -> pd.DataFrame:
+def get_true_data_for_validation(seed: int | None = None) -> pd.DataFrame:
     df = pd.read_csv(FICHERODEDATOS_CSV_PATH)
 
     # Building the dataframe column by column
     # TiempoVAM está en horas; Est. UCI y (probablemente) Est. PostUCI vienen en días → convertir a horas
     col_vam_time: pd.Series[int] = df["TiempoVAM"].round(0).astype(int)
     col_uci_stay_days = df["Est. UCI"].round(0)
-    col_uci_post_stay_days = df.get("Est. PostUCI", pd.Series([0] * len(df))).round(0)
+
+    # Asegurar índice consistente si la columna no existe
+    if "Est. PostUCI" in df.columns:
+        col_uci_post_stay_days = df["Est. PostUCI"].round(0)
+    else:
+        col_uci_post_stay_days = pd.Series([0] * len(df), index=df.index).round(0)
+
     col_uci_stay: pd.Series[int] = (col_uci_stay_days * 24).astype(int)
     col_uci_post_stay: pd.Series[int] = (col_uci_post_stay_days * 24).astype(int)
 
-    # Calculate the remaining columns
-    rng = np.random.default_rng()
-    percent: int = rng.integers(low=0, high=10, endpoint=True)  # randomly generated percent for the following [0, 10]
+    # Create RNG: if seed is None -> random; otherwise int -> reproducible seed.
+    if seed is not None:
+        if not isinstance(seed, int) or seed < 0:
+            raise ValueError("seed must be a non-negative integer or None")
+        rng = np.random.default_rng(seed)
+    else:
+        rng = np.random.default_rng()
 
-    print(f">>>>> Percentage: {percent}")
+    # percent en [0,10] inclusive
+    percent: int = int(rng.integers(low=0, high=10, endpoint=True))
+
+    print(f">>>>> Percentage: {percent} (seed={'fixed' if seed is not None else 'random'})")
 
     pre_vam: list[int] = []
     post_vam: list[int] = []
