@@ -720,11 +720,10 @@ with real_data_tab:
                 st.warning(f"No se pudo completar la predicción: {e}")
     with sim_model_validation_tab:
         # Validation panel (full-dataset validation is a work in progress)
-
-        st.markdown("### 🎈 Work in Progress :)")
+        st.subheader(body="Métricas del Modelo de Simulación")
 
         n_runs_input = st.number_input(
-            label="Corridas por paciente (n_runs)",
+            label="Corridas por paciente",
             min_value=SIM_RUNS_MIN,
             max_value=SIM_RUNS_MAX,
             step=50,
@@ -786,6 +785,8 @@ with real_data_tab:
                     true_data=df_true,
                     n_runs=n_runs_input,
                     seed=st.session_state.global_sim_seed,
+                    show_progress=True,
+                    progress_label="Simulando muestras...",
                 )
 
                 # Build metrics object and evaluate
@@ -804,8 +805,10 @@ with real_data_tab:
                 figs_bytes = {k: (fig_to_bytes(v) if v is not None else None) for k, v in figs.items()}
 
                 # Save to session state so rerenders don't recompute
+                from datetime import timezone
+
                 st.session_state.validation = {
-                    "timestamp": datetime.utcnow().isoformat(),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
                     "n_runs": n_runs_input,
                     "seed": st.session_state.global_sim_seed,
                     "true_data": df_true,

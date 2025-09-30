@@ -3,6 +3,7 @@ import secrets
 import sys
 import traceback
 from typing import List, Tuple
+import contextlib
 
 import joblib
 import numpy as np
@@ -1145,6 +1146,8 @@ def simulate_all_true_data(
     n_runs: int | None = None,
     debug: bool = False,
     seed: int | None = None,
+    show_progress: bool = False,
+    progress_label: str = "Simulando muestras...",
 ) -> np.ndarray:
     """
     Simulate the experiment for every patient present in `true_data` (DataFrame) or in the
@@ -1217,41 +1220,73 @@ def simulate_all_true_data(
         # sample per-patient integers in [0,10] inclusive
         percent_arr = rng.integers(low=0, high=11, size=n_patients)
 
-    for rec in records:
+    # Optionally show progress in Streamlit UI when requested
+    progress = None
+    status = None
+    use_progress = show_progress and ("st" in globals()) and (len(records) > 0)
+    if use_progress:
         try:
-            # determine percent for this record: use deterministic percent_arr when provided by seed,
-            # otherwise sample a random int in [0,10]
-            if percent_arr is not None:
-                rec_percent = int(percent_arr[len(sims)])
-            else:
-                rec_percent = random.randint(0, 10)
+            progress = st.progress(0)
+            status = st.empty()
+        except Exception:
+            progress = None
+            status = None
+    # If there are no patients, return an empty array with the expected shape
+    if n_patients == 0:
+        return np.zeros((0, n_runs, n_vars), dtype=np.int64)
 
-            df_sim = run_experiment(
-                n_runs,
-                age=int(rec.get("edad", 20)),
-                d1=int(rec.get("d1", 0)),
-                d2=int(rec.get("d2", 0)),
-                d3=int(rec.get("d3", 0)),
-                d4=int(rec.get("d4", 0)),
-                apache=int(rec.get("apache", 0)),
-                resp_insuf=int(rec.get("insuf", 0)),
-                artif_vent=int(rec.get("va", 0)),
-                vam_time=int(rec.get("tiempo_vam", 0)),
-                uti_stay=int(rec.get("estuci", 0)),
-                preuti_stay=int(rec.get("estpreuci", 0)),
-                percent=rec_percent,
-                debug=debug,
-            )
+    with st.spinner(progress_label) if use_progress else contextlib.nullcontext():
+        for idx, rec in enumerate(records):
+            # Update UI progress before running heavy work
+            if use_progress and progress is not None and status is not None:
+                try:
+                    status.text(f"Simulando paciente {idx+1}/{n_patients}")
+                    progress.progress(int((idx / n_patients) * 100))
+                except Exception:
+                    pass
 
-            # Keep integer hours to avoid scientific notation and preserve discreteness
-            arr = df_sim[EXP_VARS].to_numpy(dtype=np.int64)
-            if arr.ndim == 1:
-                arr = arr.reshape((1, -1))
-            sims.append(arr)
-        except Exception as e:
-            # Log the problematic record so the user can inspect input data
-            print(f"Simulation failed for record {rec}. Error: {e}")
-            sims.append(np.zeros((n_runs, n_vars), dtype=np.int64))
+            try:
+                # determine percent for this record: use deterministic percent_arr when provided by seed,
+                # otherwise sample a random int in [0,10]
+                if percent_arr is not None:
+                    rec_percent = int(percent_arr[idx])
+                else:
+                    rec_percent = random.randint(0, 10)
+
+                df_sim = run_experiment(
+                    n_runs,
+                    age=int(rec.get("edad", 20)),
+                    d1=int(rec.get("d1", 0)),
+                    d2=int(rec.get("d2", 0)),
+                    d3=int(rec.get("d3", 0)),
+                    d4=int(rec.get("d4", 0)),
+                    apache=int(rec.get("apache", 0)),
+                    resp_insuf=int(rec.get("insuf", 0)),
+                    artif_vent=int(rec.get("va", 0)),
+                    vam_time=int(rec.get("tiempo_vam", 0)),
+                    uti_stay=int(rec.get("estuci", 0)),
+                    preuti_stay=int(rec.get("estpreuci", 0)),
+                    percent=rec_percent,
+                    debug=debug,
+                )
+
+                # Keep integer hours to avoid scientific notation and preserve discreteness
+                arr = df_sim[EXP_VARS].to_numpy(dtype=np.int64)
+                if arr.ndim == 1:
+                    arr = arr.reshape((1, -1))
+                sims.append(arr)
+            except Exception as e:
+                # Log the problematic record so the user can inspect input data
+                print(f"Simulation failed for record {rec}. Error: {e}")
+                sims.append(np.zeros((n_runs, n_vars), dtype=np.int64))
+
+            # Update UI progress after finishing this patient's simulation
+            if use_progress and progress is not None and status is not None:
+                try:
+                    progress.progress(int(((idx + 1) / n_patients) * 100))
+                    status.text(f"Simulado paciente {idx+1}/{n_patients}")
+                except Exception:
+                    pass
 
     try:
         simulation_array = np.stack(sims, axis=0)
@@ -1276,13 +1311,34 @@ def simulate_all_true_data(
         print(f"Error stacking simulation arrays: {e}. Individual shapes: {shapes}")
         simulation_array = np.zeros((n_patients, n_runs, n_vars), dtype=np.int64)
 
+    # Finalize progress UI if used
+    try:
+        if use_progress and progress is not None and status is not None:
+            try:
+                progress.progress(100)
+                status.text("Simulaciones completadas")
+            except Exception:
+                pass
+    except Exception:
+        # defensive: ignore any UI errors
+        pass
+
     # When debug requested, return additional diagnostic info
     if debug:
         # Compute per-patient means and simple stats
         try:
             sim_means_per_patient = simulation_array.mean(axis=1)
             sim_mean = sim_means_per_patient.mean(axis=0)
-            sim_std = sim_means_per_patient.std(axis=0, ddof=1)
+            # Use sample std (ddof=1) only when we have more than one patient; otherwise avoid
+            # degrees-of-freedom warnings and return zeros.
+            if sim_means_per_patient.shape[0] > 1:
+                sim_std = sim_means_per_patient.std(axis=0, ddof=1)
+            else:
+                # Single patient -> no sample std; provide zeros with same shape as sim_mean
+                if sim_mean is not None:
+                    sim_std = np.zeros_like(sim_mean)
+                else:
+                    sim_std = np.zeros((n_vars,))
         except Exception:
             sim_means_per_patient = None
             sim_mean = None
