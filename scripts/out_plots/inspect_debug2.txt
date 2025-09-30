@@ -1,0 +1,62 @@
+Running inspection for 5 patients with seed=123
+>>>>> Percentage: 0 (seed=fixed)
+******* Calculation for 0
+u: 96
+t: 48
+pre: 0
+post: 48
+******* Calculation for 1
+u: 576
+t: 48
+pre: 0
+post: 528
+******* Calculation for 2
+u: 72
+t: 48
+pre: 0
+post: 24
+******* Calculation for 3
+u: 312
+t: 48
+pre: 0
+post: 264
+******* Calculation for 4
+u: 120
+t: 72
+pre: 0
+post: 48
+
+--- PATIENT 0 ---
+features: (14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+could not read centroids or compute distances: operands could not be broadcast together with shapes (3,12) (1,11) 
+sampled (raw) VAM: 217.1464621593433
+sampled (raw) PostUCI: [101.50648579]
+sampled (raw) UCI stay: [341.7149431]
+
+--- PATIENT 1 ---
+features: (14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+could not read centroids or compute distances: operands could not be broadcast together with shapes (3,12) (1,11) 
+sampled (raw) VAM: 39.972560660009584
+sampled (raw) PostUCI: [30.54376951]
+sampled (raw) UCI stay: [970.35541884]
+
+--- PATIENT 2 ---
+features: (14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+could not read centroids or compute distances: operands could not be broadcast together with shapes (3,12) (1,11) 
+sampled (raw) VAM: 58.644046785639595
+sampled (raw) PostUCI: [551.14128244]
+sampled (raw) UCI stay: [298.83205423]
+
+--- PATIENT 3 ---
+features: (14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+could not read centroids or compute distances: operands could not be broadcast together with shapes (3,12) (1,11) 
+sampled (raw) VAM: 473.0561008713242
+sampled (raw) PostUCI: [357.28982111]
+sampled (raw) UCI stay: [238.22306702]
+
+--- PATIENT 4 ---
+features: (14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+could not read centroids or compute distances: operands could not be broadcast together with shapes (3,12) (1,11) 
+sampled (raw) VAM: 39.580108172821156
+sampled (raw) PostUCI: [449.79466772]
+sampled (raw) UCI stay: [890.47915035]

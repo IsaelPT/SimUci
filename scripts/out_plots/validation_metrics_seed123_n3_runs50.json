@@ -1,0 +1,46 @@
+{
+  "coverage": {
+    "Tiempo Pre VAM": 33.33333333333333,
+    "Tiempo VAM": 100.0,
+    "Tiempo Post VAM": 0.0,
+    "Estadia UCI": 0.0,
+    "Estadia Post UCI": 0.0
+  },
+  "error_margin": {
+    "rmse": 174.86317866644578,
+    "mae": 135.78933333333333,
+    "mape": 111.46027236652236
+  },
+  "ks": {
+    "per_variable": {
+      "var_0": {
+        "statistic": 0.3333333333333333,
+        "p_value": 0.798985435931082
+      },
+      "var_1": {
+        "statistic": 0.52,
+        "p_value": 0.30431112842488006
+      },
+      "var_2": {
+        "statistic": 0.37333333333333335,
+        "p_value": 0.6836774444877288
+      },
+      "var_3": {
+        "statistic": 0.47333333333333333,
+        "p_value": 0.41516310253623934
+      },
+      "var_4": {
+        "statistic": 0.5,
+        "p_value": 0.34992208804051445
+      }
+    },
+    "overall": {
+      "statistic": 0.44000000000000006,
+      "p_value": 0.5104118398840889
+    }
+  },
+  "ad": {
+    "statistic": 1.192241840911516,
+    "significance_level": 0.1234
+  }
+}

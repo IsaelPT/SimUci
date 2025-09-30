@@ -1,0 +1,58 @@
+>>>>> Percentage: 6 (seed=random)
+******* Calculation for 0
+u: 96
+t: 48
+pre: 2
+post: 46
+******* Calculation for 1
+u: 576
+t: 48
+pre: 31
+post: 497
+******* Calculation for 2
+u: 72
+t: 48
+pre: 1
+post: 23
+******* Calculation for 3
+u: 312
+t: 48
+pre: 15
+post: 249
+******* Calculation for 4
+u: 120
+t: 72
+pre: 2
+post: 46
+Using 12 patients, 80 runs each
+simulate_all_true_data: detected experiment-result DataFrame; mapping back to original CSV inputs
+Simulated array shape: (12, 80, 5)
+RMSE: 167.88
+MAE: 104.36
+MAPE: 122.16306752839961%
+Estadφstico KS: 0.3000
+Valor p de KS: 0.0087
+Anderson-Darling Statistic: 3.0309
+Approximate Critical p-value: 0.022
+
+COVERAGE:
+{
+  "Tiempo Pre VAM": 16.666666666666664,
+  "Tiempo VAM": 16.666666666666664,
+  "Tiempo Post VAM": 16.666666666666664,
+  "Estadia UCI": 8.333333333333332,
+  "Estadia Post UCI": 16.666666666666664
+}
+
+ERROR_MARGIN: (np.float64(167.8777536383742), 104.35958333333333, np.float64(122.16306752839961))
+
+KS: (np.float64(0.3), np.float64(0.008703437675484196))
+
+AD: (np.float64(3.0308633367571005), np.float64(0.0218))
+
+TRUE_MEANS: [  8.92 112.   151.08 272.   120.  ]
+SIM_MEANS: [ 10.16  75.26 167.85 253.26 297.83]
+SIM_MEAN_STD_OVER_PATIENTS: [  6.42  23.15  40.74  64.83 252.47]
+BIAS (SIM-TRUE): [  1.24 -36.74  16.77 -18.74 177.83]
+TRUE_ZERO_PROP: [0.083 0.    0.083 0.    0.25 ]
+Elapsed sec: 3.09

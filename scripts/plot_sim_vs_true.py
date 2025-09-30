@@ -1,6 +1,7 @@
 """Plot histograms comparing true data vs simulated distributions per variable.
 Saves PNG files to scripts/out_plots and a CSV summary.
 """
+
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -62,5 +63,5 @@ def main(n_patients=20, n_runs=200, seed=0):
     print(f"Saved plots to {OUT_DIR.resolve()} and summary to {csv_path.resolve()}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

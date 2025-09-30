@@ -1,29 +1,29 @@
-import secrets
 import random
+import secrets
+import sys
+import traceback
 from typing import List, Tuple
 
+import joblib
 import numpy as np
 import pandas as pd
+import streamlit as st
 from pandas import DataFrame
 from streamlit.runtime.uploaded_file_manager import UploadedFile
-import streamlit as st
 
 from uci.stats import StatsUtils
 from utils.constants import (
     AGE_MIN,
+)
+from utils.constants import EXPERIMENT_VARIABLES_LABELS as EXP_VARS
+from utils.constants import (
     FICHERODEDATOS_CSV_PATH,
-    SIM_RUNS_DEFAULT,
-    EXPERIMENT_VARIABLES_LABELS as EXP_VARS,
     PREDICTION_MODEL_PATH,
-    VENTILATION_TYPE,
     PREUCI_DIAG,
     RESP_INSUF,
+    SIM_RUNS_DEFAULT,
+    VENTILATION_TYPE,
 )
-
-import joblib
-
-import sys
-import traceback
 
 
 def key_categ(category: str, value: str | int, viceversa: bool = False) -> int | str:
@@ -384,6 +384,36 @@ def build_df_for_stats(
             # If explicit labels are provided, they are applied; otherwise format_df_stats will fill 'Patient i'
             df_output = format_df_stats(df_output, column_label=column_label, labels_structure=labels_structure)
 
+        # Post-process: when confidence intervals were requested, ensure that for any
+        # experiment variable whose mean ('Promedio') is zero, the Límite Inf/Sup rows
+        # show 0 instead of None/NaN or small negative rounding artifacts. This makes
+        # the UI clearer when a variable is systematically 0 (e.g., Tiempo Pre VAM).
+        if include_confint and include_info_label:
+            try:
+                # locate row indices by the 'Información' label
+                info_col = column_label
+                # find indices (may raise if labels differ)
+                mean_idx = int(df_output.index[df_output[info_col] == "Promedio"][0])
+                li_idx = int(df_output.index[df_output[info_col] == "Límite Inf"][0])
+                ls_idx = int(df_output.index[df_output[info_col] == "Límite Sup"][0])
+
+                # small epsilon for float comparison
+                eps = 1e-9
+                for col in EXP_VARS:
+                    try:
+                        mean_val = float(df_output.at[mean_idx, col])
+                    except Exception:
+                        # If conversion fails, skip
+                        continue
+
+                    if abs(mean_val) <= eps:
+                        # Force CI to zero for clarity
+                        df_output.at[li_idx, col] = 0.0
+                        df_output.at[ls_idx, col] = 0.0
+            except Exception:
+                # If anything goes wrong in post-processing, don't break the flow
+                pass
+
         return df_output
 
     # If it's a single DataFrame: build vertical rows according to flags
@@ -414,8 +444,13 @@ def build_df_for_stats(
             std = df[EXP_VARS].std()
 
             li, ls = StatsUtils.confidenceinterval(mean.values, std.values, sample_size)
-            li_s = pd.Series(li, index=EXP_VARS)
-            ls_s = pd.Series(ls, index=EXP_VARS)
+            # Build series and coerce invalid numbers to 0 for clearer presentation in the UI.
+            li_s = pd.Series(li, index=EXP_VARS).astype(float)
+            ls_s = pd.Series(ls, index=EXP_VARS).astype(float)
+
+            # Replace +/- inf with NaN, then fill NaN/None with 0 so 'Límite Inf/Sup' show 0 instead of None
+            li_s = li_s.replace([np.inf, -np.inf], np.nan).fillna(0.0)
+            ls_s = ls_s.replace([np.inf, -np.inf], np.nan).fillna(0.0)
             rows.append(li_s)
             auto_labels.append("Límite Inf")
             rows.append(ls_s)
@@ -653,6 +688,7 @@ def run_experiment(
     uti_stay: int,
     preuti_stay: int,
     percent: int = 10,
+    debug: bool = False,
 ) -> pd.DataFrame:
     """
     Run the simulation for a single patient using the provided clinical inputs.
@@ -693,6 +729,10 @@ def run_experiment(
     )
 
     # Run the simulation
+    if debug:
+        print(
+            f"run_experiment: running experiment with percent={percent}, age={age}, d1={d1}, d2={d2}, d3={d3}, d4={d4}"
+        )
     res = multiple_replication(e, n_runs)
 
     # Ensure all columns are numeric
@@ -1016,27 +1056,73 @@ def simulate_and_predict_patient(csv_path: str, selection: int, **kwargs) -> tup
     return simulation_df, prediction_result
 
 
-def prepare_patient_data_for_prediction(patient_tuple: tuple) -> dict:
-    """Convert a patient data tuple into a dictionary ready for the prediction model.
+def prepare_patient_data_for_prediction(patient_tuple) -> dict:
+    """Convert various patient data representations into a dictionary ready for the prediction model.
 
-    Args:
-        patient_tuple: Tuple containing patient data in the following order:
-            (edad, diag_ing1, diag_ing2, diag_ing3, diag_ing4, apache, insuf_resp, va,
-            est_uci, tiempo_vam, est_preuti, diag_egr2)
+    Supports inputs:
+      - dict with keys like 'edad','d1','d2', 'diag_egr2' or 'Edad','Diag.Ing1', etc.
+      - pandas.Series (row) or single-row DataFrame
+      - tuple/list/np.ndarray in the legacy positional order
 
-    Returns:
-        A dict with the keys required by the prediction model (Edad, Diag.Ing1, Diag.Ing2,
-        Diag.Egr2, TiempoVAM, APACHE) with values cast to integers.
+    Returns a dict with keys: Edad, Diag.Ing1, Diag.Ing2, Diag.Egr2, TiempoVAM, APACHE
     """
 
-    return {
-        "Edad": int(patient_tuple[0]),
-        "Diag.Ing1": int(patient_tuple[1]),
-        "Diag.Ing2": int(patient_tuple[2]),
-        "Diag.Egr2": int(patient_tuple[11]),
-        "TiempoVAM": int(patient_tuple[9]),
-        "APACHE": int(patient_tuple[5]),
-    }
+    try:
+        # Quick imports for type checks
+        import pandas as _pd
+
+        # If it's a single-row DataFrame, convert to Series first
+        if isinstance(patient_tuple, _pd.DataFrame):
+            if patient_tuple.shape[0] == 0:
+                raise ValueError("Empty DataFrame provided to prepare_patient_data_for_prediction")
+            patient_tuple = patient_tuple.iloc[0]
+
+        # If it's a pandas Series, convert to dict for key-based access
+        if isinstance(patient_tuple, _pd.Series):
+            mapping = patient_tuple.to_dict()
+        elif isinstance(patient_tuple, dict):
+            mapping = dict(patient_tuple)
+        else:
+            mapping = None
+
+        if mapping is not None:
+            # Prefer lower-case canonical keys, but accept various naming conventions
+            edad = int(mapping.get("edad", mapping.get("Edad", mapping.get("Edad ", AGE_MIN))))
+            diag_ing1 = int(mapping.get("d1", mapping.get("Diag.Ing1", mapping.get("Diag.Ing 1", 0))))
+            diag_ing2 = int(mapping.get("d2", mapping.get("Diag.Ing2", mapping.get("Diag.Ing 2", 0))))
+            diag_egr2 = int(mapping.get("diag_egr2", mapping.get("Diag.Egr2", mapping.get("Diag.Egr2 ", 0))))
+            tiempo_vam = int(mapping.get("tiempo_vam", mapping.get("TiempoVAM", mapping.get("TiempoVAM ", 0))))
+            apache = int(mapping.get("apache", mapping.get("APACHE", 0)))
+        else:
+            # Treat as sequence (tuple/list/numpy array)
+            seq = list(patient_tuple)
+            edad = int(seq[0]) if len(seq) > 0 and seq[0] not in (None, "") else AGE_MIN
+            diag_ing1 = int(seq[1]) if len(seq) > 1 else 0
+            diag_ing2 = int(seq[2]) if len(seq) > 2 else 0
+            diag_egr2 = int(seq[11]) if len(seq) > 11 else 0
+            tiempo_vam = int(seq[9]) if len(seq) > 9 else 0
+            apache = int(seq[5]) if len(seq) > 5 else 0
+
+        return {
+            "Edad": edad,
+            "Diag.Ing1": diag_ing1,
+            "Diag.Ing2": diag_ing2,
+            "Diag.Egr2": diag_egr2,
+            "TiempoVAM": tiempo_vam,
+            "APACHE": apache,
+        }
+    except Exception as e:
+        # Log detailed error for easier debugging in the UI
+        tb = "".join(traceback.format_exception(*sys.exc_info()))
+        print(f"prepare_patient_data_for_prediction: unexpected input type={type(patient_tuple)}; error={e}\n{tb}")
+        return {
+            "Edad": AGE_MIN,
+            "Diag.Ing1": 0,
+            "Diag.Ing2": 0,
+            "Diag.Egr2": 0,
+            "TiempoVAM": 0,
+            "APACHE": 0,
+        }
 
 
 def apply_theme(theme_name):
@@ -1055,7 +1141,10 @@ def apply_theme(theme_name):
 
 
 def simulate_all_true_data(
-    true_data: pd.DataFrame | None = None, n_runs: int | None = None, debug: bool = False, seed: int | None = None
+    true_data: pd.DataFrame | None = None,
+    n_runs: int | None = None,
+    debug: bool = False,
+    seed: int | None = None,
 ) -> np.ndarray:
     """
     Simulate the experiment for every patient present in `true_data` (DataFrame) or in the
@@ -1073,15 +1162,45 @@ def simulate_all_true_data(
     if true_data is None:
         records = extract_true_data_from_csv(csv_path=FICHERODEDATOS_CSV_PATH, index=None, as_dataframe=False)
     elif isinstance(true_data, pd.DataFrame):
-        # Convert provided DataFrame to the same dict structure used by extract_true_data_from_csv
+        # Two possible kinds of DataFrame can be passed:
+        # 1) A patient-input DataFrame (columns like 'Edad', 'Diag.Ing1', 'APACHE', ...)
+        # 2) A "true results" DataFrame produced by get_true_data_for_validation
+        #    (columns == EXP_VARS: e.g. 'Tiempo Pre VAM', 'Tiempo VAM', ...).
         df_tmp = true_data.reset_index(drop=True)
-        records = []
-        for i in range(len(df_tmp)):
+        # If the provided DataFrame looks like the experiment "true results", map back to
+        # the canonical CSV rows so we can build patient input records.
+        try:
+            exp_vars_set = set(EXP_VARS)
+        except Exception:
+            exp_vars_set = set()
+
+        if set(df_tmp.columns) == exp_vars_set:
+            # The caller passed the post-processed true-data (pre/post VAM etc.).
+            # Map back to the original CSV (same row order) and use those rows to build records.
             try:
-                records.append(build_row_from_dataframe(df_tmp, i))
-            except Exception:
-                # Skip rows that cannot be parsed
-                continue
+                print(
+                    "simulate_all_true_data: detected experiment-result DataFrame; mapping back to original CSV inputs"
+                )
+                orig = pd.read_csv(FICHERODEDATOS_CSV_PATH)
+                orig = orig.reset_index(drop=True).head(len(df_tmp))
+                records = []
+                for i in range(len(orig)):
+                    try:
+                        records.append(build_row_from_dataframe(orig, i))
+                    except Exception:
+                        continue
+            except Exception as e:
+                print(f"simulate_all_true_data: failed to map back to original CSV: {e}")
+                records = []
+        else:
+            # Assume the DataFrame contains patient-level input columns and build records from it.
+            records = []
+            for i in range(len(df_tmp)):
+                try:
+                    records.append(build_row_from_dataframe(df_tmp, i))
+                except Exception:
+                    # Skip rows that cannot be parsed
+                    continue
     else:
         raise ValueError("`true_data` must be a pandas DataFrame or None")
 
@@ -1090,16 +1209,23 @@ def simulate_all_true_data(
 
     sims: list[np.ndarray] = []
 
-    # If seed provided, build a numpy RNG and sample a global percent to match get_true_data_for_validation
+    # If seed provided, build a numpy RNG and sample a per-patient percent array to match get_true_data_for_validation
     rng = None
-    global_percent = None
+    percent_arr = None
     if seed is not None:
         rng = np.random.default_rng(seed)
-        # replicate get_true_data_for_validation's behavior: integer in [0,10] inclusive
-        global_percent = int(rng.integers(low=0, high=10, endpoint=True))
+        # sample per-patient integers in [0,10] inclusive
+        percent_arr = rng.integers(low=0, high=11, size=n_patients)
 
     for rec in records:
         try:
+            # determine percent for this record: use deterministic percent_arr when provided by seed,
+            # otherwise sample a random int in [0,10]
+            if percent_arr is not None:
+                rec_percent = int(percent_arr[len(sims)])
+            else:
+                rec_percent = random.randint(0, 10)
+
             df_sim = run_experiment(
                 n_runs,
                 age=int(rec.get("edad", 20)),
@@ -1113,7 +1239,8 @@ def simulate_all_true_data(
                 vam_time=int(rec.get("tiempo_vam", 0)),
                 uti_stay=int(rec.get("estuci", 0)),
                 preuti_stay=int(rec.get("estpreuci", 0)),
-                percent=(global_percent if global_percent is not None else random.randint(0, 10)),
+                percent=rec_percent,
+                debug=debug,
             )
 
             # Keep integer hours to avoid scientific notation and preserve discreteness
@@ -1190,7 +1317,7 @@ def get_true_data_for_validation(seed: int | None = None) -> pd.DataFrame:
     col_uci_stay: pd.Series[int] = (col_uci_stay_days * 24).astype(int)
     col_uci_post_stay: pd.Series[int] = (col_uci_post_stay_days * 24).astype(int)
 
-    # Create RNG: if seed is None -> random; otherwise int -> reproducible seed.
+    # Create RNG: if seed is provided we want reproducible per-row percentages.
     if seed is not None:
         if not isinstance(seed, int) or seed < 0:
             raise ValueError("seed must be a non-negative integer or None")
@@ -1198,27 +1325,32 @@ def get_true_data_for_validation(seed: int | None = None) -> pd.DataFrame:
     else:
         rng = np.random.default_rng()
 
-    # percent en [0,10] inclusive
-    percent: int = int(rng.integers(low=0, high=10, endpoint=True))
+    # Sample a percent per patient in [0,10] (inclusive). Use high=11 for compatibility.
+    percent_arr = rng.integers(low=0, high=11, size=len(df))
 
-    print(f">>>>> Percentage: {percent} (seed={'fixed' if seed is not None else 'random'})")
+    print(
+        f">>>>> Percentage per-patient sample (first 10): {percent_arr[:10].tolist()} (seed={'fixed' if seed is not None else 'random'})"
+    )
 
     pre_vam: list[int] = []
     post_vam: list[int] = []
 
-    # PreVAM = int((EstadiaUCI - TiempoVAM) * percent)
+    # PreVAM = round((EstadiaUCI - TiempoVAM) * percent/100)
     # PostVAM = EstadiaUCI - TiempoVAM - PreVAM
     for pos in range(len(df)):
         u = int(col_uci_stay.iloc[pos])  # horas
         t = int(col_vam_time.iloc[pos])  # horas
         diff = max(u - t, 0)
-        pre = int(diff * (percent / 100))
+        p = int(percent_arr[pos])
+        # Use rounding to avoid systematic truncation to zero for small diffs
+        pre = int(round(diff * (p / 100.0)))
         post = diff - pre
 
         if pos < 5:
             print(f"******* Calculation for {pos}")
             print(f"u: {u}")
             print(f"t: {t}")
+            print(f"percent: {p}")
             print(f"pre: {pre}")
             print(f"post: {post}")
 
@@ -1226,7 +1358,13 @@ def get_true_data_for_validation(seed: int | None = None) -> pd.DataFrame:
         post_vam.append(post)
 
     # ["Tiempo Pre VAM", "Tiempo VAM", "Tiempo Post VAM", "Estadia UCI", "Estadia Post UCI"]
-    values = [pre_vam, col_vam_time.tolist(), post_vam, col_uci_stay.tolist(), col_uci_post_stay.tolist()]
+    values = [
+        pre_vam,
+        col_vam_time.tolist(),
+        post_vam,
+        col_uci_stay.tolist(),
+        col_uci_post_stay.tolist(),
+    ]
 
     build_true_data = pd.DataFrame({k: v for k, v in zip(EXP_VARS, values)})
 

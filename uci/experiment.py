@@ -1,9 +1,9 @@
 import pandas as pd
 import simpy
 
-from utils.constants import EXPERIMENT_VARIABLES_LABELS as VARIABLES_EXPERIMENTO
 from uci import distribuciones
 from uci.simulacion import Simulation
+from utils.constants import EXPERIMENT_VARIABLES_LABELS as VARIABLES_EXPERIMENTO
 
 
 class Experiment:

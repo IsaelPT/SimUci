@@ -27,3 +27,13 @@ Thumbs.db
 
 # Misc.
 todo.todo
+
+# Scratch / temporary scripts
+tmp_*.py
+scripts/tmp/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Logs
+*.log

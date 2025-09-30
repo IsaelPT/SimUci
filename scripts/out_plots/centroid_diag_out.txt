@@ -1,0 +1,62 @@
+Reading centroids from data\DF_Centroides.csv
+Numeric columns in centroids: ['Unnamed: 0', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17']
+Centroids shape: (3, 19)
+
+Reading true-data CSV from data\Ficherodedatos(MO)17-1-2023.csv
+
+True-data input means:
+Edad            54.192308
+Diag.Ing1       11.423077
+Diag.Ing2        7.990385
+Diag.Ing3        1.600962
+Diag.Ing4        0.163462
+APACHE          13.711538
+InsufResp        5.605769
+VA               1.471154
+Est. UCI       278.884615
+TiempoVAM      139.966346
+Est. PreUCI     52.961538
+dtype: float64
+
+Centroid means (numeric columns):
+Unnamed: 0       1.000000
+0               53.581108
+1               20.860804
+2                5.392419
+3                1.134131
+4                0.472222
+5               18.940301
+6                5.535068
+7                2.201197
+8                1.602440
+9             1779.456722
+10            1256.502762
+11              31.274401
+12               0.497007
+13             712.399632
+14              20.834868
+15              12.718386
+16               3.922345
+17               1.470304
+dtype: float64
+
+Suggested ratios (centroid_mean / true_input_mean) for first min columns:
+0: centroid_col=Unnamed: 0 centroid_mean=1.000 true_mean=54.192 ratio=0.018452803406671398
+1: centroid_col=0 centroid_mean=53.581 true_mean=11.423 ratio=4.690602050792353
+2: centroid_col=1 centroid_mean=20.861 true_mean=7.990 ratio=2.610738428557604
+3: centroid_col=2 centroid_mean=5.392 true_mean=1.601 ratio=3.3682374824179617
+4: centroid_col=3 centroid_mean=1.134 true_mean=0.163 ratio=6.938215433503052
+5: centroid_col=4 centroid_mean=0.472 true_mean=13.712 ratio=0.03443976936263053
+6: centroid_col=5 centroid_mean=18.940 true_mean=5.606 ratio=3.3787157512790786
+7: centroid_col=6 centroid_mean=5.535 true_mean=1.471 ratio=3.7623988412635363
+8: centroid_col=7 centroid_mean=2.201 true_mean=278.885 ratio=0.007892859383337742
+9: centroid_col=8 centroid_mean=1.602 true_mean=139.966 ratio=0.011448753156478796
+10: centroid_col=9 centroid_mean=1779.457 true_mean=52.962 ratio=33.599037596076556
+
+Columns with ratio > 5 or < 0.2 (possible unit mismatch):
+  => 0: Unnamed: 0 ratio=0.018452803406671398 (centroid_mean=1.0 true_mean=54.2)
+  => 4: 3 ratio=6.938215433503052 (centroid_mean=1.1 true_mean=0.2)
+  => 5: 4 ratio=0.03443976936263053 (centroid_mean=0.5 true_mean=13.7)
+  => 8: 7 ratio=0.007892859383337742 (centroid_mean=2.2 true_mean=278.9)
+  => 9: 8 ratio=0.011448753156478796 (centroid_mean=1.6 true_mean=140.0)
+  => 10: 9 ratio=33.599037596076556 (centroid_mean=1779.5 true_mean=53.0)

@@ -4,29 +4,33 @@ and simple per-variable diagnostics (means, bias, zero proportion).
 
 Run with the project's venv python.
 """
+
 import time
 import json
 import numpy as np
 from utils.helpers import get_true_data_for_validation, simulate_all_true_data
 from uci.stats import SimulationMetrics
 
+
 def main(n_patients=12, n_runs=80, seed=None):
     t0 = time.time()
     df = get_true_data_for_validation(seed=seed)
     df_small = df.head(n_patients)
     print(f"Using {df_small.shape[0]} patients, {n_runs} runs each")
-    sim = simulate_all_true_data(true_data=df_small, n_runs=n_runs, seed=seed)
+    dbg = simulate_all_true_data(true_data=df_small, n_runs=n_runs, seed=seed, debug=True)
+    # dbg is a dict with keys including 'array'
+    sim = dbg["array"]
     print("Simulated array shape:", sim.shape)
     # Use the same subset of true data that we simulated to avoid mismatches
     true = df_small.reset_index(drop=True)
     sm = SimulationMetrics(true_data=true, simulation_data=sim)
     sm.evaluate()
 
-    print('\nCOVERAGE:')
+    print("\nCOVERAGE:")
     print(json.dumps(sm.coverage_percentage, indent=2))
-    print('\nERROR_MARGIN:', sm.error_margin)
-    print('\nKS:', sm.kolmogorov_smirnov_result)
-    print('\nAD:', sm.anderson_darling_result)
+    print("\nERROR_MARGIN:", sm.error_margin)
+    print("\nKS:", sm.kolmogorov_smirnov_result)
+    print("\nAD:", sm.anderson_darling_result)
 
     per_patient_means = sim.mean(axis=1)
     sim_means = per_patient_means.mean(axis=0)
@@ -41,12 +45,27 @@ def main(n_patients=12, n_runs=80, seed=None):
 
     true_means = td.mean(axis=0)
 
-    print('\nTRUE_MEANS:', np.round(true_means, 2))
-    print('SIM_MEANS:', np.round(sim_means, 2))
-    print('SIM_MEAN_STD_OVER_PATIENTS:', np.round(sim_stds, 2))
-    print('BIAS (SIM-TRUE):', np.round(sim_means - true_means, 2))
-    print('TRUE_ZERO_PROP:', np.round((td == 0).mean(axis=0), 3))
-    print('Elapsed sec:', round(time.time() - t0, 2))
+    print("\nTRUE_MEANS:", np.round(true_means, 2))
+    print("SIM_MEANS:", np.round(sim_means, 2))
+    print("SIM_MEAN_STD_OVER_PATIENTS:", np.round(sim_stds, 2))
+    print("BIAS (SIM-TRUE):", np.round(sim_means - true_means, 2))
+    print("TRUE_ZERO_PROP:", np.round((td == 0).mean(axis=0), 3))
+    print("Elapsed sec:", round(time.time() - t0, 2))
 
-if __name__ == '__main__':
+    # Save debug info for later inspection
+    try:
+        with open("scripts/out_plots/validate_debug.json", "w", encoding="utf-8") as fh:
+            out = {
+                "sim_mean": dbg.get("sim_mean").tolist() if dbg.get("sim_mean") is not None else None,
+                "sim_std": dbg.get("sim_std").tolist() if dbg.get("sim_std") is not None else None,
+                "sim_means_per_patient": dbg.get("sim_means_per_patient").tolist()
+                if dbg.get("sim_means_per_patient") is not None
+                else None,
+            }
+            json.dump(out, fh, indent=2)
+    except Exception as e:
+        print("Could not save debug JSON:", e)
+
+
+if __name__ == "__main__":
     main()

@@ -1,8 +1,10 @@
 from dataclasses import dataclass, field
 from typing import Sequence, TypeAlias, Union
+
 import numpy as np
-from scipy.stats import wilcoxon, friedmanchisquare
+from scipy.stats import friedmanchisquare, wilcoxon
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+
 from utils.constants import EXPERIMENT_VARIABLES_LABELS
 
 # Types
@@ -114,13 +116,17 @@ class SimulationMetrics:
                 td = td.ravel()[: n_patients * n_variables].reshape((n_patients, n_variables))
             else:
                 # Shorter than expected: best-effort resize (repeats elements)
-                print("Warning: true_data shorter than expected; resizing by repeating elements to match simulation shape")
+                print(
+                    "Warning: true_data shorter than expected; resizing by repeating elements to match simulation shape"
+                )
                 td = np.resize(td, (n_patients, n_variables))
         elif td.ndim == 2:
             # If there are more rows/cols than needed, trim. If fewer rows, repeat rows.
             rows, cols = td.shape
             if rows < n_patients or cols < n_variables:
-                print("Warning: true_data dimensions smaller than simulation; resizing by repeating elements to match shape")
+                print(
+                    "Warning: true_data dimensions smaller than simulation; resizing by repeating elements to match shape"
+                )
                 td = np.resize(td, (n_patients, n_variables))
             else:
                 # Trim extra rows/cols deterministically
@@ -137,9 +143,7 @@ class SimulationMetrics:
 
         # Handle case with too few replicates: degenerate CI (point estimate)
         if n_replicates < 2:
-            print(
-                "Warning: fewer than 2 replicates; confidence intervals will be degenerate (no variance available)."
-            )
+            print("Warning: fewer than 2 replicates; confidence intervals will be degenerate (no variance available).")
             lower = means.copy()
             upper = means.copy()
         else:
@@ -196,10 +200,10 @@ class SimulationMetrics:
         denom = td.astype(float)
         zero_mask = denom == 0
         if np.all(zero_mask):
-            mape = float('nan')
+            mape = float("nan")
             print("MAPE: cannot compute because all true values are zero (division by zero). Returning NaN.")
         else:
-            with np.errstate(divide='ignore', invalid='ignore'):
+            with np.errstate(divide="ignore", invalid="ignore"):
                 mape_vec = np.abs((td - simulation_mean) / denom)
                 # ignore entries where denom == 0
                 mape = np.nanmean(np.where(zero_mask, np.nan, mape_vec)) * 100
@@ -222,26 +226,60 @@ class SimulationMetrics:
         # Ensure numpy arrays
         true_data = np.asarray(self.true_data)
         simulation_data = np.asarray(self.simulation_data)
-
         # Handle different data shapes
-        if len(simulation_data.shape) == 3:
-            # For 3D simulation data, flatten all replicates for each variable
-            # Compare true data with mean of simulated data across replicates
-            sim_mean = np.mean(simulation_data, axis=1)  # Shape: (n_patients, n_variables)
-            statistic, p_value = ks_2samp(true_data.flatten(), sim_mean.flatten())
+        if simulation_data.ndim == 3:
+            # For 3D simulation data, compare per-variable distributions (flatten patients & replicates)
+            n_vars = simulation_data.shape[2]
+            per_var = []
+            for v in range(n_vars):
+                sim_flat = simulation_data[:, :, v].ravel()
+                true_flat = true_data[:, v].ravel() if true_data.ndim > 1 else true_data.ravel()
+                try:
+                    stat, p = ks_2samp(true_flat, sim_flat)
+                except Exception:
+                    stat, p = float("nan"), float("nan")
+                per_var.append((float(stat), float(p)))
+
+            # Aggregate statistic (mean of statistics) for a quick overall indicator
+            stats_arr = np.array([s for s, _ in per_var], dtype=float)
+            pvals_arr = np.array([p for _, p in per_var], dtype=float)
+            overall_stat = float(np.nanmean(stats_arr))
+            overall_p = float(np.nanmean(pvals_arr))
+
+            print(f"Estadístico KS (per-variable): {per_var}")
+            print(f"Estadístico KS (overall mean): {overall_stat:.4f}")
+            print(f"Valor p de KS (overall mean): {overall_p:.4f}")
+
+            if as_dict:
+                # Use human-readable variable labels when available, fallback to var_{i}
+                per_variable_dict = {}
+                for i, (s, p) in enumerate(per_var):
+                    try:
+                        var_name = (
+                            EXPERIMENT_VARIABLES_LABELS[i] if i < len(EXPERIMENT_VARIABLES_LABELS) else f"var_{i}"
+                        )
+                    except Exception:
+                        var_name = f"var_{i}"
+                    per_variable_dict[var_name] = {"statistic": s, "p_value": p}
+
+                return {
+                    "per_variable": per_variable_dict,
+                    "overall": {"statistic": overall_stat, "p_value": overall_p},
+                }
+            return overall_stat, overall_p
         else:
             # For 1D data (used in individual tests)
-            statistic, p_value = ks_2samp(true_data, simulation_data.flatten())
+            try:
+                statistic, p_value = ks_2samp(true_data, simulation_data.flatten())
+            except Exception:
+                statistic, p_value = float("nan"), float("nan")
 
-        print(f"Estadístico KS: {statistic:.4f}")
-        print(f"Valor p de KS: {p_value:.4f}")
+            print(f"Estadístico KS: {statistic:.4f}")
+            print(f"Valor p de KS: {p_value:.4f}")
 
-        if as_dict:
-            return {
-                "statistic": statistic,
-                "p_value": p_value,
-            }
-        return statistic, p_value
+            if as_dict:
+                return {"statistic": float(statistic), "p_value": float(p_value)}
+            return float(statistic), float(p_value)
 
     def __anderson_darling_test(self, as_dict=False) -> Metric:
         import scipy.stats as stats
@@ -264,27 +302,26 @@ class SimulationMetrics:
             simulated_sample = np.random.choice(simulation_data, min_size, replace=False)
 
         # Perform the Anderson-Darling k-sample test.
-        # Recent scipy versions allow specifying a permutation method to compute p-values
+        # Recent scipy versions may provide a PermutationMethod helper; call it only if present.
         try:
-            # Prefer explicit permutation method when available to avoid p-value capping warnings
-            anderson_result = stats.anderson_ksamp(
-                [real_sample, simulated_sample], method=getattr(stats, "PermutationMethod", None)()
-            )
+            perm_cls = getattr(stats, "PermutationMethod", None)
+            if perm_cls is not None:
+                anderson_result = stats.anderson_ksamp([real_sample, simulated_sample], method=perm_cls())
+            else:
+                anderson_result = stats.anderson_ksamp([real_sample, simulated_sample])
         except Exception:
-            # Fallback to default behavior if method is not available in this scipy
-            anderson_result = stats.anderson_ksamp([real_sample, simulated_sample])
+            # If anderson_ksamp fails for any reason, return NaNs gracefully
+            statistic = float("nan")
+            significance_level = float("nan")
+        else:
+            statistic = float(anderson_result.statistic)
+            significance_level = float(getattr(anderson_result, "significance_level", float("nan")))
 
-        statistic = anderson_result.statistic
-        significance_level = anderson_result.significance_level
-
-        print(f"Anderson-Darling Statistic: {anderson_result.statistic:.4f}")
-        print(f"Approximate Critical p-value: {anderson_result.significance_level:.3f}")
+        print(f"Anderson-Darling Statistic: {statistic:.4f}")
+        print(f"Approximate Critical p-value: {significance_level:.3f}")
 
         if as_dict:
-            return {
-                "statistic": statistic,
-                "significance_level": significance_level,
-            }
+            return {"statistic": statistic, "significance_level": significance_level}
         return (statistic, significance_level)
 
 
@@ -311,9 +348,16 @@ class StatsUtils:
         from scipy.stats import norm
 
         sem = std / np.sqrt(n)
-        conf_int = norm.interval(alpha=coef, loc=mean, scale=sem)
-        arr_limite_inferior: np.ndarray[float] = conf_int[0]
-        arr_limite_superior: np.ndarray[float] = conf_int[1]
+
+        # Use the inverse CDF (ppf) to compute the z-score for the two-sided
+        # confidence interval. This avoids calling `norm.interval`, which has
+        # changed its parameter names across SciPy versions and can raise
+        # unexpected errors. The z for two-sided CI is ppf(1 - alpha/2).
+        alpha = 1.0 - coef
+        z = norm.ppf(1.0 - alpha / 2.0)
+
+        arr_limite_inferior = mean - z * sem
+        arr_limite_superior = mean + z * sem
 
         # print("conf_int: ", conf_int)
         # print("arr_l_inferior: ", arr_limite_inferior)

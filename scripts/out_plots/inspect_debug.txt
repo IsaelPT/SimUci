@@ -1,0 +1,48 @@
+Running inspection for 3 patients with seed=123
+>>>>> Percentage: 0 (seed=fixed)
+******* Calculation for 0
+u: 96
+t: 48
+pre: 0
+post: 48
+******* Calculation for 1
+u: 576
+t: 48
+pre: 0
+post: 528
+******* Calculation for 2
+u: 72
+t: 48
+pre: 0
+post: 24
+******* Calculation for 3
+u: 312
+t: 48
+pre: 0
+post: 264
+******* Calculation for 4
+u: 120
+t: 72
+pre: 0
+post: 48
+
+--- PATIENT 0 ---
+features: (14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+chosen_cluster: 0
+sampled (raw) VAM: 95.0767181657835
+sampled (raw) PostUCI: [91.53723973]
+sampled (raw) UCI stay: [159.22124699]
+
+--- PATIENT 1 ---
+features: (14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+chosen_cluster: 0
+sampled (raw) VAM: 148.9796201334381
+sampled (raw) PostUCI: [98.49126131]
+sampled (raw) UCI stay: [52.06217282]
+
+--- PATIENT 2 ---
+features: (14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+chosen_cluster: 0
+sampled (raw) VAM: 259.26486136242977
+sampled (raw) PostUCI: [487.31517713]
+sampled (raw) UCI stay: [217.50648416]
