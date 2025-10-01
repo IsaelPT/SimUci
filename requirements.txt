@@ -21,6 +21,7 @@ plotly==6.3.0
 protobuf==6.32.0
 requests==2.32.5
 scikit-learn==1.6.1
+imbalanced-learn==0.14.0
 scipy==1.16.1
 simpy==4.1.1
 streamlit==1.48.1
