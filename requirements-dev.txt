@@ -1,0 +1,53 @@
+# Development and tooling dependencies (not required in Streamlit Cloud runtime).
+# Install these locally when developing: pip install -r requirements-dev.txt
+
+asttokens==3.0.0
+attrs==25.3.0
+comm==0.2.3
+gitdb==4.0.12
+GitPython==3.1.45
+idna==3.10
+imbalanced-learn==0.14.0
+imblearn==0.0
+ipython_pygments_lexers==1.1.1
+jedi==0.19.2
+jsonschema-specifications==2025.4.1
+markdown-it-py==4.0.0
+MarkupSafe==3.0.2
+matplotlib-inline==0.1.7
+mdurl==0.1.2
+narwhals==2.2.0
+packaging==25.0
+parso==0.8.5
+pathspec==0.12.1
+platformdirs==4.4.0
+psutil==7.0.0
+pure_eval==0.2.3
+pycodestyle==2.14.0
+pydeck==0.9.1
+Pygments==2.19.2
+pyparsing==3.2.3
+python-dateutil==2.9.0.post0
+pytz==2025.2
+pywin32==311; sys_platform == "win32"
+pyzmq==27.1.0
+referencing==0.36.2
+rich==14.1.0
+rpds-py==0.27.0
+six==1.17.0
+sklearn-compat==0.1.4
+smmap==5.0.2
+stack-data==0.6.3
+tenacity==9.1.2
+threadpoolctl==3.6.0
+toml==0.10.2
+traitlets==5.14.3
+typing_extensions==4.15.0
+wcwidth==0.2.13
+
+# Optional dev-only packages you might add separately:
+# black
+# flake8
+# ipython
+# jupyter
+# ipykernel
