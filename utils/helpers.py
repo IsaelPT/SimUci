@@ -1240,7 +1240,7 @@ def simulate_all_true_data(
             # Update UI progress before running heavy work
             if use_progress and progress is not None and status is not None:
                 try:
-                    status.text(f"Simulando paciente {idx+1}/{n_patients}")
+                    status.text(f"Simulando paciente {idx + 1}/{n_patients}")
                     progress.progress(int((idx / n_patients) * 100))
                 except Exception:
                     pass
@@ -1284,7 +1284,7 @@ def simulate_all_true_data(
             if use_progress and progress is not None and status is not None:
                 try:
                     progress.progress(int(((idx + 1) / n_patients) * 100))
-                    status.text(f"Simulado paciente {idx+1}/{n_patients}")
+                    status.text(f"Simulado paciente {idx + 1}/{n_patients}")
                 except Exception:
                     pass
 
