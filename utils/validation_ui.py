@@ -156,7 +156,7 @@ def render_validation(
             )
 
             st.markdown(
-                "Si quieres ver el código exacto usado para los cálculos numéricos, revisa `uci.stats.SimulationMetrics` donde está la implementación."
+                "Si se desea, se puede consultar el código exacto usado para los cálculos numéricos, revisando `uci.stats.SimulationMetrics` en el repositorio de la aplicación: https://github.com/IsaelPT/SimUci."
             )
 
         with right:
@@ -237,8 +237,8 @@ def render_validation(
                 st.markdown("**KS por variable**")
                 # Small explanatory caption: what KS is and why we use it here
                 st.caption(
-                    "El test de Kolmogorov–Smirnov (KS) mide la máxima diferencia entre dos funciones de distribución empírica. "
-                    "En nuestro contexto, sirve para comprobar si la forma de la distribución simulada difiere de la observada por variable, complementando las métricas de magnitud."
+                    "El test de Kolmogorov–Smirnov (KS) máxima discrepancia entre las funciones de distribución empíricas de simulación y observación."
+                    "En nuestro contexto, sirve para detectar si la forma de la distribución simulada (dispersión, asimetría o colas) difiere de la real, complementando las métricas que miden solo magnitud del error."
                 )
                 st.dataframe(ks_df, use_container_width=True)
 
