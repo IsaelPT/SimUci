@@ -211,7 +211,7 @@ def render_validation(
                         st.image(figs_bytes.get("coverage"))
 
     with c2:
-        st.subheader("Pruebas estadísticas (resumen)")
+        st.subheader("Pruebas estadísticas")
         ks = getattr(simulation_metric, "kolmogorov_smirnov_result", {}) or {}
 
         def _is_finite_number(x):
