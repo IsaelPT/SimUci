@@ -1,62 +1,15 @@
-import os
 from datetime import datetime
-
+import os
 import pandas as pd
-import streamlit as st
 from pandas import DataFrame
+import streamlit as st
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-from uci.stats import Friedman, SimulationMetrics, Wilcoxon
-from utils.constants import (
-    AGE_DEFAULT,
-    AGE_MAX,
-    AGE_MIN,
-    APACHE_DEFAULT,
-    APACHE_MAX,
-    APACHE_MIN,
-)
-from utils.constants import EXPERIMENT_VARIABLES_LABELS as EXP_VARIABLES
-from utils.constants import (
-    FICHERODEDATOS_CSV_PATH,
-    HELP_MSG_APACHE,
-    HELP_MSG_PREDICTION_METRIC,
-    HELP_MSG_PREUTI_STAY,
-    HELP_MSG_SIM_PERCENT,
-    HELP_MSG_SIM_RUNS,
-    HELP_MSG_TIME_FORMAT,
-    HELP_MSG_UTI_STAY,
-    HELP_MSG_VAM_TIME,
-    INFO_P_VALUE,
-    INFO_STATISTIC,
-    LABEL_PREDICTION_METRIC,
-    LABEL_TIME_FORMAT,
-    PREUCI_DIAG,
-    PREUTI_STAY_DEFAULT,
-    PREUTI_STAY_MAX,
-    PREUTI_STAY_MIN,
-    PRIMARY_COLOR,
-    RESP_INSUF,
-    SIM_PERCENT_DEFAULT,
-    SIM_PERCENT_MAX,
-    SIM_PERCENT_MIN,
-    SIM_RUNS_DEFAULT,
-    SIM_RUNS_MAX,
-    SIM_RUNS_MIN,
-    UTI_STAY_DEFAULT,
-    UTI_STAY_MAX,
-    UTI_STAY_MIN,
-    VAM_T_DEFAULT,
-    VAM_T_MAX,
-    VAM_T_MIN,
-    VENTILATION_TYPE,
-)
 from utils.helpers import (
     adjust_df_sizes,
-    apply_theme,
     bin_to_df,
     build_df_for_stats,
     build_df_test_result,
-    extract_true_data_from_csv,
     fix_seed,
     format_time_columns,
     generate_id,
@@ -64,22 +17,63 @@ from utils.helpers import (
     get_true_data_for_validation,
     key_categ,
     predict,
-    prepare_patient_data_for_prediction,
-    run_experiment,
     simulate_all_true_data,
     simulate_true_data,
+    run_experiment,
     value_is_zero,
+    prepare_patient_data_for_prediction,
+    extract_true_data_from_csv,
+    apply_theme,
 )
-from utils.validation_ui import render_validation
-from utils.visuals import fig_to_bytes, make_all_plots
+from utils.constants import (
+    AGE_MIN,
+    AGE_MAX,
+    AGE_DEFAULT,
+    APACHE_MIN,
+    APACHE_MAX,
+    APACHE_DEFAULT,
+    HELP_MSG_APACHE,
+    HELP_MSG_PREDICTION_METRIC,
+    HELP_MSG_VAM_TIME,
+    HELP_MSG_TIME_FORMAT,
+    LABEL_PREDICTION_METRIC,
+    LABEL_TIME_FORMAT,
+    VAM_T_MIN,
+    VAM_T_MAX,
+    VAM_T_DEFAULT,
+    UTI_STAY_MIN,
+    UTI_STAY_MAX,
+    UTI_STAY_DEFAULT,
+    HELP_MSG_UTI_STAY,
+    RESP_INSUF,
+    VENTILATION_TYPE,
+    PREUTI_STAY_MIN,
+    PREUTI_STAY_MAX,
+    PREUTI_STAY_DEFAULT,
+    HELP_MSG_PREUTI_STAY,
+    SIM_PERCENT_MIN,
+    SIM_PERCENT_MAX,
+    SIM_PERCENT_DEFAULT,
+    HELP_MSG_SIM_PERCENT,
+    PREUCI_DIAG,
+    FICHERODEDATOS_CSV_PATH,
+    PRIMARY_COLOR,
+    EXPERIMENT_VARIABLES_LABELS as EXP_VARIABLES,
+    SIM_RUNS_MIN,
+    SIM_RUNS_MAX,
+    SIM_RUNS_DEFAULT,
+    HELP_MSG_SIM_RUNS,
+    INFO_STATISTIC,
+    INFO_P_VALUE,
+)
+from uci.stats import SimulationMetrics, Wilcoxon, Friedman
+
 
 # Initial page configuration
 st.set_page_config(page_title="SimUci", page_icon="🏥", layout="wide", initial_sidebar_state="expanded")
 
 if "theme" not in st.session_state:
     st.session_state.theme = "light"
-if "global_sim_seed" not in st.session_state:
-    st.session_state.global_sim_seed = 0
 
 apply_theme(st.session_state.theme)
 
@@ -93,13 +87,13 @@ with st.sidebar:
     # APP INFORMATION
     #
     st.subheader("Sobre la App")
-    st.markdown(
-        "Esta aplicación permite:\n"
-        "- Simular pacientes UCI\n"
-        "- Analizar datos reales\n"
-        "- Realizar predicciones\n"
-        "- Comparar resultados estadísticos\n"
-    )
+    st.markdown("""
+    Esta aplicación permite:
+    - Simular pacientes UCI
+    - Analizar datos reales
+    - Realizar predicciones
+    - Comparar resultados estadísticos
+    """)
 
     st.divider()
 
@@ -109,14 +103,11 @@ with st.sidebar:
     st.subheader("Semilla Global de Simulación")
     with st.expander(label="Explicación", expanded=False):
         st.caption(
-            body=(
-                "Valor global de la semilla aleatoria utilizada para realizar las simulaciones. "
-                "Es el punto de partida del generador de números aleatorios. "
-                "Este valor garantiza que las simulaciones puedan replicarse exactamente, "
-                "obteniendo los mismos resultados en cada ejecución"
-            ),
+            body="Valor global de la semilla aleatoria utilizada para realizar las simulaciones. Es el punto de partida del generador de números aleatorios. Este valor garantiza que las simulaciones puedan replicarse exactamente, obteniendo los mismos resultados en cada ejecución",
             width="stretch",
         )
+    if "global_sim_seed" not in st.session_state:
+        st.session_state.global_sim_seed = 0
     st.session_state.global_sim_seed = st.number_input(
         label="Semilla",
         min_value=0,
@@ -432,10 +423,7 @@ with simulation_tab:
                         delta_label = "Sin cambio"
                         delta_color = "off"  # No arrow
                     else:
-                        delta_label = (
-                            f"{how_chaged} de un {abs(percent_change):.0f}% "
-                            f"de la probabilidad de fallecer del paciente respecto a la predicción anterior"
-                        )
+                        delta_label = f"{how_chaged} de un {abs(percent_change):.0f}% de la probabilidad de fallecer del paciente respecto a la predicción anterior"
 
                 except Exception:
                     # Si ocurre un error, no mostrar delta
@@ -447,10 +435,7 @@ with simulation_tab:
 
             # Binary classification variable (0, 1) <-> (False, True)
             paciente_vive: bool = True if st.session_state.prediction_classes == 0 else False
-            metric_display_value: str = (
-                f"{'Paciente no fallece' if paciente_vive else 'Paciente fallece'} "
-                f"(predicción de {(current_pred * 100):.0f}%)"
-            )
+            metric_display_value: str = f"{'Paciente no fallece' if paciente_vive else 'Paciente fallece'} (predicción de {(current_pred * 100):.0f}% )"
 
             st.metric(
                 label=LABEL_PREDICTION_METRIC,
@@ -551,10 +536,7 @@ with simulation_tab:
                 if not os.path.exists(path_base):
                     os.makedirs(path_base)
                 fecha: str = datetime.now().strftime("%d-%m-%Y")
-                path: str = (
-                    f"{path_base}\\experimento-id {generate_id(5)} fecha {fecha} "
-                    f"corridas {st.session_state.sim_sample_size}.csv"
-                )
+                path: str = f"{path_base}\\experimento-id {generate_id(5)} fecha {fecha} corridas {st.session_state.sim_sample_size}.csv"
                 experiment_result.to_csv(path, index=False)
                 st.session_state.df_result = experiment_result
 
@@ -595,7 +577,16 @@ with real_data_tab:
             height=300,
         )["selection"]["rows"]
 
-        # INFORMATION ABOUT SELECTION: df_selection is a dict containing selected rows and columns
+        # INFORMATION ABOUT SELECTION
+        # ------------------------------------------
+        #
+        # df_selection returns a dict shaped like:
+        #
+        # "df_selection": {
+        #     "rows": [0, 1, 2, ...],
+        #     "columns": [0, 1, 2, ...]
+        # }
+        #
 
         corridas_sim_input = st.number_input(
             label="Cantidad de Simulaciones por paciente",
@@ -605,6 +596,8 @@ with real_data_tab:
             value=SIM_RUNS_DEFAULT,
             help=HELP_MSG_SIM_RUNS,
         )
+
+        corridas_sim_input = SIM_RUNS_DEFAULT
 
         if "df_sim_real_data" not in st.session_state:
             st.session_state.df_sim_real_data = pd.DataFrame()
@@ -623,15 +616,16 @@ with real_data_tab:
             disabled=disable_rerun_btn,
         )
 
-        # Simulation and prediction for the selected patient
+        # Simulation and Prediction of the selected patient
         if current_selection is not None or current_selection == 0:
-            # debug prints removed
+            # print(f"prev >> {st.session_state.prev_selection}")
+            # print(f"curr >> {current_selection}")
 
             if (st.session_state.prev_selection != current_selection) or rerun_sim_btn:
-                # Run simulation for the selected row
+                # Simulation
                 data = simulate_true_data(csv_path=FICHERODEDATOS_CSV_PATH, selection=current_selection)
 
-                # Prepare patient data for prediction
+                # Data for prediction
                 st.session_state.patient_data = prepare_patient_data_for_prediction(
                     extract_true_data_from_csv(
                         csv_path=FICHERODEDATOS_CSV_PATH,
@@ -640,7 +634,8 @@ with real_data_tab:
                     )
                 )
 
-                # Build and store simulation summary DataFrame
+                # Build new DataFrame with Simulation - Prediction result
+                # Assign to session_state
                 st.session_state.df_sim_real_data = build_df_for_stats(
                     data=data,
                     sample_size=corridas_sim_input,
@@ -656,12 +651,12 @@ with real_data_tab:
 
             st.session_state.prev_selection = current_selection
 
-        # If simulation & prediction results are available, render them
+        # print(st.session_state.df_sim_real_data)
+
+        # If Simulation & Prediction results are available
         if not (st.session_state.df_sim_real_data.empty and st.session_state.patient_data is None) or rerun_sim_btn:
             toggle_format = st.toggle(
-                label=LABEL_TIME_FORMAT,
-                help=HELP_MSG_TIME_FORMAT,
-                key="formato-tiempo-datos-reales",
+                label=LABEL_TIME_FORMAT, value=False, help=HELP_MSG_TIME_FORMAT, key="formato-tiempo-datos-reales"
             )
 
             # Render simulation DataFrame
@@ -673,10 +668,7 @@ with real_data_tab:
                 )
             else:
                 st.dataframe(
-                    format_time_columns(
-                        df=st.session_state.df_sim_real_data,
-                        exclude_rows=["Métrica de Calibración"],
-                    ),
+                    format_time_columns(df=st.session_state.df_sim_real_data, exclude_rows=["Métrica de Calibración"]),
                     hide_index=True,
                     use_container_width=True,
                 )
@@ -719,115 +711,36 @@ with real_data_tab:
             except Exception as e:
                 st.warning(f"No se pudo completar la predicción: {e}")
     with sim_model_validation_tab:
-        # Validation panel (full-dataset validation is a work in progress)
-        st.subheader(body="Métricas del Modelo de Simulación")
+        # TODO >> SIMULATE ALL DATA IN THE TABLE.
 
-        n_runs_input = st.number_input(
-            label="Corridas por paciente",
-            min_value=SIM_RUNS_MIN,
-            max_value=SIM_RUNS_MAX,
-            step=50,
-            value=SIM_RUNS_DEFAULT,
-            help="Número de repeticiones por paciente para calcular intervalos y métricas.",
-        )
+        st.markdown("### 🎈 Work in Progress :)")
 
-        # The detailed validation renderer has been extracted to utils/validation_ui.render_validation
-        # Button to trigger full validation across the provided true-data CSV
-        run_validation_btn = st.button(
-            label="Comprobar modelo de simulación",
-            type="primary",
-            use_container_width=True,
-            help="Ejecuta la simulación para todo el conjunto de datos verdadero y calcula métricas/plots de validación.",
-        )
+        if st.button(label="Comprobar modelo de simulación"):
+            simulation_data = simulate_all_true_data(true_data=df_true_data, n_runs=50)
+            true_data = get_true_data_for_validation()
 
-        # If we have saved validation in session_state, show it by default
-        if "validation" in st.session_state and st.session_state.validation:
-            val = st.session_state.validation
-            try:
-                # Show a small metadata line so the user knows this is cached
-                try:
-                    ts = val.get("timestamp") or "-"
-                    n_runs_cached = val.get("n_runs") or "-"
-                    seed_cached = val.get("seed") if val.get("seed") is not None else st.session_state.global_sim_seed
-                    st.caption(
-                        f"Resultados en caché · guardado: {ts} · corridas: {n_runs_cached} · semilla: {seed_cached}"
-                    )
-                except Exception:
-                    pass
+            print("----------------")
+            print(">>> DF_TRUE_DATA")
+            print("----------------")
+            print(df_true_data)
 
-                # Offer a clear-cache button so users can force recompute
-                clear_col, spacer = st.columns([1, 4])
-                with clear_col:
-                    if st.button(
-                        "Borrar cache de validación",
-                        use_container_width=True,
-                        key="clear_validation_cache",
-                    ):
-                        st.session_state.validation = None
-                        st.rerun()
+            print("----------------")
+            print(">>> TRUE_DATA")
+            print("----------------")
+            print(true_data)
 
-                render_validation(
-                    simulation_metric=val.get("simulation_metric"),
-                    true_data=val.get("true_data"),
-                    simulation_data=val.get("simulation_data"),
-                    figs=val.get("figs"),
-                    figs_bytes=val.get("figs_bytes"),
-                )
-            except Exception:
-                # If rendering cached validation fails, clear it so user can re-run
-                st.session_state.validation = None
+            print("----------------")
+            print(">>> SIMULATION_DATA")
+            print("----------------")
+            print(simulation_data)
 
-        if run_validation_btn:
-            try:
-                # Load the true data and run the simulation for all patients
-                df_true = get_true_data_for_validation()
-                sim_arr = simulate_all_true_data(
-                    true_data=df_true,
-                    n_runs=n_runs_input,
-                    seed=st.session_state.global_sim_seed,
-                    show_progress=True,
-                    progress_label="Simulando muestras...",
-                )
+            simulation_metric = SimulationMetrics(true_data=true_data, simulation_data=simulation_data)
+            simulation_metric.evaluate()
 
-                # Build metrics object and evaluate
-                sim_metrics = SimulationMetrics(
-                    true_data=(df_true.to_numpy() if hasattr(df_true, "to_numpy") else df_true),
-                    simulation_data=sim_arr,
-                )
-                sim_metrics.evaluate(
-                    confidence_level=0.95,
-                    random_state=st.session_state.global_sim_seed,
-                    result_as_dict=True,
-                )
-
-                # Build plots and bytes
-                figs = make_all_plots(sim_metrics, df_true, sim_arr)
-                figs_bytes = {k: (fig_to_bytes(v) if v is not None else None) for k, v in figs.items()}
-
-                # Save to session state so rerenders don't recompute
-                from datetime import timezone
-
-                st.session_state.validation = {
-                    "timestamp": datetime.now(timezone.utc).isoformat(),
-                    "n_runs": n_runs_input,
-                    "seed": st.session_state.global_sim_seed,
-                    "true_data": df_true,
-                    "simulation_data": sim_arr,
-                    "simulation_metric": sim_metrics,
-                    "figs": figs,
-                    "figs_bytes": figs_bytes,
-                }
-
-                # Render results
-                render_validation(
-                    simulation_metric=sim_metrics,
-                    true_data=df_true,
-                    simulation_data=sim_arr,
-                    figs=figs,
-                    figs_bytes=figs_bytes,
-                )
-            except Exception as e:
-                st.exception(f"Error ejecutando la validación: {e}")
+            st.write(simulation_metric.coverage_percentage)
+            st.write(simulation_metric.error_margin)
+            st.write(simulation_metric.kolmogorov_smirnov_result)
+            st.write(simulation_metric.anderson_darling_result)
 
 
 #################
@@ -859,7 +772,7 @@ with comparisons_tab:
                             df_experiment1,
                             height=200,
                             use_container_width=True,
-                            # Show a small metadata line so the user knows this is cached
+                            hide_index=True,
                         )
                 if file_upl2:
                     df_experiment2 = bin_to_df(file_upl2)
@@ -870,6 +783,7 @@ with comparisons_tab:
                             use_container_width=True,
                             hide_index=True,
                         )
+
         col_comparison_selectbox = st.selectbox(
             "Seleccione una columna para comparar",
             EXP_VARIABLES,
@@ -904,21 +818,19 @@ with comparisons_tab:
                         if experiment1.shape[0] > experiment2.shape[0]:  # X mayor que Y
                             experiment1 = experiment1.head(experiment2.shape[0])
                             st.info(
-                                "Se eliminaron filas del experimento 1 para coincidir con el experimento 2 "
-                                f"({len_dif} filas diferentes)."
+                                f"Se eliminaron filas del experimento 1 para coincidir con el experimento 2 ({len_dif} filas diferentes)."
                             )
                         elif experiment1.shape[0] < experiment2.shape[0]:  # Y mayor que X
                             experiment2 = experiment2.head(experiment1.shape[0])
                             st.info(
-                                "Se eliminaron filas del experimento 2 para coincidir con el experimento 1 "
-                                f"({len_dif} filas diferentes)."
+                                f"Se eliminaron filas del experimento 2 para coincidir con el experimento 1 ({len_dif} filas diferentes)."
                             )
 
                         try:
-                            # Wilcoxon test
+                            # Wilcoxon test.
                             wilcoxon_test = Wilcoxon(x=experiment1, y=experiment2)
                             wilcoxon_test.test()
-                            st.session_state.wilcoxon_test = wilcoxon_test
+                            st.session_statee.wilcoxon_test = wilcoxon_test
 
                             # Showing results.
                             df_to_show = build_df_test_result(
@@ -942,9 +854,7 @@ with comparisons_tab:
             experiment_dataframes = bin_to_df(experiments_file_upl)
 
         col_comparison_selectbox = st.selectbox(
-            "Seleccione una columna para comparar",
-            EXP_VARIABLES,
-            key="col-comparison-friedman",
+            "Seleccione una columna para comparar", EXP_VARIABLES, key="col-comparison-friedman"
         )
         comparison_btn = st.button(
             "Realizar prueba de Friedman",
