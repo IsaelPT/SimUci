@@ -10,9 +10,13 @@ if TYPE_CHECKING:
 
 
 class Simulation:
-    def __init__(self, experiment: "Experiment", cluster) -> None:
+    def __init__(
+        self,
+        experiment: "Experiment",
+        cluster: np.intp,
+    ) -> None:
         self.experiment = experiment
-        self.cluster = cluster
+        self.cluster: np.intp = cluster
 
     def uci(self, env: simpy.Environment):
         # Helper: convert numpy arrays/scalars or lists to a Python float safely
