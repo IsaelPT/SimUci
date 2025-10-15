@@ -954,24 +954,38 @@ with comparisons_tab:
 
                     samples_selection = adjusted_sample_tuple[0]
                     min_sample_size = adjusted_sample_tuple[1]
-                    if min_sample_size != -1:
-                        st.info(
-                            f"Para realizar correctamente el examen se eliminaron filas de las tablas de los experimentos, ya que es un requisito que exista el mismo tamaño de muestra. Todas las tablas pasaron a tener {min_sample_size} filas."
-                        )
 
-                    try:
-                        # Friedman test.
-                        friedman_test = Friedman(samples=samples_selection)
-                        friedman_test.test()
-                        st.session_state.friedman_test_result = friedman_test
-
-                        # Showing results.
-                        df_to_show = build_df_test_result(
-                            statistic=st.session_state.friedman_test.statistic,
-                            p_value=st.session_state.friedman_test.p_value,
+                    # Verificación: Asegurar que hay al menos 3 muestras para Friedman
+                    if len(samples_selection) < 3:
+                        st.error(
+                            f"No se puede realizar el test de Friedman: se necesitan al menos 3 experimentos válidos, pero solo se encontraron {len(samples_selection)}. "
+                            "Verifica que los archivos CSV tengan la columna seleccionada y no estén vacíos."
                         )
-                        st.dataframe(df_to_show, hide_index=True, use_container_width=True)
-                        st.markdown(INFO_STATISTIC)
-                        st.markdown(INFO_P_VALUE)
-                    except Exception as data:
-                        st.exception(data)
+                        # Opcional: Debug para inspeccionar qué se cargó
+                        st.warning(f"Debug: Número de archivos subidos: {len(experiments_file_upl)}")
+                        st.warning(f"Debug: Número de DataFrames procesados: {len(experiment_dataframes)}")
+                        st.warning(
+                            f"Debug: Columnas en cada DataFrame: {[df.columns.tolist() if not df.empty else 'Vacío' for df in experiment_dataframes]}"
+                        )
+                    else:
+                        if min_sample_size != -1:
+                            st.info(
+                                f"Para realizar correctamente el examen se eliminaron filas de las tablas de los experimentos, ya que es un requisito que exista el mismo tamaño de muestra. Todas las tablas pasaron a tener {min_sample_size} filas."
+                            )
+
+                        try:
+                            # Friedman test.
+                            friedman_test = Friedman(samples=samples_selection)
+                            friedman_test.test()
+                            st.session_state.friedman_test_result = friedman_test
+
+                            # Showing results.
+                            df_to_show = build_df_test_result(
+                                statistic=st.session_state.friedman_test_result.statistic,
+                                p_value=st.session_state.friedman_test_result.p_value,
+                            )
+                            st.dataframe(df_to_show, hide_index=True, use_container_width=True)
+                            st.markdown(INFO_STATISTIC)
+                            st.markdown(INFO_P_VALUE)
+                        except Exception as data:
+                            st.exception(data)

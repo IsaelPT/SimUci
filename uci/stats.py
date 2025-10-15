@@ -33,7 +33,7 @@ class Friedman:
     p_value: float = 0.0
 
     def test(self) -> None:
-        res = friedmanchisquare(self.samples)
+        res = friedmanchisquare(*self.samples)
         self.statistic, self.p_value = res[0], res[1]
 
 
