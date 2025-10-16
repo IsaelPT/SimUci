@@ -78,17 +78,17 @@ def render_validation(
             # Display the metrics (outside the exception block so they always render)
             try:
                 st.metric(
-                    "RMSE",
-                    f"{rmse:.2f}" if rmse is not None else "N/A",
-                    help="resalta errores grandes; si es mucho mayor que MAE, busque outliers o colas largas.",
+                    label="RMSE (horas)",
+                    value=f"{rmse:.0f}" if rmse is not None else "N/A",
+                    help="RMSE: resalta errores grandes; si es mucho mayor que el MAE, buscar outliers o colas largas.",
                 )
             except Exception:
                 st.metric("RMSE", "N/A")
 
             try:
                 st.metric(
-                    "MAE",
-                    f"{mae:.2f}" if mae is not None else "N/A",
+                    label="MAE",
+                    value=f"{mae:.0f}" if mae is not None else "N/A",
                     help="MAE: error promedio en las mismas unidades (horas).",
                 )
             except Exception:
